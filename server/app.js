@@ -6,15 +6,15 @@ const bodyParser = require('body-parser');
 const compress = require('compression');
 const cors = require('cors');
 const logger = require('morgan');
-const apicache = require('apicache');
-const cacheMiddleware = apicache.options({debug: true}).middleware;
 const _ = require('underscore');
 var port = 8080;
+const router = require('./router');
 
 app.use(bodyParser.urlencoded({extend: true}));
 app.use(bodyParser.json());
 app.use(compress());
 app.use(cors());
+app.use(router);
 
 if(process.env.NODE_ENV == 'production') {
 	app.use(logger('tiny'));

@@ -7,11 +7,12 @@ const router = express.Router();
 const theMovieBaseUrl = require('../properties').theMovieBaseUrl;
 const theMovieToken = require('../properties').theMovieToken;
 
-router.get('/:category', apicache('1 day'), function(req, res){
-	req.apicacheGroup = req.params.category;
+router.get('/:category/:page', apicache('1 day'), function(req, res){
+	req.apicacheGroup = req.params.category+req.params.page;
 	let category = req.params.category;
+	let page = req.params.page;
 
-	axios({method: 'GET',url: `${theMovieBaseUrl}${category}?api_key=${theMovieToken}`}).then((result) => {
+	axios({method: 'GET',url: `${theMovieBaseUrl}${category}?api_key=${theMovieToken}&language=en&page=${page}`}).then((result) => {
 		res.send(result.data);
 	}).catch((result) => {
 		console.error(result);

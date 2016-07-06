@@ -8,6 +8,9 @@ export default ngModule => {
             controllerAs: "vm",
             controller: function(){
                 const vm = this;
+                const crud = require('../service/crud');
+
+                
             }
         };
     });

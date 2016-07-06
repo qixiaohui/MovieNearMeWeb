@@ -3,14 +3,13 @@ export default ngModule => {
         require('./main.css');
         return {
             restrict: "E",
-            scope: {},
+            scope: true,
             template: require('./main.html'),
             controllerAs: "vm",
             controller: function(){
                 const vm = this;
-                const crud = require('../service/crud');
+                vm.movieCategory = 'PLAYING_NOW';
 
-                
             }
         };
     });

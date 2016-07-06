@@ -1,12 +1,12 @@
 export default ngModule => {
     ngModule.config(($stateProvider, $urlRouterProvider) => {
         $stateProvider.state(
-            'movies', {
-                url: '/movies',
+            'main', {
+                url: '/main',
                 template: '<main></main>'
             }
         );
 
-        $urlRouterProvider.otherwise('/movies');
+        $urlRouterProvider.otherwise('/main');
     });
 };

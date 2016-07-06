@@ -7,9 +7,12 @@ var config = {
     },
     module: {
         loaders: [
-            {test: /\.js$/, loader: 'babel', exclude: /node_modules/, query: {presets: ['es2015']}},
             {test: /\.html$/, loader: 'raw', exclude: /node_modules/},
-            {test: /\.css$/, loader: 'style!css', exclude: /node_modules/}
+            {test: /\.css$/, loader: 'style!css'},
+            {test: /\.js$/, loader: 'babel', exclude: /node_modules/, query: {presets: ['es2015']}},
+            {test: /\.(png|jpg)$/, loader: 'file?name=img/[name].[ext]'},
+            {test: /\.scss$/, loader: "style!css!autoprefixer!sass"},
+            {test: [/fontawesome-webfont\.svg/, /fontawesome-webfont\.eot/, /fontawesome-webfont\.ttf/, /fontawesome-webfont\.woff/, /fontawesome-webfont\.woff2/], loader: 'file?name=fonts/[name].[ext]'}
         ]
     }
 };

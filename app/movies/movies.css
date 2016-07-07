@@ -1,0 +1,13 @@
+md-card:hover {
+    cursor: pointer;
+}
+
+.paginWrapper{
+    width: 30%;
+    margin: auto;
+}
+
+a.disabled {
+    pointer-events: none;
+    cursor: default;
+}

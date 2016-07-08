@@ -2,11 +2,13 @@
     margin-top: 10px;
     margin-left: 10px;
     width: 80%;
-    height: 20%;
+    height: 100%;
     display: flex;
 }
 
 .video-list {
+    float: left;
+    width: 100%;
     margin-top: 10px;
 }
 
@@ -42,7 +44,7 @@
 
 .similar-movie {
     margin-top: 5px;
-    maring-bottom: 5px;
+    margin-bottom: 5px;
 }
 
 .similar-summry {
@@ -50,5 +52,32 @@
 }
 
 .video-card {
-width: 20%;
+    width: 90%;
+    margin: auto;
+}
+
+.video-card:hover {
+    cursor: pointer;
+}
+
+.info-card {
+    width: 100%;
+    display: flex;
+}
+
+.play-button {
+    opacity: 0.8;
+    position: absolute;
+    left: 30%;
+    top: 20%; 
+    width: 30%;
+}
+
+.video-description {
+    background-color: rgba(0, 0, 0, 0.7);
+    width: 90%;
+}
+
+.video-description p {
+    color: white;
 }

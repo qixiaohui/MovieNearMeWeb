@@ -1,38 +1,53 @@
 
 <section layout="row" flex>
-    <div class="info-container">
-        <md-card class="info-poster">
-            <img ng-src="{{vm.info.poster_path?'http://image.tmdb.org/t/p/w300'+vm.info.poster_path:'img/pic/NoImage.jpg'}}" class="md-card-image" alt="Washed Out">
-        </md-card>
-        <div class="right-card">
-            <div>
-                <div class="top-card">
-                    <span class="md-headline">
-                        {{vm.info.tagline}}
-                    </span>
-                    <h5>IMDB rating: {{vm.info.imdbRating}} rated by {{vm.info.ratedByUsers}} people</h5>
-                    <h5>Release data: {{vm.info.release_date}}</h5>
-                    <h5>Runtime: {{vm.info.runtime}} minutes</h5>
-                    <h5>Original language: {{vm.info.original_language}}</h5>
-                    <h5><p style="float: left;">Genre:</p> <p class="inlineText" ng-repeat="genre in vm.info.genres">{{genre.name}}</p></h5>
+    <div class="info-container" layout="column">
+        <div class="info-card">
+            <md-card class="info-poster">
+                <img ng-src="{{vm.info.poster_path?'http://image.tmdb.org/t/p/w300'+vm.info.poster_path:'img/pic/NoImage.jpg'}}" class="md-card-image" alt="Washed Out">
+            </md-card>
+            <div class="right-card">
+                <div>
+                    <div class="top-card">
+                        <span class="md-headline">
+                            {{vm.info.tagline}}
+                        </span>
+                        <h5>IMDB rating: {{vm.info.imdbRating}} rated by {{vm.info.ratedByUsers}} people</h5>
+                        <h5>Release data: {{vm.info.release_date}}</h5>
+                        <h5>Runtime: {{vm.info.runtime}} minutes</h5>
+                        <h5>Original language: {{vm.info.original_language}}</h5>
+                        <h5><p style="float: left;">Genre:</p> <p class="inlineText" ng-repeat="genre in vm.info.genres">{{genre.name}}</p></h5>
+                    </div>
+                </div>
+                <div>
+                </div>
+                <md-content class="description" flex layout-padding>
+                    <p style="padding-left: 5px">Storyline: {{vm.info.overview}}</p>
+                </md-content>
+            </div>
+        </div>
+        <div class="video-list">
+            <span style="display: inline-block;" class="md-headline">
+                Videos
+            </span>
+            <div layout='row'>
+                <div ng-click="vm.openPlayer(video.link)" style="position: relative;" ng-repeat="video in vm.info.videos">
+                    <picture>
+                        <source srcSet='{{"https://i.ytimg.com/vi/"+video.id+"/mqdefault.jpg"}}' media="(min-width:991px)" />
+                        <source srcSet='{{"https://i.ytimg.com/vi/"+video.id+"/hqdefault.jpg"}}' media="(min-width:767px)" />
+                        <source srcSet='{{"https://i.ytimg.com/vi/"+video.id+"/sddefault.jpg"}}' />
+                        <img class="video-card" srcSet />
+                    </picture>
+                    <img class="play-button" src="../img/pic/play.png" />
+                    <div class="video-description">
+                        <p>{{video.title | limitTo: 23}}...</p>
+                    </div>
                 </div>
             </div>
-            <div>
-            </div>
-            <md-content class="description" flex layout-padding>
-                <p>{{vm.info.overview}}</p>
-            </md-content>
         </div>
-        <!--<div class="video-list">-->
-            <!--<picture ng-repeat="video in vm.info.videos">-->
-                <!--<source srcSet='{{"http://img.youtube.com/vi/"+video.id+"/mqdefault.jpg"}}' media="(min-width:991px)" />-->
-                <!--<source srcSet='{{"http://img.youtube.com/vi/"+video.id+"/hqdefault.jpg"}}' media="(min-width:767px)" />-->
-                <!--<source srcSet='{{"http://img.youtube.com/vi/"+video.id+"/sddefault.jpg"}}' />-->
-                <!--<img class="video-card" srcSet />-->
-            <!--</picture>-->
-        <!--</div>-->
     </div>
     <md-sidenav flex class="md-sidenav-right md-whiteframe-4dp similiar" md-is-locked-open="$mdMedia('gt-md')" md-component-id="right">
+        <h4 style="margin-top: 20px; margin-left: 20px">You may also like</h4>
+        <md-divider ng-if="!$last"></md-divider>
         <md-list flex>
             <md-list-item class="md-3-line" ng-repeat="movie in vm.info.similar" ng-click="null">
                 <img ng-src="{{movie.poster_path?'http://image.tmdb.org/t/p/w92'+movie.poster_path:'img/pic/NoImage.jpg'}}" class="md-card-image similar-movie" />
@@ -40,6 +55,7 @@
                     <h5>{{movie.title}}</h5>
                     <p>Rate: {{movie.vote_average}} by {{movie.vote_count}} people</p>
                 </div>
+                <md-divider ng-if="!$last"></md-divider>
             </md-list-item>
         </md-list>
     </md-sidenav>

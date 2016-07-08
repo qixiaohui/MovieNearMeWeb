@@ -34,6 +34,10 @@ export default ngModule => {
                     vm.info.videos = [];
                     $scope.$digest();
                 });
+
+                vm.openPlayer = (url) => {
+                    window.open(url,'_blank');
+                };
             }
         }
     });

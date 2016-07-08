@@ -1,7 +1,7 @@
 export default ngModule => {
     ngModule.directive("movies", () => {
         require('./movies.css');
-        const axios = require('../service/crud');
+        const crud = require('../service/crud');
         return {
             restrict: "E",
             scope: {
@@ -9,7 +9,7 @@ export default ngModule => {
             },
             template: require('./movies.html'),
             controllerAs: "vm",
-            controller: function($scope){
+            controller: function($scope, $rootScope, $location){
                 const vm = this;
                 vm.movies = {};
                 vm.category = $scope.category;
@@ -18,7 +18,7 @@ export default ngModule => {
 
                 vm.pagination = (index) => {
                     vm.index = index;
-                    axios.GET(`/movies/${vm.category}/${vm.index}`, {}).then((response) => {
+                    crud.GET(`/movies/${vm.category}/${vm.index}`, {}).then((response) => {
                         vm.movies = response.data;
                         vm.totalPages = response.data.total_pages;
                         $scope.$digest();
@@ -26,6 +26,12 @@ export default ngModule => {
                     }).catch((err) => {
                         console.error(err);
                     });
+                };
+
+                vm.forwardInfo = (info) => {
+                    $rootScope.appName = info.title;
+                    $rootScope.movieInfo = info;
+                    $location.path('/main/info');
                 };
 
                 vm.pagination(1);

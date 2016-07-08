@@ -6,10 +6,22 @@ export default ngModule => {
             scope: true,
             template: require('./main.html'),
             controllerAs: "vm",
-            controller: function(){
+            controller: function($rootScope, $location){
                 const vm = this;
-                vm.movieCategory = 'PLAYING_NOW';
+                vm.state = {currentPath: {name: 'main.tabs'}, previousPath: ''};
+                $rootScope.appName = 'Movie near me';
+                $rootScope.$on('$stateChangeSuccess', function (ev, to, toParams, from, fromParams) {
+                    vm.state.currentPath = to;
+                    vm.state.previousPath = from;
 
+                });
+
+                vm.statePop = () => {
+                    if(vm.state.previousPath.name === 'main.tabs'){
+                        $rootScope.appName = 'Movie near me';
+                    }
+                    $location.path(vm.state.previousPath);
+                };
             }
         };
     });

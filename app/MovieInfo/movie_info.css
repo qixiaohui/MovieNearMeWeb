@@ -1,0 +1,54 @@
+.info-container {
+    margin-top: 10px;
+    margin-left: 10px;
+    width: 80%;
+    height: 20%;
+    display: flex;
+}
+
+.video-list {
+    margin-top: 10px;
+}
+
+.info-poster {
+    width: 20%;
+    float: left;
+}
+
+.top-card {
+    margin-left: 20px;
+    padding-top: 10px;
+}
+
+.right-card {
+    width: 80%;
+    position: relative;
+}
+
+.description {
+    margin-right: 20px;
+    position: absolute;
+    bottom: 0;
+}
+
+.inlineText {
+    float: left;
+    padding-left: 10px;
+}
+
+.similiar {
+    height: 100vh;
+}
+
+.similar-movie {
+    margin-top: 5px;
+    maring-bottom: 5px;
+}
+
+.similar-summry {
+    padding-left: 10px;
+}
+
+.video-card {
+width: 20%;
+}

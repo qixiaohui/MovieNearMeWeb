@@ -16,5 +16,9 @@ import angularUIRouter from 'angular-ui-router';
 const app = angular.module('app', [angularMaterial, angularAnimate, angularUIRouter]);
 
 require('./main/main_directive').default(app);
+require('./tabs/tabs_directive').default(app);
 require('./movies/movies_directive').default(app);
+require('./MovieInfo/movie_info').default(app);
+
 require('./router/router').default(app);
+

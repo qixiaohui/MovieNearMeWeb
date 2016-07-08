@@ -3,7 +3,7 @@
             md-cols="1" md-cols-sm="2" md-cols-md="3" md-cols-gt-md="6"
             md-row-height-gt-md="1:1" md-row-height="4:3"
             md-gutter="8px" md-gutter-gt-sm="4px" >
-        <md-grid-tile ng-repeat="movie in vm.movies.results"
+        <md-grid-tile ng-click="vm.forwardInfo(movie)" ng-repeat="movie in vm.movies.results"
                       md-rowspan="3"
                       md-colspan="1"
                       md-colspan-sm="1"
@@ -12,7 +12,7 @@
                 <img ng-src="{{movie.poster_path?'http://image.tmdb.org/t/p/w300'+movie.poster_path:'img/pic/NoImage.jpg'}}" class="md-card-image" alt="Washed Out">
                 <md-card-title>
                     <md-card-title-text>
-                        <span class="md-headline">{{movie.title}}</span>
+                        <h4>{{movie.title}}</h4>
                     </md-card-title-text>
                 </md-card-title>
                 <md-card-content>

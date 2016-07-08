@@ -26,10 +26,10 @@ if(process.env.NODE_ENV == 'production') {
 app.get('/', function (req, res) {
 	if(process.env.NODE_ENV == 'production'){
 		app.use(express.static('./dist/'));
-		res.sendfile('./app/index.html');
+		res.sendfile('./dist/index.html');
 	}else{
 		app.use(express.static('./app/'));
-		res.sendfile('./dist/index.html');
+		res.sendfile('./app/index.html');
 	}
 });
 

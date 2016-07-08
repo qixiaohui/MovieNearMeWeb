@@ -1,0 +1,46 @@
+
+<section layout="row" flex>
+    <div class="info-container">
+        <md-card class="info-poster">
+            <img ng-src="{{vm.info.poster_path?'http://image.tmdb.org/t/p/w300'+vm.info.poster_path:'img/pic/NoImage.jpg'}}" class="md-card-image" alt="Washed Out">
+        </md-card>
+        <div class="right-card">
+            <div>
+                <div class="top-card">
+                    <span class="md-headline">
+                        {{vm.info.tagline}}
+                    </span>
+                    <h5>IMDB rating: {{vm.info.imdbRating}} rated by {{vm.info.ratedByUsers}} people</h5>
+                    <h5>Release data: {{vm.info.release_date}}</h5>
+                    <h5>Runtime: {{vm.info.runtime}} minutes</h5>
+                    <h5>Original language: {{vm.info.original_language}}</h5>
+                    <h5><p style="float: left;">Genre:</p> <p class="inlineText" ng-repeat="genre in vm.info.genres">{{genre.name}}</p></h5>
+                </div>
+            </div>
+            <div>
+            </div>
+            <md-content class="description" flex layout-padding>
+                <p>{{vm.info.overview}}</p>
+            </md-content>
+        </div>
+        <!--<div class="video-list">-->
+            <!--<picture ng-repeat="video in vm.info.videos">-->
+                <!--<source srcSet='{{"http://img.youtube.com/vi/"+video.id+"/mqdefault.jpg"}}' media="(min-width:991px)" />-->
+                <!--<source srcSet='{{"http://img.youtube.com/vi/"+video.id+"/hqdefault.jpg"}}' media="(min-width:767px)" />-->
+                <!--<source srcSet='{{"http://img.youtube.com/vi/"+video.id+"/sddefault.jpg"}}' />-->
+                <!--<img class="video-card" srcSet />-->
+            <!--</picture>-->
+        <!--</div>-->
+    </div>
+    <md-sidenav flex class="md-sidenav-right md-whiteframe-4dp similiar" md-is-locked-open="$mdMedia('gt-md')" md-component-id="right">
+        <md-list flex>
+            <md-list-item class="md-3-line" ng-repeat="movie in vm.info.similar" ng-click="null">
+                <img ng-src="{{movie.poster_path?'http://image.tmdb.org/t/p/w92'+movie.poster_path:'img/pic/NoImage.jpg'}}" class="md-card-image similar-movie" />
+                <div class="md-list-item-text similar-summry" layout="column">
+                    <h5>{{movie.title}}</h5>
+                    <p>Rate: {{movie.vote_average}} by {{movie.vote_count}} people</p>
+                </div>
+            </md-list-item>
+        </md-list>
+    </md-sidenav>
+</section>

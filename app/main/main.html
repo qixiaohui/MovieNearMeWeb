@@ -1,7 +1,11 @@
 <div layout="column" layout-fill>
     <md-toolbar md-scroll-shrink="true">
         <div class="md-toolbar-tools">
-            <span>My App's Title</span>
+            <md-button class="md-icon-button" aria-label="Settings" ng-disabled="true">
+                <md-icon ng-if="vm.state.currentPath.name == 'main.tabs'" md-svg-icon="img/icons/menu.svg"></md-icon>
+                <md-icon ng-click="vm.statePop()" ng-if="vm.state.currentPath.name != 'main.tabs'" md-svg-icon="img/icons/back.svg"></md-icon>
+            </md-button>
+            <span>{{appName}}</span>
             <!-- fill up the space between left and right area -->
             <span flex></span>
             <md-button>
@@ -9,14 +13,5 @@
             </md-button>
         </div>
     </md-toolbar>
-    <md-nav-bar md-selected-nav-item="vm.movieCategory">
-        <md-nav-item md-nav-click="vm.movieCategory = 'PLAYING_NOW'" name="PLAYING_NOW">Now Playing</md-nav-item>
-        <md-nav-item md-nav-click="vm.movieCategory = 'POPULAR'" name="POPULAR">Popular</md-nav-item>
-        <md-nav-item md-nav-click="vm.movieCategory = 'TOP_RATED'" name="TOP_RATED">Top Rated</md-nav-item>
-        <md-nav-item md-nav-click="vm.movieCategory = 'UPCOMING'" name="UPCOMING">Upcoming</md-nav-item>
-    </md-nav-bar>
-    <movies ng-show="vm.movieCategory == 'PLAYING_NOW'" category="now_playing"></movies>
-    <movies ng-show="vm.movieCategory == 'POPULAR'" category="popular"></movies>
-    <movies ng-show="vm.movieCategory == 'TOP_RATED'" category="top_rated"></movies>
-    <movies ng-show="vm.movieCategory == 'UPCOMING'" category="upcoming"></movies>
+    <div ui-view></div>
 </div>

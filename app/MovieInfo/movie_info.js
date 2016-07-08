@@ -11,6 +11,25 @@ export default ngModule => {
             controllerAs: "vm",
             controller: function ($scope, $rootScope) {
                 const vm = this;
+                vm.today = new Date();
+                vm.date = {
+                    currentDate: vm.today,
+                    maxDate: new Date(
+                        vm.today.getFullYear(),
+                        vm.today.getMonth(),
+                        vm.today.getDate()+6),
+                    minDate: vm.today
+                };
+
+                $scope.$watch('vm.date.currentDate', (newValue, oldValue) => {
+                    if(newValue.getDate() === oldValue.getDate()){
+                        return;
+                    }
+
+                    let days = vm.date.currentDate.getDate() - vm.today.getDate();
+                    vm.getTheaters(null, days);
+                });
+
                 vm.info = $rootScope.movieInfo;
 
                 crud.GET(`/movie/info/${vm.info.id}`, {}).then((response) => {
@@ -45,7 +64,7 @@ export default ngModule => {
                 });
 
                 vm.getTheaters = (argLocation, argDays) => {
-                    var days = 1;
+                    var days = 0;
 
                     if(argLocation){
                         let location = argLocation;
@@ -53,7 +72,11 @@ export default ngModule => {
                             crud.GET(`http://maps.googleapis.com/maps/api/geocode/json?latlng=${location.coords.latitude},${location.coords.longitude}&sensor=true`, {}).then((response) => {
                                 let length = response.data.results[0].address_components.length;
                                 vm.zip = response.data.results[0].address_components[length-1].short_name;
-                                sessionStorage.setItem('zip', vm.zip);
+                                vm.location = {};
+                                vm.location.lati = location.coords.latitude;
+                                vm.location.longi = location.coords.longitude;
+                                sessionStorage.setItem('zip', JSON.stringify({zip: vm.zip, lati: location.coords.latitude, longi: location.coords.longitude}));
+                                $scope.$digest();
                                 resolve();
                             }).catch((err) => {
                                 console.error(err);
@@ -102,7 +125,11 @@ export default ngModule => {
                 };
 
                 if(sessionStorage.getItem('zip')){
-                    vm.zip = sessionStorage.getItem('zip');
+                    let zipObj = JSON.parse(sessionStorage.getItem('zip'));
+                    vm.zip = zipObj.zip;
+                    vm.location = {};
+                    vm.location.lati = zipObj.lati;
+                    vm.location.longi = zipObj.longi;
                     vm.getTheaters();
                 }else {
                     if (navigator.geolocation) {
@@ -115,6 +142,10 @@ export default ngModule => {
                 }
 
                 vm.openPlayer = (url) => {
+                    window.open(url,'_blank');
+                };
+
+                vm.buyTicket = (url) => {
                     window.open(url,'_blank');
                 };
             }

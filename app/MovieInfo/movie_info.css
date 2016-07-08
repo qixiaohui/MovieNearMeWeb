@@ -18,6 +18,12 @@
     margin-top: 10px;
 }
 
+.theaters {
+    float: left;
+    width: 100%;
+    margin-top: 10px;
+}
+
 .info-poster {
     width: 20%;
     float: left;
@@ -86,4 +92,15 @@
 
 .video-description p {
     color: white;
+}
+
+.theater-card {
+    float: left;
+    margin-right: 10px;
+    width: 20%;
+}
+
+.showtime {
+    float: left;
+    width: 80%;
 }

@@ -44,6 +44,41 @@
                 </div>
             </div>
         </div>
+        <div ng-if="vm.info.theaters" class="theaters">
+            <span style="display: inline-block;" class="md-headline">
+                Showtime
+            </span>
+            <div style="margin-left: 20px" layout="row">
+                <md-content>
+                    <h4>Date</h4>
+                    <md-datepicker style="float: left" ng-model="myDate" md-placeholder="Enter date"
+                                   md-min-date="minDate" md-max-date="maxDate"></md-datepicker>
+                    <md-list class="md-dense" flex style="width: 100%; clear: both; margin-top: 100px">
+                        <md-content>
+                            <md-list-item style="justify-content: space-between;" ng-repeat="theater in vm.info.theaters" ng-click="null">
+                                <div class="theater-card">
+                                    <b style="display: block">{{theater.name}}</b>
+                                    <img style="float: left" class="md-avatar" ng-src="../img/icons/phone.svg" />
+                                    <div style="float: left" class="md-list-item-text">
+                                        <p> {{theater.phoneNumber}} </p>
+                                    </div>
+                                </div>
+                                <div class="showtime" layout="row">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr ng-repeat="movie in theater.movie">
+                                            <th>{{movie.name}}</th>
+                                            <td ng-repeat="time in movie.showtimes">{{time}}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </md-list-item>
+                        </md-content>
+                    </md-list>
+                </md-content>
+            </div>
+        </div>
         <div class="cast">
             <span style="display: inline-block;" class="md-headline">
                 Credit
@@ -59,7 +94,7 @@
                         <md-list flex>
                             <!-- <md-subheader class="md-no-sticky">Crew</md-subheader> -->
                             <md-list-item class="md-3-line" ng-repeat="crew in vm.info.credit.crew | limitTo: 10" ng-click="null">
-                              <img ng-src="{{'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+crew.profile_path}}" class="md-avatar" />
+                              <img ng-src="{{crew.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+crew.profile_path:'../img/pic/avatar.png'}}" class="md-avatar" />
                               <div class="md-list-item-text" layout="column">
                                 <h4>department: {{crew.department}}</h4>
                                 <p>name: {{crew.name}}</p>
@@ -78,7 +113,7 @@
                         <md-list flex>
                             <!-- <md-subheader class="md-no-sticky">Cast</md-subheader> -->
                             <md-list-item class="md-3-line" ng-repeat="cast in vm.info.credit.cast | limitTo: 10" ng-click="null">
-                              <img ng-src="{{'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+cast.profile_path}}" class="md-avatar" />
+                              <img ng-src="{{cast.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+cast.profile_path:'../img/pic/avatar.png'}}" class="md-avatar" />
                               <div class="md-list-item-text" layout="column">
                                 <h4>character: {{cast.character}}</h4>
                                 <p>name: {{cast.name}}</p>

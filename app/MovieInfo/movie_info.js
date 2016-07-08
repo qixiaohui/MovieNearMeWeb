@@ -31,8 +31,17 @@ export default ngModule => {
                     vm.info.videos = response.data;
                     $scope.$digest();
                 }).catch((err) => {
+                    console.error(err);
                     vm.info.videos = [];
                     $scope.$digest();
+                });
+
+                crud.GET(`/movie/credit/${vm.info.id}`, {}).then((response) => {
+                    vm.info.credit = response.data;
+                    debugger;
+                    $scope.$digest();
+                }).catch((err) => {
+                    console.error(err);
                 });
 
                 vm.openPlayer = (url) => {

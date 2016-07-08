@@ -42,7 +42,7 @@ router.get('/similar/:id', apicache('1 day'), function(req, res){
         res.send(result.data);
     }).catch((data) => {
         console.error(data);
-        res,status(400).send('Ooops something went wrong');
+        res.status(400).send('Ooops something went wrong');
     });
 });
 
@@ -54,7 +54,7 @@ router.get('/video/:name', apicache('1 day'), function(req, res){
         maxResults: 5,
         key: youtubeKey
     };
-    console.log(youtubeKey+" "+name);
+
     youtubeSearch(name, opt, (err, results) => {
         if(err){
             console.error(err);
@@ -63,6 +63,18 @@ router.get('/video/:name', apicache('1 day'), function(req, res){
         }
 
         res.send(results);
+    });
+});
+
+router.get('/credit/:id', apicache('1 day'), function(req, res){
+    req.apicacheGroup = req.params.id;
+    let id = req.params.id;
+
+    axios({method: 'GET', url: `${theMovieBaseUrl}${id}/credits?api_key=${theMovieToken}`}).then((result) => {
+        res.send(result.data);
+    }).catch((data) => {
+        console.error(data);
+        res.status(400).send('Ooops something went wrong');
     });
 });
 

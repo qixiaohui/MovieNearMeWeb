@@ -6,7 +6,13 @@ export default ngModule => {
             scope: true,
             template: require('./tabs.html'),
             controllerAs: "vm",
-            controller: function($scope){
+            controller: function($rootScope, $scope){
+                const vm = this;
+                vm.sd = $scope.categoryIndex;
+                vm.setTab = (index) => {
+                    $rootScope.tabIndex = index;
+                };
+
             }
         };
     });

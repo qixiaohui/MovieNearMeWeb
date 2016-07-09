@@ -1,23 +1,23 @@
 <md-content>
     <md-tabs md-selected="tabIndex" md-dynamic-height md-border-bottom>
-        <md-tab label="Now Playing">
+        <md-tab ng-click="vm.setTab(0)" label="Now Playing">
             <md-content class="md-padding">
-                <movies category="now_playing"></movies>
+                <movies category="now_playing" index='categoryIndex.nowPlaying'></movies>
             </md-content>
         </md-tab>
-        <md-tab label="Popular">
+        <md-tab ng-click="vm.setTab(1)" label="Popular">
             <md-content class="md-padding">
-                <movies category="popular"></movies>
+                <movies category="popular" index='categoryIndex.popular'></movies>
             </md-content>
         </md-tab>
-        <md-tab label="Top Rated">
+        <md-tab ng-click="vm.setTab(2)" label="Top Rated">
             <md-content class="md-padding">
-                <movies category="top_rated"></movies>
+                <movies category="top_rated" index='categoryIndex.topRated'></movies>
             </md-content>
         </md-tab>
-        <md-tab label="Upcoming">
+        <md-tab ng-click="vm.setTab(3)" label="Upcoming">
             <md-content class="md-padding">
-                <movies category="upcoming"></movies>
+                <movies category="upcoming" index='categoryIndex.upComing'></movies>
             </md-content>
         </md-tab>
     </md-tabs>

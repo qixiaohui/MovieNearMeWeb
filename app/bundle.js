@@ -90,9 +90,9 @@
 	__webpack_require__(/*! ./tabs/tabs_directive */ 33).default(app);
 	__webpack_require__(/*! ./movies/movies_directive */ 37).default(app);
 	__webpack_require__(/*! ./MovieInfo/movie_info */ 62).default(app);
-	__webpack_require__(/*! ./map/map_directive */ 68).default(app);
+	__webpack_require__(/*! ./map/map_directive */ 69).default(app);
 	
-	__webpack_require__(/*! ./router/router */ 73).default(app);
+	__webpack_require__(/*! ./router/router */ 74).default(app);
 
 /***/ },
 /* 1 */
@@ -72049,23 +72049,41 @@
 	            template: __webpack_require__(/*! ./main.html */ 32),
 	            controllerAs: "vm",
 	            controller: function controller($rootScope, $location, $scope) {
-	                $scope.tabIndex = 1;
-	                $scope.$watch('tabIndex', function () {
-	                    debugger;
-	                });
+	                //default add parameters on launch
+	                $rootScope.tabIndex = 0;
+	                $scope.categoryIndex = {
+	                    nowPlaying: { index: 1 },
+	                    topRate: 1,
+	                    popular: 1,
+	                    upComing: 1
+	                };
+	
+	                //this will use as a stack to hold the movies
+	                //when select a movie the previous movie will be pushed in
+	                //when select
+	                $rootScope.stack = [];
+	
 	                var vm = this;
 	                vm.state = { currentPath: { name: 'main.tabs' }, previousPath: '' };
-	                $rootScope.appName = 'Movie near me';
+	                $rootScope.appName = 'Movie near me(Alpha)';
 	                $rootScope.$on('$stateChangeSuccess', function (ev, to, toParams, from, fromParams) {
 	                    vm.state.currentPath = to;
 	                    vm.state.previousPath = from;
 	                });
 	
 	                vm.statePop = function () {
-	                    if (vm.state.previousPath.name === 'main.tabs') {
-	                        $rootScope.appName = 'Movie near me';
+	                    if ($rootScope.stack.length === 0) {
+	                        if (vm.state.previousPath.name === 'main.tabs') {
+	                            $rootScope.appName = 'Movie near me(Alpha)';
+	                        }
+	                        $location.path(vm.state.previousPath);
+	                    } else {
+	                        var movie = $rootScope.stack.pop();
+	                        $rootScope.appName = movie.title;
+	                        $rootScope.movieInfo = movie;
+	                        $rootScope.$broadcast('pop', {});
+	                        debugger;
 	                    }
-	                    $location.path(vm.state.previousPath);
 	                };
 	            }
 	        };
@@ -72148,7 +72166,13 @@
 	            scope: true,
 	            template: __webpack_require__(/*! ./tabs.html */ 36),
 	            controllerAs: "vm",
-	            controller: function controller($scope) {}
+	            controller: function controller($rootScope, $scope) {
+	                var vm = this;
+	                vm.sd = $scope.categoryIndex;
+	                vm.setTab = function (index) {
+	                    $rootScope.tabIndex = index;
+	                };
+	            }
 	        };
 	    });
 	};
@@ -72206,7 +72230,7 @@
   \************************/
 /***/ function(module, exports) {
 
-	module.exports = "<md-content>\n    <md-tabs md-selected=\"tabIndex\" md-dynamic-height md-border-bottom>\n        <md-tab label=\"Now Playing\">\n            <md-content class=\"md-padding\">\n                <movies category=\"now_playing\"></movies>\n            </md-content>\n        </md-tab>\n        <md-tab label=\"Popular\">\n            <md-content class=\"md-padding\">\n                <movies category=\"popular\"></movies>\n            </md-content>\n        </md-tab>\n        <md-tab label=\"Top Rated\">\n            <md-content class=\"md-padding\">\n                <movies category=\"top_rated\"></movies>\n            </md-content>\n        </md-tab>\n        <md-tab label=\"Upcoming\">\n            <md-content class=\"md-padding\">\n                <movies category=\"upcoming\"></movies>\n            </md-content>\n        </md-tab>\n    </md-tabs>\n</md-content>"
+	module.exports = "<md-content>\n    <md-tabs md-selected=\"tabIndex\" md-dynamic-height md-border-bottom>\n        <md-tab ng-click=\"vm.setTab(0)\" label=\"Now Playing\">\n            <md-content class=\"md-padding\">\n                <movies category=\"now_playing\" index='categoryIndex.nowPlaying'></movies>\n            </md-content>\n        </md-tab>\n        <md-tab ng-click=\"vm.setTab(1)\" label=\"Popular\">\n            <md-content class=\"md-padding\">\n                <movies category=\"popular\" index='categoryIndex.popular'></movies>\n            </md-content>\n        </md-tab>\n        <md-tab ng-click=\"vm.setTab(2)\" label=\"Top Rated\">\n            <md-content class=\"md-padding\">\n                <movies category=\"top_rated\" index='categoryIndex.topRated'></movies>\n            </md-content>\n        </md-tab>\n        <md-tab ng-click=\"vm.setTab(3)\" label=\"Upcoming\">\n            <md-content class=\"md-padding\">\n                <movies category=\"upcoming\" index='categoryIndex.upComing'></movies>\n            </md-content>\n        </md-tab>\n    </md-tabs>\n</md-content>"
 
 /***/ },
 /* 37 */
@@ -72228,7 +72252,8 @@
 	        return {
 	            restrict: "E",
 	            scope: {
-	                category: '@'
+	                category: '@',
+	                index: '='
 	            },
 	            template: __webpack_require__(/*! ./movies.html */ 61),
 	            controllerAs: "vm",
@@ -72236,16 +72261,19 @@
 	                var vm = this;
 	                vm.movies = {};
 	                vm.category = $scope.category;
-	                vm.index = 1;
+	                vm.index = $scope.index;
 	                vm.totalPages = 0;
 	
 	                vm.pagination = function (index) {
 	                    vm.index = index;
+	                    // bind to rootscope categoryIndex
+	                    $scope.index = index;
 	                    crud.GET('/movies/' + vm.category + '/' + vm.index, {}).then(function (response) {
 	                        vm.movies = response.data;
 	                        vm.totalPages = response.data.total_pages;
 	                        $scope.$digest();
 	                        window.scrollTo(0, 0);
+	                        sessionStorage.setItem(vm.category, JSON.stringify(vm.movies));
 	                    }).catch(function (err) {
 	                        console.error(err);
 	                    });
@@ -72257,7 +72285,17 @@
 	                    $location.path('/main/info');
 	                };
 	
-	                vm.pagination(1);
+	                if (sessionStorage.getItem(vm.category)) {
+	                    var movies = JSON.parse(sessionStorage.getItem(vm.category));
+	                    if (movies.page === vm.index) {
+	                        vm.movies = movies;
+	                        vm.totalPages = movies.total_pages;
+	                    } else {
+	                        vm.pagination(vm.index);
+	                    }
+	                } else {
+	                    vm.pagination(vm.index);
+	                }
 	            }
 	        };
 	    });
@@ -73743,7 +73781,7 @@
   \****************************/
 /***/ function(module, exports) {
 
-	module.exports = "<div>\n    <md-grid-list\n            md-cols=\"1\" md-cols-sm=\"2\" md-cols-md=\"3\" md-cols-gt-md=\"6\"\n            md-row-height-gt-md=\"1:1\" md-row-height=\"4:3\"\n            md-gutter=\"8px\" md-gutter-gt-sm=\"4px\" >\n        <md-grid-tile ng-click=\"vm.forwardInfo(movie)\" ng-repeat=\"movie in vm.movies.results\"\n                      md-rowspan=\"3\"\n                      md-colspan=\"1\"\n                      md-colspan-sm=\"1\"\n                      md-colspan-xs=\"1\">\n            <md-card>\n                <img ng-src=\"{{movie.poster_path?'http://image.tmdb.org/t/p/w300'+movie.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image\" alt=\"Washed Out\">\n                <md-card-title>\n                    <md-card-title-text>\n                        <h4>{{movie.title}}</h4>\n                    </md-card-title-text>\n                </md-card-title>\n                <md-card-content>\n                    <p>{{movie.overview | limitTo:100}}</p>\n                </md-card-content>\n                <md-card-actions layout=\"row\" layout-align=\"end center\">\n                    <md-button class=\"md-icon-button\" aria-label=\"Favorite\">\n                        <md-icon md-svg-icon=\"img/icons/favorite.svg\"></md-icon>\n                    </md-button>\n                    <md-button class=\"md-icon-button\" aria-label=\"Settings\">\n                        <md-icon md-svg-icon=\"img/icons/menu.svg\"></md-icon>\n                    </md-button>\n                    <md-button class=\"md-icon-button\" aria-label=\"Share\">\n                        <md-icon md-svg-icon=\"img/icons/share.svg\"></md-icon>\n                    </md-button>\n                </md-card-actions>\n            </md-card>\n        </md-grid-tile>\n    </md-grid-list>\n    <nav class=\"paginWrapper\">\n        <ul class=\"pagination\">\n            <li><a ng-class=\"{'disabled': vm.index<=1}\" ng-click=\"vm.pagination(1)\">First</a></li>\n            <li><a ng-class=\"{'disabled': vm.index<=1}\" ng-click=\"vm.pagination(vm.index-1)\">Pre</a></li>\n            <li><a >{{vm.index}} of {{vm.totalPages}}</a></li>\n            <li><a ng-class=\"{'disabled': vm.index>=vm.totalPages}\" ng-click=\"vm.pagination(vm.index+1)\"}>Next</a></li>\n            <li><a ng-class=\"{'disabled': vm.index>=vm.totalPages}\" ng-click=\"vm.pagination(vm.totalPages)\">Last</a></li>\n        </ul>\n    </nav>\n</div>"
+	module.exports = "<div>\n    <md-grid-list\n            md-cols=\"1\" md-cols-sm=\"2\" md-cols-md=\"3\" md-cols-gt-md=\"6\"\n            md-row-height-gt-md=\"1:1\" md-row-height=\"4:3\"\n            md-gutter=\"8px\" md-gutter-gt-sm=\"4px\" >\n        <md-grid-tile ng-click=\"vm.forwardInfo(movie)\" ng-repeat=\"movie in vm.movies.results\"\n                      md-rowspan=\"3\"\n                      md-colspan=\"1\"\n                      md-colspan-sm=\"1\"\n                      md-colspan-xs=\"1\">\n            <md-card>\n                <img ng-src=\"{{movie.poster_path?'http://image.tmdb.org/t/p/w300'+movie.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image\" alt=\"Washed Out\">\n                <md-card-title>\n                    <md-card-title-text>\n                        <h4>{{movie.title}}</h4>\n                    </md-card-title-text>\n                </md-card-title>\n                <md-card-content>\n                    <p>{{movie.overview | limitTo:100}}</p>\n                </md-card-content>\n                <md-card-actions layout=\"row\" layout-align=\"end center\">\n                    <md-button class=\"md-icon-button\" aria-label=\"Favorite\">\n                        <md-icon md-svg-icon=\"img/icons/favorite.svg\"></md-icon>\n                    </md-button>\n                    <md-button class=\"md-icon-button\" aria-label=\"Settings\">\n                        <md-icon md-svg-icon=\"img/icons/menu.svg\"></md-icon>\n                    </md-button>\n                    <md-button class=\"md-icon-button\" aria-label=\"Share\">\n                        <md-icon md-svg-icon=\"img/icons/share.svg\"></md-icon>\n                    </md-button>\n                </md-card-actions>\n            </md-card>\n        </md-grid-tile>\n    </md-grid-list>\n    <nav ng-show=\"vm.movies.results\" class=\"paginWrapper\">\n        <ul class=\"pagination\">\n            <li><a ng-class=\"{'disabled': vm.index<=1}\" ng-click=\"vm.pagination(1)\">First</a></li>\n            <li><a ng-class=\"{'disabled': vm.index<=1}\" ng-click=\"vm.pagination(vm.index-1)\">Pre</a></li>\n            <li><a >{{vm.index}} of {{vm.totalPages}}</a></li>\n            <li><a ng-class=\"{'disabled': vm.index>=vm.totalPages}\" ng-click=\"vm.pagination(vm.index+1)\"}>Next</a></li>\n            <li><a ng-class=\"{'disabled': vm.index>=vm.totalPages}\" ng-click=\"vm.pagination(vm.totalPages)\">Last</a></li>\n        </ul>\n    </nav>\n</div>"
 
 /***/ },
 /* 62 */
@@ -73759,23 +73797,18 @@
 	});
 	var _ = __webpack_require__(/*! underscore */ 63);
 	var crud = __webpack_require__(/*! ../service/crud */ 40);
+	var util = __webpack_require__(/*! ../util/util */ 64);
 	
 	exports.default = function (ngModule) {
 	    ngModule.directive("info", function () {
-	        __webpack_require__(/*! ./movie_info.css */ 64);
+	        __webpack_require__(/*! ./movie_info.css */ 65);
 	        return {
 	            restrict: "E",
 	            scope: true,
-	            template: __webpack_require__(/*! ./movie_info.html */ 66),
+	            template: __webpack_require__(/*! ./movie_info.html */ 67),
 	            controllerAs: "vm",
 	            controller: function controller($scope, $rootScope, $mdDialog, $mdMedia) {
 	                var vm = this;
-	                vm.today = new Date();
-	                vm.date = {
-	                    currentDate: vm.today,
-	                    maxDate: new Date(vm.today.getFullYear(), vm.today.getMonth(), vm.today.getDate() + 6),
-	                    minDate: vm.today
-	                };
 	
 	                $scope.$watch('vm.date.currentDate', function (newValue, oldValue) {
 	                    if (newValue.getDate() === oldValue.getDate()) {
@@ -73784,39 +73817,6 @@
 	
 	                    var days = vm.date.currentDate.getDate() - vm.today.getDate();
 	                    vm.getTheaters(null, days);
-	                });
-	
-	                vm.info = $rootScope.movieInfo;
-	
-	                crud.GET('/movie/info/' + vm.info.id, {}).then(function (response) {
-	                    _.extend(vm.info, response.data);
-	                    $scope.$digest();
-	                }).catch(function (err) {
-	                    console.error(err);
-	                });
-	
-	                crud.GET('/movie/similar/' + vm.info.id, {}).then(function (response) {
-	                    vm.info.similar = response.data.results;
-	                    $scope.$digest();
-	                }).catch(function (err) {
-	                    console.error(err);
-	                });
-	
-	                crud.GET('/movie/video/' + vm.info.title, {}).then(function (response) {
-	                    vm.info.videos = response.data;
-	                    $scope.$digest();
-	                }).catch(function (err) {
-	                    console.error(err);
-	                    vm.info.videos = [];
-	                    $scope.$digest();
-	                });
-	
-	                crud.GET('/movie/credit/' + vm.info.id, {}).then(function (response) {
-	                    vm.info.credit = response.data;
-	                    debugger;
-	                    $scope.$digest();
-	                }).catch(function (err) {
-	                    console.error(err);
 	                });
 	
 	                vm.getTheaters = function (argLocation, argDays) {
@@ -73872,7 +73872,6 @@
 	                                    vm.info.theaters.push(theater);
 	                                }
 	                            });
-	                            debugger;
 	                            $scope.$digest();
 	                        }).catch(function (err) {
 	                            console.error(err);
@@ -73884,22 +73883,73 @@
 	                    });
 	                };
 	
-	                if (sessionStorage.getItem('zip')) {
-	                    var zipObj = JSON.parse(sessionStorage.getItem('zip'));
-	                    vm.zip = zipObj.zip;
-	                    vm.location = {};
-	                    vm.location.lati = zipObj.lati;
-	                    vm.location.longi = zipObj.longi;
-	                    vm.getTheaters();
-	                } else {
-	                    if (navigator.geolocation) {
-	                        debugger;
-	                        navigator.geolocation.getCurrentPosition(vm.getTheaters);
-	                    } else {
-	                        debugger;
-	                        //TODO: handle geolocation not supported
+	                vm.reload = function () {
+	
+	                    vm.info = $rootScope.movieInfo;
+	                    //this will decide if the show time will show
+	                    //condition: if release date month is older than 2 month
+	                    vm.shouldShowtime = true;
+	                    vm.today = new Date();
+	                    var releaseArr = vm.info.release_date.split('-');
+	                    var releaseDate = new Date(parseInt(releaseArr[0]), parseInt(releaseArr[1]) - 1, parseInt(releaseArr[2]));
+	
+	                    if (util.compareDate(vm.today, releaseDate) > 60) {
+	                        vm.shouldShowtime = false;
+	                    } else if (util.compareDate(releaseDate, vm.today) > 1) {
+	                        vm.today = releaseDate;
 	                    }
-	                }
+	
+	                    vm.date = {
+	                        currentDate: vm.today,
+	                        maxDate: new Date(vm.today.getFullYear(), vm.today.getMonth(), vm.today.getDate() + 6),
+	                        minDate: vm.today
+	                    };
+	
+	                    crud.GET('/movie/info/' + vm.info.id, {}).then(function (response) {
+	                        _.extend(vm.info, response.data);
+	                        $scope.$digest();
+	                    }).catch(function (err) {
+	                        console.error(err);
+	                    });
+	
+	                    crud.GET('/movie/similar/' + vm.info.id, {}).then(function (response) {
+	                        vm.info.similar = response.data.results;
+	                        $scope.$digest();
+	                    }).catch(function (err) {
+	                        console.error(err);
+	                    });
+	
+	                    crud.GET('/movie/video/' + vm.info.title, {}).then(function (response) {
+	                        vm.info.videos = response.data;
+	                        $scope.$digest();
+	                    }).catch(function (err) {
+	                        console.error(err);
+	                        vm.info.videos = [];
+	                        $scope.$digest();
+	                    });
+	
+	                    crud.GET('/movie/credit/' + vm.info.id, {}).then(function (response) {
+	                        vm.info.credit = response.data;
+	                        $scope.$digest();
+	                    }).catch(function (err) {
+	                        console.error(err);
+	                    });
+	
+	                    if (sessionStorage.getItem('zip')) {
+	                        var zipObj = JSON.parse(sessionStorage.getItem('zip'));
+	                        vm.zip = zipObj.zip;
+	                        vm.location = {};
+	                        vm.location.lati = zipObj.lati;
+	                        vm.location.longi = zipObj.longi;
+	                        vm.getTheaters();
+	                    } else {
+	                        if (navigator.geolocation) {
+	                            navigator.geolocation.getCurrentPosition(vm.getTheaters);
+	                        } else {
+	                            //TODO: handle geolocation not supported
+	                        }
+	                    }
+	                };
 	
 	                vm.openPlayer = function (url) {
 	                    window.open(url, '_blank');
@@ -73910,12 +73960,11 @@
 	                };
 	
 	                vm.showPerson = function (person) {
-	                    debugger;
 	                    var useFullScreen = ($mdMedia('sm') || $mdMedia('xs')) && $scope.customFullscreen;
 	
 	                    $mdDialog.show({
 	                        controller: DialogController,
-	                        template: __webpack_require__(/*! ./person.html */ 67),
+	                        template: __webpack_require__(/*! ./person.html */ 68),
 	                        locals: {
 	                            person: person
 	                        },
@@ -73924,7 +73973,22 @@
 	                        fullscreen: useFullScreen
 	                    });
 	                };
+	
+	                vm.loadSimilar = function (movie) {
+	                    //push current movie to stack
+	                    $rootScope.stack.push(vm.info);
+	                    $rootScope.movieInfo = movie;
+	                    $rootScope.appName = vm.info.title;
+	                    vm.reload();
+	                };
+	
+	                $rootScope.$on('pop', function (event) {
+	                    vm.reload();
+	                });
+	
+	                vm.reload();
 	            }
+	
 	        };
 	    });
 	};
@@ -73933,7 +73997,6 @@
 	    $scope.person = person;
 	
 	    crud.GET('/movie/person/' + person.id, {}).then(function (response) {
-	        debugger;
 	        $scope.person = response.data;
 	        $scope.$digest();
 	    }).catch(function (err) {
@@ -75510,6 +75573,44 @@
 
 /***/ },
 /* 64 */
+/*!**********************!*\
+  !*** ./util/util.js ***!
+  \**********************/
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	var util = {
+	    compareDate: function compareDate(date1, date2) {
+	        Date.prototype.addHours = function (h) {
+	            this.setHours(this.getHours() + h);
+	            return this;
+	        };
+	
+	        // adjust diff for for daylight savings
+	        var hoursToAdjust = Math.abs(date1.getTimezoneOffset() / 60) - Math.abs(date2.getTimezoneOffset() / 60);
+	        // apply the tz offset
+	        date2.addHours(hoursToAdjust);
+	
+	        // The number of milliseconds in one day
+	        var ONE_DAY = 1000 * 60 * 60 * 24;
+	
+	        // Convert both dates to milliseconds
+	        var date1_ms = date1.getTime();
+	        var date2_ms = date2.getTime();
+	
+	        // Calculate the difference in milliseconds
+	        var difference_ms = date1_ms - date2_ms;
+	
+	        // Convert back to days and return
+	        return Math.round(difference_ms / ONE_DAY);
+	    }
+	};
+	
+	module.exports = util;
+
+/***/ },
+/* 65 */
 /*!**********************************!*\
   !*** ./MovieInfo/movie_info.css ***!
   \**********************************/
@@ -75518,7 +75619,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./movie_info.css */ 65);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./movie_info.css */ 66);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
@@ -75538,7 +75639,7 @@
 	}
 
 /***/ },
-/* 65 */
+/* 66 */
 /*!**************************************************!*\
   !*** ../~/css-loader!./MovieInfo/movie_info.css ***!
   \**************************************************/
@@ -75555,16 +75656,16 @@
 
 
 /***/ },
-/* 66 */
+/* 67 */
 /*!***********************************!*\
   !*** ./MovieInfo/movie_info.html ***!
   \***********************************/
 /***/ function(module, exports) {
 
-	module.exports = "\n<section layout=\"row\" flex>\n    <div class=\"info-container\" layout=\"column\">\n        <div class=\"info-card\">\n            <md-card class=\"info-poster\">\n                <img ng-src=\"{{vm.info.poster_path?'http://image.tmdb.org/t/p/w300'+vm.info.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image\" alt=\"Washed Out\">\n            </md-card>\n            <div class=\"right-card\">\n                <div>\n                    <div class=\"top-card\">\n                        <span class=\"md-headline\">\n                            {{vm.info.tagline}}\n                        </span>\n                        <h5>IMDB rating: {{vm.info.imdbRating}} rated by {{vm.info.ratedByUsers}} people</h5>\n                        <h5>Release data: {{vm.info.release_date}}</h5>\n                        <h5>Runtime: {{vm.info.runtime}} minutes</h5>\n                        <h5>Original language: {{vm.info.original_language}}</h5>\n                        <h5 style=\"display: inline;\"><p style=\"float: left; display: inline; padding-top: 15px\">Genre:</p></h5>\n                        <md-chips style=\"float: left\">\n                            <md-chip ng-repeat=\"genre in vm.info.genres\">\n                                {{genre.name}}\n                            </md-chip>\n                        </md-chips>\n                    </div>\n                </div>\n                <div>\n                </div>\n                <md-content class=\"description\" flex layout-padding>\n                    <p style=\"padding-left: 5px\">Storyline: {{vm.info.overview}}</p>\n                </md-content>\n            </div>\n        </div>\n        <div class=\"video-list\">\n            <span style=\"display: inline-block;\" class=\"md-headline\">\n                Videos\n            </span>\n            <div layout='row'>\n                <div ng-click=\"vm.openPlayer(video.link)\" style=\"position: relative;\" ng-repeat=\"video in vm.info.videos\">\n                    <picture>\n                        <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/mqdefault.jpg\"}}' media=\"(min-width:991px)\" />\n                        <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/hqdefault.jpg\"}}' media=\"(min-width:767px)\" />\n                        <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/sddefault.jpg\"}}' />\n                        <img class=\"video-card\" srcSet />\n                    </picture>\n                    <img class=\"play-button\" src=\"../img/pic/play.png\" />\n                    <div class=\"video-description\">\n                        <p>{{video.title | limitTo: 40}}...</p>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div ng-if=\"vm.info.theaters\" class=\"theaters\">\n            <span style=\"display: inline-block;\" class=\"md-headline\">\n                Showtime\n            </span>\n            <div style=\"margin-left: 20px\" layout=\"row\">\n                <md-content>\n                    <h4>Date</h4>\n                    <md-datepicker style=\"float: left\" ng-model=\"vm.date.currentDate\" md-placeholder=\"Enter date\"\n                                   md-min-date=\"vm.date.minDate\" md-max-date=\"vm.date.maxDate\"></md-datepicker>\n                    <md-list ng-if=\"vm.info.theaters.length > 0\" class=\"md-dense\" flex style=\"width: 100%; clear: both; margin-top: 100px\">\n                        <md-list-item  class=\"md-3-line\" style=\"justify-content: space-between;\" ng-repeat=\"theater in vm.info.theaters\">\n                            <div class=\"theater-card\">\n                                <b style=\"display: block\">{{theater.name}}</b>\n                                <img style=\"float: left\" class=\"md-avatar\" ng-src=\"../img/icons/phone.svg\" />\n                                <div style=\"float: left\" class=\"md-list-item-text\">\n                                    <p> {{theater.phoneNumber}} </p>\n                                </div>\n                            </div>\n                            <div class=\"showtime\" layout=\"row\">\n                                <table class=\"table\">\n                                    <tbody>\n                                    <tr ng-repeat=\"movie in theater.movie\">\n                                        <th>{{movie.name}}</th>\n                                        <td ng-repeat=\"time in movie.showtimes\"><p style=\"display: block\">{{time}}</p> <img ng-if=\"movie.showtime_tickets[time]\" ng-click=\"vm.buyTicket(movie.showtime_tickets[time])\" style=\"width: 50px; height: 20px\" ng-src=\"../img/pic/ticket.png\" /></td>\n                                    </tr>\n                                    </tbody>\n                                </table>\n                            </div>\n                            <md-divider ng-if=\"!$last\"></md-divider>\n                        </md-list-item>\n                    </md-list>\n                </md-content>\n            </div>\n            <map ng-if=\"vm.location.lati\" location=\"vm.location\" theaters=\"vm.info.theaters\"></map>\n        </div>\n        <div class=\"cast\">\n            <span style=\"display: inline-block;\" class=\"md-headline\">\n                Credit\n            </span>\n            <div ng-cloak layout-gt-sm=\"row\" layout=\"column\">\n                <div flex-gt-sm=\"50\" flex>\n                    <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                      <div class=\"md-toolbar-tools\">\n                        <span>Crew</span>\n                      </div>\n                    </md-toolbar>\n                    <md-content>\n                        <md-list flex>\n                            <!-- <md-subheader class=\"md-no-sticky\">Crew</md-subheader> -->\n                            <md-list-item class=\"md-3-line\" ng-repeat=\"crew in vm.info.credit.crew | limitTo: 10\" ng-click=\"vm.showPerson(crew)\">\n                              <img ng-src=\"{{crew.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+crew.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                              <div class=\"md-list-item-text\" layout=\"column\">\n                                <h4>department: {{crew.department}}</h4>\n                                <p>name: {{crew.name}}</p>\n                              </div>\n                            </md-list-item>\n                        </md-list>  \n                    </md-content>\n                </div>\n                <div flex-gt-sm=\"50\" flex>\n                    <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                      <div class=\"md-toolbar-tools\">\n                        <span>Cast</span>\n                      </div>\n                    </md-toolbar>\n                    <md-content>\n                        <md-list flex>\n                            <!-- <md-subheader class=\"md-no-sticky\">Cast</md-subheader> -->\n                            <md-list-item class=\"md-3-line\" ng-repeat=\"cast in vm.info.credit.cast | limitTo: 10\" ng-click=\"vm.showPerson(cast)\">\n                              <img ng-src=\"{{cast.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+cast.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                              <div class=\"md-list-item-text\" layout=\"column\">\n                                <h4>character: {{cast.character}}</h4>\n                                <p>name: {{cast.name}}</p>\n                              </div>\n                            </md-list-item>\n                        </md-list>\n                    </md-content>\n                </div>\n            </div>\n        </div>\n    </div>\n    <md-sidenav flex class=\"md-sidenav-right md-whiteframe-4dp similiar\" md-is-locked-open=\"$mdMedia('gt-md')\" md-component-id=\"right\">\n        <h4 style=\"margin-top: 20px; margin-left: 20px\">You may also like</h4>\n        <md-divider ng-if=\"!$last\"></md-divider>\n        <md-list flex>\n            <md-list-item class=\"md-3-line\" ng-repeat=\"movie in vm.info.similar\" ng-click=\"null\">\n                <img ng-src=\"{{movie.poster_path?'http://image.tmdb.org/t/p/w92'+movie.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image similar-movie\" />\n                <div class=\"md-list-item-text similar-summry\" layout=\"column\">\n                    <h5>{{movie.title}}</h5>\n                    <p>Rate: {{movie.vote_average}} by {{movie.vote_count}} people</p>\n                </div>\n                <md-divider ng-if=\"!$last\"></md-divider>\n            </md-list-item>\n        </md-list>\n    </md-sidenav>\n</section>\n"
+	module.exports = "\n<section layout=\"row\" flex>\n    <div class=\"info-container\" layout=\"column\">\n        <div class=\"info-card\">\n            <md-card class=\"info-poster\">\n                <img ng-src=\"{{vm.info.poster_path?'http://image.tmdb.org/t/p/w300'+vm.info.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image\" alt=\"Washed Out\">\n            </md-card>\n            <div class=\"right-card\">\n                <div>\n                    <div class=\"top-card\">\n                        <span class=\"md-headline\">\n                            {{vm.info.tagline}}\n                        </span>\n                        <h5>IMDB rating: {{vm.info.imdbRating}} rated by {{vm.info.ratedByUsers}} people</h5>\n                        <h5>Release data: {{vm.info.release_date}}</h5>\n                        <h5>Runtime: {{vm.info.runtime}} minutes</h5>\n                        <h5>Original language: {{vm.info.original_language}}</h5>\n                        <h5 style=\"display: inline;\"><p style=\"float: left; display: inline; padding-top: 15px\">Genre:</p></h5>\n                        <md-chips style=\"float: left\">\n                            <md-chip ng-repeat=\"genre in vm.info.genres\">\n                                {{genre.name}}\n                            </md-chip>\n                        </md-chips>\n                    </div>\n                </div>\n                <div>\n                </div>\n                <md-content class=\"description\" flex layout-padding>\n                    <p style=\"padding-left: 5px\">Storyline: {{vm.info.overview}}</p>\n                </md-content>\n            </div>\n        </div>\n        <div class=\"video-list\">\n            <span style=\"display: inline-block;\" class=\"md-headline\">\n                Videos\n            </span>\n            <div layout='row'>\n                <div ng-click=\"vm.openPlayer(video.link)\" style=\"position: relative;\" ng-repeat=\"video in vm.info.videos\">\n                    <picture>\n                        <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/mqdefault.jpg\"}}' media=\"(min-width:991px)\" />\n                        <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/hqdefault.jpg\"}}' media=\"(min-width:767px)\" />\n                        <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/sddefault.jpg\"}}' />\n                        <img class=\"video-card\" srcSet />\n                    </picture>\n                    <img class=\"play-button\" src=\"../img/pic/play.png\" />\n                    <div class=\"video-description\">\n                        <p>{{video.title | limitTo: 40}}...</p>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div ng-if=\"vm.shouldShowtime\" class=\"theaters\">\n            <span style=\"display: inline-block;\" class=\"md-headline\">\n                Showtime\n            </span>\n            <div style=\"margin-left: 20px\" layout=\"row\">\n                <md-content>\n                    <h4>Date</h4>\n                    <md-datepicker style=\"float: left\" ng-model=\"vm.date.currentDate\" md-placeholder=\"Enter date\"\n                                   md-min-date=\"vm.date.minDate\" md-max-date=\"vm.date.maxDate\"></md-datepicker>\n                    <md-list ng-if=\"vm.info.theaters.length > 0\" class=\"md-dense\" flex style=\"width: 100%; clear: both; margin-top: 100px\">\n                        <md-list-item  class=\"md-3-line\" style=\"justify-content: space-between;\" ng-repeat=\"theater in vm.info.theaters\">\n                            <div class=\"theater-card\">\n                                <b style=\"display: block\">{{theater.name}}</b>\n                                <img style=\"float: left\" class=\"md-avatar\" ng-src=\"../img/icons/phone.svg\" />\n                                <div style=\"float: left\" class=\"md-list-item-text\">\n                                    <p> {{theater.phoneNumber}} </p>\n                                </div>\n                            </div>\n                            <div class=\"showtime\" layout=\"row\">\n                                <table class=\"table\">\n                                    <tbody>\n                                    <tr ng-repeat=\"movie in theater.movie\">\n                                        <th>{{movie.name}}</th>\n                                        <td ng-repeat=\"time in movie.showtimes\"><p style=\"display: block\">{{time}}</p> <img ng-if=\"movie.showtime_tickets[time]\" ng-click=\"vm.buyTicket(movie.showtime_tickets[time])\" style=\"width: 50px; height: 20px\" ng-src=\"../img/pic/ticket.png\" /></td>\n                                    </tr>\n                                    </tbody>\n                                </table>\n                            </div>\n                            <md-divider ng-if=\"!$last\"></md-divider>\n                        </md-list-item>\n                    </md-list>\n                </md-content>\n            </div>\n            <map ng-if=\"vm.location.lati\" location=\"vm.location\" theaters=\"vm.info.theaters\"></map>\n        </div>\n        <div class=\"cast\">\n            <span style=\"display: inline-block;\" class=\"md-headline\">\n                Credit\n            </span>\n            <div ng-cloak layout-gt-sm=\"row\" layout=\"column\">\n                <div flex-gt-sm=\"50\" flex>\n                    <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                      <div class=\"md-toolbar-tools\">\n                        <span>Crew</span>\n                      </div>\n                    </md-toolbar>\n                    <md-content>\n                        <md-list flex>\n                            <!-- <md-subheader class=\"md-no-sticky\">Crew</md-subheader> -->\n                            <md-list-item class=\"md-3-line\" ng-repeat=\"crew in vm.info.credit.crew | limitTo: 10\" ng-click=\"vm.showPerson(crew)\">\n                              <img ng-src=\"{{crew.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+crew.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                              <div class=\"md-list-item-text\" layout=\"column\">\n                                <h4>department: {{crew.department}}</h4>\n                                <p>name: {{crew.name}}</p>\n                              </div>\n                            </md-list-item>\n                        </md-list>  \n                    </md-content>\n                </div>\n                <div flex-gt-sm=\"50\" flex>\n                    <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                      <div class=\"md-toolbar-tools\">\n                        <span>Cast</span>\n                      </div>\n                    </md-toolbar>\n                    <md-content>\n                        <md-list flex>\n                            <!-- <md-subheader class=\"md-no-sticky\">Cast</md-subheader> -->\n                            <md-list-item class=\"md-3-line\" ng-repeat=\"cast in vm.info.credit.cast | limitTo: 10\" ng-click=\"vm.showPerson(cast)\">\n                              <img ng-src=\"{{cast.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+cast.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                              <div class=\"md-list-item-text\" layout=\"column\">\n                                <h4>character: {{cast.character}}</h4>\n                                <p>name: {{cast.name}}</p>\n                              </div>\n                            </md-list-item>\n                        </md-list>\n                    </md-content>\n                </div>\n            </div>\n        </div>\n    </div>\n    <md-sidenav flex class=\"md-sidenav-right md-whiteframe-4dp similiar\" md-is-locked-open=\"$mdMedia('gt-md')\" md-component-id=\"right\">\n        <h4 style=\"margin-top: 20px; margin-left: 20px\">You may also like</h4>\n        <md-divider ng-if=\"!$last\"></md-divider>\n        <md-list flex>\n            <md-list-item class=\"md-3-line\" ng-repeat=\"movie in vm.info.similar\" ng-click=\"vm.loadSimilar(movie)\">\n                <img ng-src=\"{{movie.poster_path?'http://image.tmdb.org/t/p/w92'+movie.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image similar-movie\" />\n                <div class=\"md-list-item-text similar-summry\" layout=\"column\">\n                    <h5>{{movie.title}}</h5>\n                    <p>Rate: {{movie.vote_average}} by {{movie.vote_count}} people</p>\n                </div>\n                <md-divider ng-if=\"!$last\"></md-divider>\n            </md-list-item>\n        </md-list>\n    </md-sidenav>\n</section>\n"
 
 /***/ },
-/* 67 */
+/* 68 */
 /*!*******************************!*\
   !*** ./MovieInfo/person.html ***!
   \*******************************/
@@ -75573,7 +75674,7 @@
 	module.exports = "<md-dialog   ng-cloak>\n  <form>\n    <md-toolbar>\n      <div class=\"md-toolbar-tools\">\n        <h2>{{person.name}}</h2>\n        <span flex></span>\n        <md-button class=\"md-icon-button\" ng-click=\"cancel()\">\n          <md-icon md-svg-src=\"img/icons/close.svg\" aria-label=\"Close dialog\"></md-icon>\n        </md-button>\n      </div>\n    </md-toolbar>\n    <md-dialog-content>\n      <div class=\"md-dialog-content\" style=\"width: 800px\">\n        <img style=\"float: left; max-width: 200px;\" alt=\"Lush mango tree\" ng-src=\"{{person.profile_path?'https://image.tmdb.org/t/p/w300_and_h450_bestv2/'+person.profile_path:'../img/pic/avatar.png'}}\">\n        <div style=\"float: left; width: 400px; margin-left: 20px\">\n        <label>Birthday</label>\n          <p>\n            {{person.birthday}}\n          </p>\n        <label>Place of birth</label>\n          <p>\n            {{person.place_of_birth}}\n          </p>\n        <label>Biography</label>\n          <p>\n            {{person.biography}}\n          </p>\n        </div>\n      </div>\n    </md-dialog-content>\n    <md-dialog-actions layout=\"row\">\n      <md-button ng-href=\"{{'http://www.imdb.com/name/'+person.imdb_id}}\" target=\"_blank\" md-autofocus>\n        IMDB profile\n      </md-button>\n      <span flex></span>\n    </md-dialog-actions>\n  </form>\n</md-dialog>"
 
 /***/ },
-/* 68 */
+/* 69 */
 /*!******************************!*\
   !*** ./map/map_directive.js ***!
   \******************************/
@@ -75585,20 +75686,20 @@
 	    value: true
 	});
 	var _ = __webpack_require__(/*! underscore */ 63);
-	var GoogleMapsLoader = __webpack_require__(/*! google-maps */ 69);
+	var GoogleMapsLoader = __webpack_require__(/*! google-maps */ 70);
 	
 	GoogleMapsLoader.KEY = 'AIzaSyDOjFm5V6Ar1QeNIDa0_d_jjfDQ2KGR2Ts';
 	
 	exports.default = function (ngModule) {
 	    ngModule.directive("map", function () {
-	        __webpack_require__(/*! ./map.css */ 70);
+	        __webpack_require__(/*! ./map.css */ 71);
 	        return {
 	            restrict: "E",
 	            scope: {
 	                location: '=',
 	                theaters: '='
 	            },
-	            template: __webpack_require__(/*! ./map.html */ 72),
+	            template: __webpack_require__(/*! ./map.html */ 73),
 	            controllerAs: "vm",
 	            controller: function controller($scope, $rootScope) {
 	                var vm = this;
@@ -75670,7 +75771,7 @@
 	};
 
 /***/ },
-/* 69 */
+/* 70 */
 /*!**************************************!*\
   !*** ../~/google-maps/lib/Google.js ***!
   \**************************************/
@@ -75898,7 +75999,7 @@
 
 
 /***/ },
-/* 70 */
+/* 71 */
 /*!*********************!*\
   !*** ./map/map.css ***!
   \*********************/
@@ -75907,7 +76008,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./map.css */ 71);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./map.css */ 72);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
@@ -75927,7 +76028,7 @@
 	}
 
 /***/ },
-/* 71 */
+/* 72 */
 /*!*************************************!*\
   !*** ../~/css-loader!./map/map.css ***!
   \*************************************/
@@ -75944,7 +76045,7 @@
 
 
 /***/ },
-/* 72 */
+/* 73 */
 /*!**********************!*\
   !*** ./map/map.html ***!
   \**********************/
@@ -75953,7 +76054,7 @@
 	module.exports = "<div id=\"map\"></div>"
 
 /***/ },
-/* 73 */
+/* 74 */
 /*!**************************!*\
   !*** ./router/router.js ***!
   \**************************/

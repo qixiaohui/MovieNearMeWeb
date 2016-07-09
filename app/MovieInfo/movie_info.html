@@ -49,7 +49,7 @@
                 </div>
             </div>
         </div>
-        <div ng-if="vm.info.theaters" class="theaters">
+        <div ng-if="vm.shouldShowtime" class="theaters">
             <span style="display: inline-block;" class="md-headline">
                 Showtime
             </span>
@@ -134,7 +134,7 @@
         <h4 style="margin-top: 20px; margin-left: 20px">You may also like</h4>
         <md-divider ng-if="!$last"></md-divider>
         <md-list flex>
-            <md-list-item class="md-3-line" ng-repeat="movie in vm.info.similar" ng-click="null">
+            <md-list-item class="md-3-line" ng-repeat="movie in vm.info.similar" ng-click="vm.loadSimilar(movie)">
                 <img ng-src="{{movie.poster_path?'http://image.tmdb.org/t/p/w92'+movie.poster_path:'img/pic/NoImage.jpg'}}" class="md-card-image similar-movie" />
                 <div class="md-list-item-text similar-summry" layout="column">
                     <h5>{{movie.title}}</h5>

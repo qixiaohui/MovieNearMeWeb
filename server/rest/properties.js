@@ -14,6 +14,6 @@ const imdbBase = "http://www.imdb.com/title/";
 
 exports.imdbBase = imdbBase;
 
-const youtubeKey = "AIzaSyAl3i1tA-bg6XJpdadp2qS9LjvKYkxZZHU";
+const youtubeKey = "AIzaSyCHtwDOvFeeg0Ofeh2WpPfRDme8yK40HfY";
 
 exports.youtubeKey = youtubeKey;

@@ -5,7 +5,8 @@ export default ngModule => {
         return {
             restrict: "E",
             scope: {
-                category: '@'
+                category: '@',
+                index: '='
             },
             template: require('./movies.html'),
             controllerAs: "vm",
@@ -13,16 +14,19 @@ export default ngModule => {
                 const vm = this;
                 vm.movies = {};
                 vm.category = $scope.category;
-                vm.index = 1;
+                vm.index = $scope.index;
                 vm.totalPages = 0;
 
                 vm.pagination = (index) => {
                     vm.index = index;
+                    // bind to rootscope categoryIndex
+                    $scope.index = index;
                     crud.GET(`/movies/${vm.category}/${vm.index}`, {}).then((response) => {
                         vm.movies = response.data;
                         vm.totalPages = response.data.total_pages;
                         $scope.$digest();
                         window.scrollTo(0, 0);
+                        sessionStorage.setItem(vm.category, JSON.stringify(vm.movies));
                     }).catch((err) => {
                         console.error(err);
                     });
@@ -34,7 +38,18 @@ export default ngModule => {
                     $location.path('/main/info');
                 };
 
-                vm.pagination(1);
+                if(sessionStorage.getItem(vm.category)){
+                    let movies = JSON.parse(sessionStorage.getItem(vm.category));
+                    if(movies.page === vm.index){
+                        vm.movies = movies;
+                        vm.totalPages = movies.total_pages;
+                    }else{
+                        vm.pagination(vm.index);
+                    }
+                }else{
+                    vm.pagination(vm.index);
+                }
+
             }
         };
     });

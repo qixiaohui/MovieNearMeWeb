@@ -1,5 +1,6 @@
 const _ = require('underscore');
 const crud = require('../service/crud');
+const util = require('../util/util');
 
 export default ngModule => {
     ngModule.directive("info", () => {
@@ -11,15 +12,6 @@ export default ngModule => {
             controllerAs: "vm",
             controller: function ($scope, $rootScope, $mdDialog, $mdMedia) {
                 const vm = this;
-                vm.today = new Date();
-                vm.date = {
-                    currentDate: vm.today,
-                    maxDate: new Date(
-                        vm.today.getFullYear(),
-                        vm.today.getMonth(),
-                        vm.today.getDate()+6),
-                    minDate: vm.today
-                };
 
                 $scope.$watch('vm.date.currentDate', (newValue, oldValue) => {
                     if(newValue.getDate() === oldValue.getDate()){
@@ -28,39 +20,6 @@ export default ngModule => {
 
                     let days = vm.date.currentDate.getDate() - vm.today.getDate();
                     vm.getTheaters(null, days);
-                });
-
-                vm.info = $rootScope.movieInfo;
-
-                crud.GET(`/movie/info/${vm.info.id}`, {}).then((response) => {
-                    _.extend(vm.info, response.data);
-                    $scope.$digest();
-                }).catch((err) => {
-                    console.error(err);
-                });
-
-                crud.GET(`/movie/similar/${vm.info.id}`, {}).then((response) => {
-                    vm.info.similar = response.data.results;
-                    $scope.$digest();
-                }).catch((err) => {
-                    console.error(err);
-                });
-
-                crud.GET(`/movie/video/${vm.info.title}`, {}).then((response) => {
-                    vm.info.videos = response.data;
-                    $scope.$digest();
-                }).catch((err) => {
-                    console.error(err);
-                    vm.info.videos = [];
-                    $scope.$digest();
-                });
-
-                crud.GET(`/movie/credit/${vm.info.id}`, {}).then((response) => {
-                    vm.info.credit = response.data;
-                    debugger;
-                    $scope.$digest();
-                }).catch((err) => {
-                    console.error(err);
                 });
 
                 vm.getTheaters = (argLocation, argDays) => {
@@ -112,7 +71,6 @@ export default ngModule => {
                                     vm.info.theaters.push(theater);
                                 }
                             });
-                            debugger;
                             $scope.$digest();
                         }).catch((err) => {
                             console.error(err);
@@ -124,22 +82,76 @@ export default ngModule => {
                     });
                 };
 
-                if(sessionStorage.getItem('zip')){
-                    let zipObj = JSON.parse(sessionStorage.getItem('zip'));
-                    vm.zip = zipObj.zip;
-                    vm.location = {};
-                    vm.location.lati = zipObj.lati;
-                    vm.location.longi = zipObj.longi;
-                    vm.getTheaters();
-                }else {
-                    if (navigator.geolocation) {
-                        debugger;
-                        navigator.geolocation.getCurrentPosition(vm.getTheaters);
-                    } else {
-                        debugger;
-                        //TODO: handle geolocation not supported
+                vm.reload = () => {
+
+                    vm.info = $rootScope.movieInfo;
+                    //this will decide if the show time will show
+                    //condition: if release date month is older than 2 month
+                    vm.shouldShowtime = true;
+                    vm.today = new Date();
+                    var releaseArr = vm.info.release_date.split('-');
+                    var releaseDate = new Date(parseInt(releaseArr[0]), parseInt(releaseArr[1])-1, parseInt(releaseArr[2]));
+
+                    if(util.compareDate(vm.today, releaseDate) > 60){
+                        vm.shouldShowtime = false;
+                    }else if(util.compareDate(releaseDate, vm.today) > 1){
+                        vm.today = releaseDate;
                     }
-                }
+
+                    vm.date = {
+                        currentDate: vm.today,
+                        maxDate: new Date(
+                            vm.today.getFullYear(),
+                            vm.today.getMonth(),
+                            vm.today.getDate()+6),
+                        minDate: vm.today
+                    };
+
+                    crud.GET(`/movie/info/${vm.info.id}`, {}).then((response) => {
+                        _.extend(vm.info, response.data);
+                        $scope.$digest();
+                    }).catch((err) => {
+                        console.error(err);
+                    });
+
+                    crud.GET(`/movie/similar/${vm.info.id}`, {}).then((response) => {
+                        vm.info.similar = response.data.results;
+                        $scope.$digest();
+                    }).catch((err) => {
+                        console.error(err);
+                    });
+
+                    crud.GET(`/movie/video/${vm.info.title}`, {}).then((response) => {
+                        vm.info.videos = response.data;
+                        $scope.$digest();
+                    }).catch((err) => {
+                        console.error(err);
+                        vm.info.videos = [];
+                        $scope.$digest();
+                    });
+
+                    crud.GET(`/movie/credit/${vm.info.id}`, {}).then((response) => {
+                        vm.info.credit = response.data;
+                        $scope.$digest();
+                    }).catch((err) => {
+                        console.error(err);
+                    });
+
+                    if(sessionStorage.getItem('zip')){
+                        let zipObj = JSON.parse(sessionStorage.getItem('zip'));
+                        vm.zip = zipObj.zip;
+                        vm.location = {};
+                        vm.location.lati = zipObj.lati;
+                        vm.location.longi = zipObj.longi;
+                        vm.getTheaters();
+                    }else {
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(vm.getTheaters);
+                        } else {
+                            //TODO: handle geolocation not supported
+                        }
+                    }
+                };
 
                 vm.openPlayer = (url) => {
                     window.open(url,'_blank');
@@ -150,7 +162,6 @@ export default ngModule => {
                 };
 
                 vm.showPerson = (person) => {
-                    debugger;
                     var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
 
                     $mdDialog.show({
@@ -164,16 +175,30 @@ export default ngModule => {
                       fullscreen: useFullScreen
                     });
                 };
+
+                vm.loadSimilar = (movie) => {
+                    //push current movie to stack
+                    $rootScope.stack.push(vm.info);
+                    $rootScope.movieInfo = movie;
+                    $rootScope.appName = vm.info.title;
+                    vm.reload();
+                };
+
+                $rootScope.$on('pop', (event) => {
+                    vm.reload();
+                });
+
+                vm.reload();
+
             }
-        }
-    });
-}
+        
+    }});
+};
 
 function DialogController($scope, $mdDialog, person) {
   $scope.person = person;
 
     crud.GET(`/movie/person/${person.id}`, {}).then((response) => {
-        debugger;
         $scope.person = response.data;
         $scope.$digest();
     }).catch((err) => {

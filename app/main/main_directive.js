@@ -7,24 +7,42 @@ export default ngModule => {
             template: require('./main.html'),
             controllerAs: "vm",
             controller: function($rootScope, $location, $scope){
-                $scope.tabIndex = 1;
-                $scope.$watch('tabIndex', function(){
-                    debugger;
-                });
+                //default add parameters on launch
+                $rootScope.tabIndex = 0;
+                $scope.categoryIndex = {
+                    nowPlaying: {index: 1},
+                    topRate: 1,
+                    popular: 1,
+                    upComing: 1
+                };
+
+                //this will use as a stack to hold the movies
+                //when select a movie the previous movie will be pushed in
+                //when select
+                $rootScope.stack = [];
+
                 const vm = this;
                 vm.state = {currentPath: {name: 'main.tabs'}, previousPath: ''};
-                $rootScope.appName = 'Movie near me';
+                $rootScope.appName = 'Movie near me(Alpha)';
                 $rootScope.$on('$stateChangeSuccess', function (ev, to, toParams, from, fromParams) {
                     vm.state.currentPath = to;
                     vm.state.previousPath = from;
 
                 });
-
+                
                 vm.statePop = () => {
-                    if(vm.state.previousPath.name === 'main.tabs'){
-                        $rootScope.appName = 'Movie near me';
+                    if($rootScope.stack.length === 0) {
+                        if (vm.state.previousPath.name === 'main.tabs') {
+                            $rootScope.appName = 'Movie near me(Alpha)';
+                        }
+                        $location.path(vm.state.previousPath);
+                    }else{
+                        let movie = $rootScope.stack.pop();
+                        $rootScope.appName = movie.title;
+                        $rootScope.movieInfo = movie;
+                        $rootScope.$broadcast('pop', {});
+                        debugger;
                     }
-                    $location.path(vm.state.previousPath);
                 };
             }
         };

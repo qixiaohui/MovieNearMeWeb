@@ -1,15 +1,15 @@
 const _ = require('underscore');
+const crud = require('../service/crud');
 
 export default ngModule => {
     ngModule.directive("info", () => {
         require('./movie_info.css');
-        const crud = require('../service/crud');
         return {
             restrict: "E",
             scope: true,
             template: require('./movie_info.html'),
             controllerAs: "vm",
-            controller: function ($scope, $rootScope) {
+            controller: function ($scope, $rootScope, $mdDialog, $mdMedia) {
                 const vm = this;
                 vm.today = new Date();
                 vm.date = {
@@ -148,7 +148,45 @@ export default ngModule => {
                 vm.buyTicket = (url) => {
                     window.open(url,'_blank');
                 };
+
+                vm.showPerson = (person) => {
+                    debugger;
+                    var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
+
+                    $mdDialog.show({
+                      controller: DialogController,
+                      template: require('./person.html'),
+                      locals: {
+                        person: person
+                      },
+                      parent: angular.element(document.body),
+                      clickOutsideToClose:true,
+                      fullscreen: useFullScreen
+                    });
+                };
             }
         }
     });
+}
+
+function DialogController($scope, $mdDialog, person) {
+  $scope.person = person;
+
+    crud.GET(`/movie/person/${person.id}`, {}).then((response) => {
+        debugger;
+        $scope.person = response.data;
+        $scope.$digest();
+    }).catch((err) => {
+        console.error(err);
+    });
+
+  $scope.hide = function() {
+    $mdDialog.hide();
+  };
+  $scope.cancel = function() {
+    $mdDialog.cancel();
+  };
+  $scope.answer = function(answer) {
+    $mdDialog.hide(answer);
+  };
 }

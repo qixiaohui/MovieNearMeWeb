@@ -6,8 +6,7 @@ export default ngModule => {
             scope: true,
             template: require('./tabs.html'),
             controllerAs: "vm",
-            controller: function(){
-
+            controller: function($scope){
             }
         };
     });

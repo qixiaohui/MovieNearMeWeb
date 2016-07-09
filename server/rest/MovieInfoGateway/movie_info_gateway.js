@@ -10,6 +10,7 @@ const youtubeSearch = require('youtube-search');
 const theMovieBaseUrl = require('../properties').theMovieBaseUrl;
 const theMovieToken = require('../properties').theMovieToken;
 const youtubeKey = require('../properties').youtubeKey;
+const theMoviePersonUrl = require('../properties').theMoviePersonUrl;
 
 router.get('/info/:id',apicache('1 day'), function(req, res){
     req.apicacheGroup = req.params.id;
@@ -71,6 +72,19 @@ router.get('/credit/:id', apicache('1 day'), function(req, res){
     let id = req.params.id;
 
     axios({method: 'GET', url: `${theMovieBaseUrl}${id}/credits?api_key=${theMovieToken}`}).then((result) => {
+        res.send(result.data);
+    }).catch((data) => {
+        console.error(data);
+        res.status(400).send('Ooops something went wrong');
+    });
+});
+
+router.get('/person/:id', apicache('1 day'), function(req, res){
+    req.apicacheGroup = req.params.id;
+    let id = req.params.id;
+
+    console.log(`${theMoviePersonUrl}${id}?api_key=${theMovieToken}`);
+    axios({method: 'GET', url: `${theMoviePersonUrl}${id}?api_key=${theMovieToken}`}).then((result) => {
         res.send(result.data);
     }).catch((data) => {
         console.error(data);

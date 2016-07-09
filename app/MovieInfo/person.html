@@ -1,0 +1,38 @@
+<md-dialog   ng-cloak>
+  <form>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>{{person.name}}</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="cancel()">
+          <md-icon md-svg-src="img/icons/close.svg" aria-label="Close dialog"></md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+    <md-dialog-content>
+      <div class="md-dialog-content" style="width: 800px">
+        <img style="float: left; max-width: 200px;" alt="Lush mango tree" ng-src="{{person.profile_path?'https://image.tmdb.org/t/p/w300_and_h450_bestv2/'+person.profile_path:'../img/pic/avatar.png'}}">
+        <div style="float: left; width: 400px; margin-left: 20px">
+        <label>Birthday</label>
+          <p>
+            {{person.birthday}}
+          </p>
+        <label>Place of birth</label>
+          <p>
+            {{person.place_of_birth}}
+          </p>
+        <label>Biography</label>
+          <p>
+            {{person.biography}}
+          </p>
+        </div>
+      </div>
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+      <md-button ng-href="{{'http://www.imdb.com/name/'+person.imdb_id}}" target="_blank" md-autofocus>
+        IMDB profile
+      </md-button>
+      <span flex></span>
+    </md-dialog-actions>
+  </form>
+</md-dialog>

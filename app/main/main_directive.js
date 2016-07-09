@@ -6,7 +6,11 @@ export default ngModule => {
             scope: true,
             template: require('./main.html'),
             controllerAs: "vm",
-            controller: function($rootScope, $location){
+            controller: function($rootScope, $location, $scope){
+                $scope.tabIndex = 1;
+                $scope.$watch('tabIndex', function(){
+                    debugger;
+                });
                 const vm = this;
                 vm.state = {currentPath: {name: 'main.tabs'}, previousPath: ''};
                 $rootScope.appName = 'Movie near me';

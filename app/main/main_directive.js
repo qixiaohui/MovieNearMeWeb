@@ -23,7 +23,7 @@ export default ngModule => {
 
                 const vm = this;
                 vm.state = {currentPath: {name: 'main.tabs'}, previousPath: ''};
-                $rootScope.appName = 'Movie near me(Alpha)';
+                $rootScope.appName = 'Movie near you(Alpha)';
                 $rootScope.$on('$stateChangeSuccess', function (ev, to, toParams, from, fromParams) {
                     vm.state.currentPath = to;
                     vm.state.previousPath = from;
@@ -33,7 +33,7 @@ export default ngModule => {
                 vm.statePop = () => {
                     if($rootScope.stack.length === 0) {
                         if (vm.state.previousPath.name === 'main.tabs') {
-                            $rootScope.appName = 'Movie near me(Alpha)';
+                            $rootScope.appName = 'Movie near you(Alpha)';
                         }
                         $location.path(vm.state.previousPath);
                     }else{

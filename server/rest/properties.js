@@ -17,3 +17,6 @@ exports.imdbBase = imdbBase;
 const youtubeKey = "AIzaSyCt7YXiR7I9lwCXyYDmayb3kJRzML8TxHY";
 
 exports.youtubeKey = youtubeKey;
+
+const herokuRedirect = "http://polar-sands-49796.herokuapp.com/";
+exports.herokuRedirect = herokuRedirect;

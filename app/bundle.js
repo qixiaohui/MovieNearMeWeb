@@ -73828,7 +73828,7 @@
 	                        (function () {
 	                            var location = argLocation;
 	                            promise = new Promise(function (resolve, reject) {
-	                                crud.GET('http://maps.googleapis.com/maps/api/geocode/json?latlng=' + location.coords.latitude + ',' + location.coords.longitude + '&sensor=true', {}).then(function (response) {
+	                                crud.GET('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + location.coords.latitude + ',' + location.coords.longitude + '&sensor=true', {}).then(function (response) {
 	                                    _.each(response.data.results[0].address_components, function (component) {
 	                                        if (component.types[0] === 'postal_code') {
 	                                            vm.zip = component.short_name;

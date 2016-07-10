@@ -27,6 +27,7 @@
     "font-awesome": "^4.6.3",
     "google-maps": "^3.2.1",
     "gps2zip": "^2.1.0",
+    "https": "^1.0.0",
     "morgan": "^1.7.0",
     "net": "^1.0.2",
     "raw-loader": "^0.5.1",

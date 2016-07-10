@@ -1,5 +1,7 @@
 'use strict';
 
+const https = require('https');
+const fs = require('fs');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -37,6 +39,13 @@ app.get('/ping', function(req, res) {
 	res.send('pong');
 })
 
-app.listen(port, function(){
-	console.info("app listening on port: "+port);
+var secureServer = https.createServer({
+    key: fs.readFileSync('./ssl/server.key'),
+    cert: fs.readFileSync('./ssl/server.crt'),
+    ca: fs.readFileSync('./ssl/ca.crt'),
+    requestCert: true,
+    rejectUnauthorized: false
+}, app).listen('8443', function() {
+    console.log("Secure Express server listening on port 8443");
 });
+

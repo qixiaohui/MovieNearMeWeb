@@ -29,8 +29,12 @@ export default ngModule => {
                         let location = argLocation;
                         var promise = new Promise((resolve, reject) => {
                             crud.GET(`http://maps.googleapis.com/maps/api/geocode/json?latlng=${location.coords.latitude},${location.coords.longitude}&sensor=true`, {}).then((response) => {
-                                let length = response.data.results[0].address_components.length;
-                                vm.zip = response.data.results[0].address_components[length-1].short_name;
+                                _.each(response.data.results[0].address_components, (component) => {
+                                   if(component.types[0] === 'postal_code'){
+                                       vm.zip = component.short_name;
+                                   }
+                                });
+
                                 vm.location = {};
                                 vm.location.lati = location.coords.latitude;
                                 vm.location.longi = location.coords.longitude;

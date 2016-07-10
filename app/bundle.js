@@ -72065,7 +72065,7 @@
 	
 	                var vm = this;
 	                vm.state = { currentPath: { name: 'main.tabs' }, previousPath: '' };
-	                $rootScope.appName = 'Movie near me(Alpha)';
+	                $rootScope.appName = 'Movie near you(Alpha)';
 	                $rootScope.$on('$stateChangeSuccess', function (ev, to, toParams, from, fromParams) {
 	                    vm.state.currentPath = to;
 	                    vm.state.previousPath = from;
@@ -72074,7 +72074,7 @@
 	                vm.statePop = function () {
 	                    if ($rootScope.stack.length === 0) {
 	                        if (vm.state.previousPath.name === 'main.tabs') {
-	                            $rootScope.appName = 'Movie near me(Alpha)';
+	                            $rootScope.appName = 'Movie near you(Alpha)';
 	                        }
 	                        $location.path(vm.state.previousPath);
 	                    } else {
@@ -73829,8 +73829,12 @@
 	                            var location = argLocation;
 	                            promise = new Promise(function (resolve, reject) {
 	                                crud.GET('http://maps.googleapis.com/maps/api/geocode/json?latlng=' + location.coords.latitude + ',' + location.coords.longitude + '&sensor=true', {}).then(function (response) {
-	                                    var length = response.data.results[0].address_components.length;
-	                                    vm.zip = response.data.results[0].address_components[length - 1].short_name;
+	                                    _.each(response.data.results[0].address_components, function (component) {
+	                                        if (component.types[0] === 'postal_code') {
+	                                            vm.zip = component.short_name;
+	                                        }
+	                                    });
+	
 	                                    vm.location = {};
 	                                    vm.location.lati = location.coords.latitude;
 	                                    vm.location.longi = location.coords.longitude;

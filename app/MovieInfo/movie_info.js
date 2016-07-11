@@ -1,6 +1,7 @@
 const _ = require('underscore');
 const crud = require('../service/crud');
 const util = require('../util/util');
+const key = 'AIzaSyDOjFm5V6Ar1QeNIDa0_d_jjfDQ2KGR2Ts';
 
 export default ngModule => {
     ngModule.directive("info", () => {
@@ -28,7 +29,7 @@ export default ngModule => {
                     if(argLocation){
                         let location = argLocation;
                         var promise = new Promise((resolve, reject) => {
-                            crud.GET(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.coords.latitude},${location.coords.longitude}&sensor=true`, {}).then((response) => {
+                            crud.GET(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.coords.latitude},${location.coords.longitude}&key=${key}&sensor=true`, {}).then((response) => {
                                 _.each(response.data.results[0].address_components, (component) => {
                                    if(component.types[0] === 'postal_code'){
                                        vm.zip = component.short_name;

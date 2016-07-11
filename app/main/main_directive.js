@@ -10,7 +10,7 @@ export default ngModule => {
                 //default add parameters on launch
                 $rootScope.tabIndex = 0;
                 $scope.categoryIndex = {
-                    nowPlaying: {index: 1},
+                    nowPlaying: 1,
                     topRate: 1,
                     popular: 1,
                     upComing: 1

@@ -82,7 +82,7 @@
                     </md-list>
                 </md-content>
             </div>
-            <map ng-if="vm.location.lati" location="vm.location" theaters="vm.info.theaters"></map>
+            <map ng-if="vm.info.theaters.length > 0" location="vm.location" theaters="vm.info.theaters"></map>
         </div>
         <div class="cast">
             <span style="display: inline-block;" class="md-headline">

@@ -15,6 +15,7 @@ export default ngModule => {
             template: require('./map.html'),
             controllerAs: "vm",
             controller: function ($scope, $rootScope) {
+
                 const vm = this;
                 var map;
                 var geocoder;
@@ -37,7 +38,7 @@ export default ngModule => {
                         geocoder.geocode({'address': address}, (results, status) => {
                             if (status == google.maps.GeocoderStatus.OK){
                                 var marker = new google.maps.Marker({
-                                    icon: 'http://maps.google.com/mapfiles/ms/icons/blue.png',
+                                    icon: './img/pic/blueMark.png',
                                     map: map,
                                     animation: google.maps.Animation.DROP,
                                     position: results[0].geometry.location,

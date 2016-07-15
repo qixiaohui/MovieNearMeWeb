@@ -8,9 +8,32 @@
             <span>{{appName}}</span>
             <!-- fill up the space between left and right area -->
             <span flex></span>
-            <md-button>
-                Right Bar Button
+            <md-button ng-if="!vm.user" ng-click="vm.signin()">
+                Sign in with facebook
             </md-button>
+            <div class="fb-appbar-login-area">
+                <md-menu class="fb-appear-menu">
+                    <button class="fb-appear-btn md-button md-gmp-blue-theme md-ink-ripple" ng-click="$mdOpenMenu($event)">
+                        <img ng-if="vm.user" style="width: 40px; margin-right: 50px; border-radius: 50%" ng-src="{{vm.user.photoURL}}" />
+                        <div class="md-ripple-container"></div>
+                    </button>
+                    <md-menu-content>
+                        <md-menu-item role="menuitem" style="height: 90px">
+                            <div layout="row" class="logout">
+                                <img ng-src="{{vm.user.photoURL}}" />
+                                <div layout="column" style="flex-direction: column">
+                                    <div class="logout-email">
+                                        {{vm.user.email}}
+                                    </div>
+                                    <div class="logout-btn">
+                                        <a ng-click="vm.logout()">SIGN OUT</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </md-menu-item>
+                    </md-menu-content>
+                </md-menu>
+            </div>
         </div>
     </md-toolbar>
     <div ui-view></div>

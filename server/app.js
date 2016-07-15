@@ -37,7 +37,7 @@ app.get('/', function (req, res) {
 
 app.get('/ping', function(req, res) {
 	res.send('pong');
-})
+});
 
 var secureServer = https.createServer({
     key: fs.readFileSync('./ssl/server.key'),

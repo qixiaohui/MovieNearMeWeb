@@ -1,4 +1,4 @@
-export default ngModule => {
+export default (ngModule, firebase, provider) => {
     ngModule.directive("main", () => {
         require('./main.css');
         return {
@@ -41,8 +41,46 @@ export default ngModule => {
                         $rootScope.appName = movie.title;
                         $rootScope.movieInfo = movie;
                         $rootScope.$broadcast('pop', {});
-                        debugger;
                     }
+                };
+
+                /**
+                 * firebase fb signin
+                 * @type {firebase.User|null|*}
+                 */
+                firebase.auth().onAuthStateChanged(function(user) {
+                    if (user) {
+                        // User is signed in.
+                        vm.user = user;
+                        $scope.$digest();
+                    }else{
+                        // User signed out
+                        vm.user = null;
+                        $scope.$digest();
+                    }
+                });
+                
+                vm.signin = () => {
+                    firebase.auth().signInWithPopup(provider).then(function(result) {
+                        // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+                        var token = result.credential.accessToken;
+                    }).catch(function(error) {
+                        // Handle Errors here.
+                        var errorCode = error.code;
+                        var errorMessage = error.message;
+                        // The email of the user's account used.
+                        var email = error.email;
+                        // The firebase.auth.AuthCredential type that was used.
+                        var credential = error.credential;
+                    });
+                };
+
+                vm.logout = () => {
+                    firebase.auth().signOut().then(function() {
+                        // Sign-out successful.
+                    }, function(error) {
+                        // An error happened.
+                    });
                 };
             }
         };

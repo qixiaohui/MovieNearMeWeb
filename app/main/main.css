@@ -1,0 +1,84 @@
+.logout {
+    margin: 0;
+    background: white;
+    height: 88px;
+    max-width: 350px;
+    min-width: 100px;
+    padding-right: 18px;
+    flex-direction: row;
+}
+
+.logout img {
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    height: 56px;
+    margin: 16px;
+    width: 56px;
+}
+
+.logout-email {
+    color: rgba(0,0,0,0.87);
+    font-size: 14px;
+    line-height: 16px;
+    margin-top: 24px;
+    max-width: 217px;
+    min-width: 106px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.logout-btn {
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: .53px;
+    line-height: 16px;
+    margin-top: 12px;
+    max-width: 217px;
+    min-width: 106px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fb-appear-menu {
+    margin: 0;
+    padding: 0;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    -webkit-align-items: stretch;
+    align-items: stretch;
+}
+
+.fb-appear-btn {
+    padding: 0 0 0 8px!important;
+    margin: 0 24px 0 0!important;
+    min-width: 0;
+    background-color: transparent!important;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    -webkit-align-items: center;
+    align-items: center;
+}
+
+.fb-appbar-login-area{
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    -webkit-align-items: stretch;
+    align-items: stretch;
+}

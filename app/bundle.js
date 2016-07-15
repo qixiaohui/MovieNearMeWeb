@@ -109,8 +109,9 @@
 	__webpack_require__(/*! ./movies/movies_directive */ 45).default(app);
 	__webpack_require__(/*! ./MovieInfo/movie_info */ 70).default(app);
 	__webpack_require__(/*! ./map/map_directive */ 77).default(app);
+	__webpack_require__(/*! ./PurchaseChannels/purchase_channels */ 82).default(app);
 	
-	__webpack_require__(/*! ./router/router */ 82).default(app);
+	__webpack_require__(/*! ./router/router */ 86).default(app);
 
 /***/ },
 /* 1 */
@@ -74634,6 +74635,7 @@
 	                    //this will decide if the show time will show
 	                    //condition: if release date month is older than 2 month
 	                    vm.shouldShowtime = true;
+	                    vm.shouldPurchase = true;
 	                    vm.today = new Date();
 	                    var releaseArr = vm.info.release_date.split('-');
 	                    var releaseDate = new Date(parseInt(releaseArr[0]), parseInt(releaseArr[1]) - 1, parseInt(releaseArr[2]));
@@ -74642,6 +74644,8 @@
 	                        vm.shouldShowtime = false;
 	                    } else if (util.compareDate(releaseDate, vm.today) > 1) {
 	                        vm.today = releaseDate;
+	                        // movie is not released yet, no purchase option avilable
+	                        vm.shouldPurchase = false;
 	                    }
 	
 	                    vm.date = {
@@ -74680,18 +74684,31 @@
 	                        console.error(err);
 	                    });
 	
-	                    if (sessionStorage.getItem('zip')) {
-	                        var zipObj = JSON.parse(sessionStorage.getItem('zip'));
-	                        vm.zip = zipObj.zip;
-	                        vm.location = {};
-	                        vm.location.lati = zipObj.lati;
-	                        vm.location.longi = zipObj.longi;
-	                        vm.getTheaters();
-	                    } else {
-	                        if (navigator.geolocation) {
-	                            navigator.geolocation.getCurrentPosition(vm.getTheaters);
+	                    //if false shouldn't call purchase
+	                    if (vm.shouldPurchase) {
+	                        crud.GET('/schedule/avilableon/webpurchase/' + vm.info.id, {}).then(function (response) {
+	                            vm.info.purchaseChannels = response.data;
+	                            $scope.$digest();
+	                        }).catch(function (err) {
+	                            console.error(err);
+	                        });
+	                    }
+	
+	                    //if false then shouldn't search show time at all
+	                    if (vm.shouldShowtime) {
+	                        if (sessionStorage.getItem('zip')) {
+	                            var zipObj = JSON.parse(sessionStorage.getItem('zip'));
+	                            vm.zip = zipObj.zip;
+	                            vm.location = {};
+	                            vm.location.lati = zipObj.lati;
+	                            vm.location.longi = zipObj.longi;
+	                            vm.getTheaters();
 	                        } else {
-	                            //TODO: handle geolocation not supported
+	                            if (navigator.geolocation) {
+	                                navigator.geolocation.getCurrentPosition(vm.getTheaters);
+	                            } else {
+	                                //TODO: handle geolocation not supported
+	                            }
 	                        }
 	                    }
 	                };
@@ -76395,7 +76412,7 @@
 	
 	
 	// module
-	exports.push([module.id, ".info-container {\n    margin-top: 10px;\n    margin-left: 10px;\n    width: 80%;\n    height: 100%;\n    display: flex;\n}\n\n.video-list {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.cast {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.theaters {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.info-poster {\n    width: 20%;\n    float: left;\n}\n\n.top-card {\n    margin-left: 20px;\n    padding-top: 10px;\n}\n\n.right-card {\n    width: 80%;\n    position: relative;\n}\n\n.description {\n    margin-right: 20px;\n    position: absolute;\n    bottom: 0;\n}\n\n.inlineText {\n    float: left;\n    padding-left: 10px;\n}\n\n.similiar {\n    height: 100%;\n}\n\n.similar-movie {\n    margin-top: 5px;\n    margin-bottom: 5px;\n}\n\n.similar-summry {\n    padding-left: 10px;\n}\n\n.video-card {\n    width: 90%;\n    margin: auto;\n}\n\n.video-card:hover {\n    cursor: pointer;\n}\n\n.info-card {\n    width: 100%;\n    display: flex;\n}\n\n.play-button {\n    opacity: 0.8;\n    position: absolute;\n    left: 30%;\n    top: 20%; \n    width: 30%;\n}\n\n.video-description {\n    background-color: rgba(0, 0, 0, 0.7);\n    width: 90%;\n}\n\n.video-description p {\n    color: white;\n}\n\n.theater-card {\n    float: left;\n    margin-right: 10px;\n    width: 20%;\n}\n\n.showtime {\n    float: left;\n    width: 80%;\n}\n\n#map {\n    height: 100%;\n}", ""]);
+	exports.push([module.id, ".info-container {\n    margin-top: 10px;\n    margin-left: 10px;\n    width: 80%;\n    height: 100%;\n    display: flex;\n}\n\n.video-list {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.cast {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.theaters {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.avilableon {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.info-poster {\n    width: 20%;\n    float: left;\n}\n\n.top-card {\n    margin-left: 20px;\n    padding-top: 10px;\n}\n\n.right-card {\n    width: 80%;\n    position: relative;\n}\n\n.description {\n    margin-right: 20px;\n    position: absolute;\n    bottom: 0;\n}\n\n.inlineText {\n    float: left;\n    padding-left: 10px;\n}\n\n.similiar {\n    height: 100%;\n}\n\n.similar-movie {\n    margin-top: 5px;\n    margin-bottom: 5px;\n}\n\n.similar-summry {\n    padding-left: 10px;\n}\n\n.video-card {\n    width: 90%;\n    margin: auto;\n}\n\n.video-card:hover {\n    cursor: pointer;\n}\n\n.info-card {\n    width: 100%;\n    display: flex;\n}\n\n.play-button {\n    opacity: 0.8;\n    position: absolute;\n    left: 30%;\n    top: 20%; \n    width: 30%;\n}\n\n.video-description {\n    background-color: rgba(0, 0, 0, 0.7);\n    width: 90%;\n}\n\n.video-description p {\n    color: white;\n}\n\n.theater-card {\n    float: left;\n    margin-right: 10px;\n    width: 20%;\n}\n\n.showtime {\n    float: left;\n    width: 80%;\n}\n\n#map {\n    height: 100%;\n}", ""]);
 	
 	// exports
 
@@ -76407,7 +76424,7 @@
   \***********************************/
 /***/ function(module, exports) {
 
-	module.exports = "\n<section layout=\"row\" flex>\n    <div class=\"info-container\" layout=\"column\">\n        <div class=\"info-card\">\n            <md-card class=\"info-poster\">\n                <img ng-src=\"{{vm.info.poster_path?'http://image.tmdb.org/t/p/w300'+vm.info.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image\" alt=\"Washed Out\">\n            </md-card>\n            <div class=\"right-card\">\n                <div>\n                    <div class=\"top-card\">\n                        <span class=\"md-headline\">\n                            {{vm.info.tagline}}\n                        </span>\n                        <h5>IMDB rating: {{vm.info.imdbRating}} rated by {{vm.info.ratedByUsers}} people</h5>\n                        <h5>Release data: {{vm.info.release_date}}</h5>\n                        <h5>Runtime: {{vm.info.runtime}} minutes</h5>\n                        <h5>Original language: {{vm.info.original_language}}</h5>\n                        <h5 style=\"display: inline;\"><p style=\"float: left; display: inline; padding-top: 15px\">Genre:</p></h5>\n                        <md-chips style=\"float: left\">\n                            <md-chip ng-repeat=\"genre in vm.info.genres\">\n                                {{genre.name}}\n                            </md-chip>\n                        </md-chips>\n                    </div>\n                </div>\n                <div>\n                </div>\n                <md-content class=\"description\" flex layout-padding>\n                    <p style=\"padding-left: 5px\">Storyline: {{vm.info.overview}}</p>\n                </md-content>\n            </div>\n        </div>\n        <div class=\"video-list\">\n            <span style=\"display: inline-block;\" class=\"md-headline\">\n                Videos\n            </span>\n            <div layout='row'>\n                <div ng-click=\"vm.openPlayer(video.link)\" style=\"position: relative;\" ng-repeat=\"video in vm.info.videos\">\n                    <picture>\n                        <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/mqdefault.jpg\"}}' media=\"(min-width:991px)\" />\n                        <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/hqdefault.jpg\"}}' media=\"(min-width:767px)\" />\n                        <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/sddefault.jpg\"}}' />\n                        <img class=\"video-card\" srcSet />\n                    </picture>\n                    <img class=\"play-button\" src=\"../img/pic/play.png\" />\n                    <div class=\"video-description\">\n                        <p>{{video.title | limitTo: 40}}...</p>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div ng-if=\"vm.shouldShowtime\" class=\"theaters\">\n            <span style=\"display: inline-block;\" class=\"md-headline\">\n                Showtime\n            </span>\n            <div style=\"margin-left: 20px\" layout=\"row\">\n                <md-content>\n                    <h4>Date</h4>\n                    <md-datepicker style=\"float: left\" ng-model=\"vm.date.currentDate\" md-placeholder=\"Enter date\"\n                                   md-min-date=\"vm.date.minDate\" md-max-date=\"vm.date.maxDate\"></md-datepicker>\n                    <md-list ng-if=\"vm.info.theaters.length > 0\" class=\"md-dense\" flex style=\"width: 100%; clear: both; margin-top: 100px\">\n                        <md-list-item  class=\"md-3-line\" style=\"justify-content: space-between;\" ng-repeat=\"theater in vm.info.theaters\">\n                            <div class=\"theater-card\">\n                                <b style=\"display: block\">{{theater.name}}</b>\n                                <img style=\"float: left\" class=\"md-avatar\" ng-src=\"../img/icons/phone.svg\" />\n                                <div style=\"float: left\" class=\"md-list-item-text\">\n                                    <p> {{theater.phoneNumber}} </p>\n                                </div>\n                            </div>\n                            <div class=\"showtime\" layout=\"row\">\n                                <table class=\"table\">\n                                    <tbody>\n                                    <tr ng-repeat=\"movie in theater.movie\">\n                                        <th>{{movie.name}}</th>\n                                        <td ng-repeat=\"time in movie.showtimes\"><p style=\"display: block\">{{time}}</p> <img ng-if=\"movie.showtime_tickets[time]\" ng-click=\"vm.buyTicket(movie.showtime_tickets[time])\" style=\"width: 50px; height: 20px\" ng-src=\"../img/pic/ticket.png\" /></td>\n                                    </tr>\n                                    </tbody>\n                                </table>\n                            </div>\n                            <md-divider ng-if=\"!$last\"></md-divider>\n                        </md-list-item>\n                    </md-list>\n                </md-content>\n            </div>\n            <map ng-if=\"vm.info.theaters.length > 0\" location=\"vm.location\" theaters=\"vm.info.theaters\"></map>\n        </div>\n        <div class=\"cast\">\n            <span style=\"display: inline-block;\" class=\"md-headline\">\n                Credit\n            </span>\n            <div ng-cloak layout-gt-sm=\"row\" layout=\"column\">\n                <div flex-gt-sm=\"50\" flex>\n                    <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                      <div class=\"md-toolbar-tools\">\n                        <span>Crew</span>\n                      </div>\n                    </md-toolbar>\n                    <md-content>\n                        <md-list flex>\n                            <!-- <md-subheader class=\"md-no-sticky\">Crew</md-subheader> -->\n                            <md-list-item class=\"md-3-line\" ng-repeat=\"crew in vm.info.credit.crew | limitTo: 10\" ng-click=\"vm.showPerson(crew)\">\n                              <img ng-src=\"{{crew.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+crew.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                              <div class=\"md-list-item-text\" layout=\"column\">\n                                <h4>department: {{crew.department}}</h4>\n                                <p>name: {{crew.name}}</p>\n                              </div>\n                            </md-list-item>\n                        </md-list>  \n                    </md-content>\n                </div>\n                <div flex-gt-sm=\"50\" flex>\n                    <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                      <div class=\"md-toolbar-tools\">\n                        <span>Cast</span>\n                      </div>\n                    </md-toolbar>\n                    <md-content>\n                        <md-list flex>\n                            <!-- <md-subheader class=\"md-no-sticky\">Cast</md-subheader> -->\n                            <md-list-item class=\"md-3-line\" ng-repeat=\"cast in vm.info.credit.cast | limitTo: 10\" ng-click=\"vm.showPerson(cast)\">\n                              <img ng-src=\"{{cast.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+cast.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                              <div class=\"md-list-item-text\" layout=\"column\">\n                                <h4>character: {{cast.character}}</h4>\n                                <p>name: {{cast.name}}</p>\n                              </div>\n                            </md-list-item>\n                        </md-list>\n                    </md-content>\n                </div>\n            </div>\n        </div>\n    </div>\n    <md-sidenav flex class=\"md-sidenav-right md-whiteframe-4dp similiar\" md-is-locked-open=\"$mdMedia('gt-md')\" md-component-id=\"right\">\n        <h4 style=\"margin-top: 20px; margin-left: 20px\">You may also like</h4>\n        <md-divider ng-if=\"!$last\"></md-divider>\n        <md-list flex>\n            <md-list-item class=\"md-3-line\" ng-repeat=\"movie in vm.info.similar\" ng-click=\"vm.loadSimilar(movie)\">\n                <img ng-src=\"{{movie.poster_path?'http://image.tmdb.org/t/p/w92'+movie.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image similar-movie\" />\n                <div class=\"md-list-item-text similar-summry\" layout=\"column\">\n                    <h5>{{movie.title}}</h5>\n                    <p>Rate: {{movie.vote_average}} by {{movie.vote_count}} people</p>\n                </div>\n                <md-divider ng-if=\"!$last\"></md-divider>\n            </md-list-item>\n        </md-list>\n    </md-sidenav>\n</section>\n"
+	module.exports = "\n<section layout=\"row\" flex>\n    <div class=\"info-container\" layout=\"column\">\n        <div class=\"info-card\">\n            <md-card class=\"info-poster\">\n                <img ng-src=\"{{vm.info.poster_path?'http://image.tmdb.org/t/p/w300'+vm.info.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image\" alt=\"Washed Out\">\n            </md-card>\n            <div class=\"right-card\">\n                <div>\n                    <div class=\"top-card\">\n                        <span class=\"md-headline\">\n                            {{vm.info.tagline}}\n                        </span>\n                        <h5>IMDB rating: {{vm.info.imdbRating}} rated by {{vm.info.ratedByUsers}} people</h5>\n                        <h5>Release data: {{vm.info.release_date}}</h5>\n                        <h5>Runtime: {{vm.info.runtime}} minutes</h5>\n                        <h5>Original language: {{vm.info.original_language}}</h5>\n                        <h5 style=\"display: inline;\"><p style=\"float: left; display: inline; padding-top: 15px\">Genre:</p></h5>\n                        <md-chips style=\"float: left\">\n                            <md-chip ng-repeat=\"genre in vm.info.genres\">\n                                {{genre.name}}\n                            </md-chip>\n                        </md-chips>\n                    </div>\n                </div>\n                <div>\n                </div>\n                <md-content class=\"description\" flex layout-padding>\n                    <p style=\"padding-left: 5px\">Storyline: {{vm.info.overview}}</p>\n                </md-content>\n            </div>\n        </div>\n        <div class=\"video-list\">\n            <span style=\"display: inline-block;\" class=\"md-headline\">\n                Videos\n            </span>\n            <div layout='row'>\n                <div ng-click=\"vm.openPlayer(video.link)\" style=\"position: relative;\" ng-repeat=\"video in vm.info.videos\">\n                    <picture>\n                        <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/mqdefault.jpg\"}}' media=\"(min-width:991px)\" />\n                        <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/hqdefault.jpg\"}}' media=\"(min-width:767px)\" />\n                        <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/sddefault.jpg\"}}' />\n                        <img class=\"video-card\" srcSet />\n                    </picture>\n                    <img class=\"play-button\" src=\"../img/pic/play.png\" />\n                    <div class=\"video-description\">\n                        <p>{{video.title | limitTo: 40}}...</p>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab ng-if=\"vm.shouldShowtime\" label=\"Showtime\">\n                    <div class=\"theaters\">\n                        <div style=\"margin-left: 20px\" layout=\"row\">\n                            <md-content>\n                                <h4>Date</h4>\n                                <md-datepicker style=\"float: left\" ng-model=\"vm.date.currentDate\" md-placeholder=\"Enter date\"\n                                               md-min-date=\"vm.date.minDate\" md-max-date=\"vm.date.maxDate\"></md-datepicker>\n                                <md-list ng-if=\"vm.info.theaters.length > 0\" class=\"md-dense\" flex style=\"width: 100%; clear: both; margin-top: 100px\">\n                                    <md-list-item  class=\"md-3-line\" style=\"justify-content: space-between;\" ng-repeat=\"theater in vm.info.theaters\">\n                                        <div class=\"theater-card\">\n                                            <b style=\"display: block\">{{theater.name}}</b>\n                                            <img style=\"float: left\" class=\"md-avatar\" ng-src=\"../img/icons/phone.svg\" />\n                                            <div style=\"float: left\" class=\"md-list-item-text\">\n                                                <p> {{theater.phoneNumber}} </p>\n                                            </div>\n                                        </div>\n                                        <div class=\"showtime\" layout=\"row\">\n                                            <table class=\"table\">\n                                                <tbody>\n                                                <tr ng-repeat=\"movie in theater.movie\">\n                                                    <th>{{movie.name}}</th>\n                                                    <td ng-repeat=\"time in movie.showtimes\"><p style=\"display: block\">{{time}}</p> <img ng-if=\"movie.showtime_tickets[time]\" ng-click=\"vm.buyTicket(movie.showtime_tickets[time])\" style=\"width: 50px; height: 20px\" ng-src=\"../img/pic/ticket.png\" /></td>\n                                                </tr>\n                                                </tbody>\n                                            </table>\n                                        </div>\n                                        <md-divider ng-if=\"!$last\"></md-divider>\n                                    </md-list-item>\n                                </md-list>\n                            </md-content>\n                        </div>\n                        <map ng-if=\"vm.info.theaters.length > 0\" location=\"vm.location\" theaters=\"vm.info.theaters\"></map>\n                    </div>\n                </md-tab>\n                <md-tab ng-if=\"vm.info.purchaseChannels\" label=\"Avilable On\">\n                    <channels channels=\"vm.info.purchaseChannels\"></channels>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n        <div class=\"cast\">\n            <span style=\"display: inline-block;\" class=\"md-headline\">\n                Credit\n            </span>\n            <div ng-cloak layout-gt-sm=\"row\" layout=\"column\">\n                <div flex-gt-sm=\"50\" flex>\n                    <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                      <div class=\"md-toolbar-tools\">\n                        <span>Crew</span>\n                      </div>\n                    </md-toolbar>\n                    <md-content>\n                        <md-list flex>\n                            <!-- <md-subheader class=\"md-no-sticky\">Crew</md-subheader> -->\n                            <md-list-item class=\"md-3-line\" ng-repeat=\"crew in vm.info.credit.crew | limitTo: 10\" ng-click=\"vm.showPerson(crew)\">\n                              <img ng-src=\"{{crew.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+crew.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                              <div class=\"md-list-item-text\" layout=\"column\">\n                                <h4>department: {{crew.department}}</h4>\n                                <p>name: {{crew.name}}</p>\n                              </div>\n                            </md-list-item>\n                        </md-list>  \n                    </md-content>\n                </div>\n                <div flex-gt-sm=\"50\" flex>\n                    <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                      <div class=\"md-toolbar-tools\">\n                        <span>Cast</span>\n                      </div>\n                    </md-toolbar>\n                    <md-content>\n                        <md-list flex>\n                            <!-- <md-subheader class=\"md-no-sticky\">Cast</md-subheader> -->\n                            <md-list-item class=\"md-3-line\" ng-repeat=\"cast in vm.info.credit.cast | limitTo: 10\" ng-click=\"vm.showPerson(cast)\">\n                              <img ng-src=\"{{cast.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+cast.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                              <div class=\"md-list-item-text\" layout=\"column\">\n                                <h4>character: {{cast.character}}</h4>\n                                <p>name: {{cast.name}}</p>\n                              </div>\n                            </md-list-item>\n                        </md-list>\n                    </md-content>\n                </div>\n            </div>\n        </div>\n    </div>\n    <md-sidenav flex class=\"md-sidenav-right md-whiteframe-4dp similiar\" md-is-locked-open=\"$mdMedia('gt-md')\" md-component-id=\"right\">\n        <h4 style=\"margin-top: 20px; margin-left: 20px\">You may also like</h4>\n        <md-divider ng-if=\"!$last\"></md-divider>\n        <md-list flex>\n            <md-list-item class=\"md-3-line\" ng-repeat=\"movie in vm.info.similar\" ng-click=\"vm.loadSimilar(movie)\">\n                <img ng-src=\"{{movie.poster_path?'http://image.tmdb.org/t/p/w92'+movie.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image similar-movie\" />\n                <div class=\"md-list-item-text similar-summry\" layout=\"column\">\n                    <h5>{{movie.title}}</h5>\n                    <p>Rate: {{movie.vote_average}} by {{movie.vote_count}} people</p>\n                </div>\n                <md-divider ng-if=\"!$last\"></md-divider>\n            </md-list-item>\n        </md-list>\n    </md-sidenav>\n</section>\n"
 
 /***/ },
 /* 76 */
@@ -76801,6 +76818,97 @@
 
 /***/ },
 /* 82 */
+/*!***********************************************!*\
+  !*** ./PurchaseChannels/purchase_channels.js ***!
+  \***********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	exports.default = function (ngModule) {
+	    ngModule.directive("channels", function () {
+	        __webpack_require__(/*! ./purchase.css */ 83);
+	        return {
+	            restrict: "E",
+	            scope: {
+	                channels: "="
+	            },
+	            template: __webpack_require__(/*! ./purchase.html */ 85),
+	            controllerAs: "vm",
+	            controller: function controller($scope, $rootScope) {
+	                var vm = this;
+	                debugger;
+	                vm.channels = $scope.channels;
+	
+	                vm.redirect = function (url) {
+	                    window.open(url, '_blank');
+	                };
+	            }
+	        };
+	    });
+	};
+
+/***/ },
+/* 83 */
+/*!***************************************!*\
+  !*** ./PurchaseChannels/purchase.css ***!
+  \***************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !./../../~/css-loader!./purchase.css */ 84);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./purchase.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./purchase.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 84 */
+/*!*******************************************************!*\
+  !*** ../~/css-loader!./PurchaseChannels/purchase.css ***!
+  \*******************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".channel-card {\n    float: left;\n    margin-left: 10px;\n    display: flex;\n    flex-direction: column;\n}\n\n.purchase-info {\n    float: left;\n    width: 80%;\n}\n\n.purchase-info td {\n    padding-left: 20px;\n    padding-right: 20px;\n}", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 85 */
+/*!****************************************!*\
+  !*** ./PurchaseChannels/purchase.html ***!
+  \****************************************/
+/***/ function(module, exports) {
+
+	module.exports = "<div>\n    <md-list ng-if=\"vm.channels.length > 0\" class=\"md-dense\" flex style=\"width: 100%; clear: both; margin-top: 10px\">\n        <md-list-item  class=\"md-3-line\" style=\"justify-content: space-between;\" ng-repeat=\"channel in vm.channels\" ng-click=\"vm.redirect(channel.link)\">\n            <div class=\"channel-card\">\n                <img class=\"md-avatar\" ng-src=\"{{'img/channels/'+channel.source+'.png'}}\" />\n                <p style=\"font-size: 10px\">{{channel.display_name}}</p>\n            </div>\n            <div class=\"purchase-info\" layout=\"row\">\n                <table>\n                    <tbody>\n                    <tr>\n                        <td ng-repeat=\"info in channel.formats\"><p style=\"display: block\">{{info.price}}$</p><p>{{info.type}} {{info.format}}</p></td>\n                    </tr>\n                    </tbody>\n                </table>\n            </div>\n            <md-divider ng-if=\"!$last\"></md-divider>\n        </md-list-item>\n    </md-list>\n</div>"
+
+/***/ },
+/* 86 */
 /*!**************************!*\
   !*** ./router/router.js ***!
   \**************************/

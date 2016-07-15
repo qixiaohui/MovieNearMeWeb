@@ -93,6 +93,7 @@ export default ngModule => {
                     //this will decide if the show time will show
                     //condition: if release date month is older than 2 month
                     vm.shouldShowtime = true;
+                    vm.shouldPurchase = true;
                     vm.today = new Date();
                     var releaseArr = vm.info.release_date.split('-');
                     var releaseDate = new Date(parseInt(releaseArr[0]), parseInt(releaseArr[1])-1, parseInt(releaseArr[2]));
@@ -101,6 +102,8 @@ export default ngModule => {
                         vm.shouldShowtime = false;
                     }else if(util.compareDate(releaseDate, vm.today) > 1){
                         vm.today = releaseDate;
+                        // movie is not released yet, no purchase option avilable
+                        vm.shouldPurchase = false;
                     }
 
                     vm.date = {
@@ -142,18 +145,31 @@ export default ngModule => {
                         console.error(err);
                     });
 
-                    if(sessionStorage.getItem('zip')){
-                        let zipObj = JSON.parse(sessionStorage.getItem('zip'));
-                        vm.zip = zipObj.zip;
-                        vm.location = {};
-                        vm.location.lati = zipObj.lati;
-                        vm.location.longi = zipObj.longi;
-                        vm.getTheaters();
-                    }else {
-                        if (navigator.geolocation) {
-                            navigator.geolocation.getCurrentPosition(vm.getTheaters);
+                    //if false shouldn't call purchase
+                    if(vm.shouldPurchase) {
+                        crud.GET(`/schedule/avilableon/webpurchase/${vm.info.id}`, {}).then((response) => {
+                            vm.info.purchaseChannels = response.data;
+                            $scope.$digest();
+                        }).catch((err) => {
+                            console.error(err);
+                        });
+                    }
+
+                    //if false then shouldn't search show time at all
+                    if(vm.shouldShowtime) {
+                        if (sessionStorage.getItem('zip')) {
+                            let zipObj = JSON.parse(sessionStorage.getItem('zip'));
+                            vm.zip = zipObj.zip;
+                            vm.location = {};
+                            vm.location.lati = zipObj.lati;
+                            vm.location.longi = zipObj.longi;
+                            vm.getTheaters();
                         } else {
-                            //TODO: handle geolocation not supported
+                            if (navigator.geolocation) {
+                                navigator.geolocation.getCurrentPosition(vm.getTheaters);
+                            } else {
+                                //TODO: handle geolocation not supported
+                            }
                         }
                     }
                 };

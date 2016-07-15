@@ -19,4 +19,13 @@ const youtubeKey = "AIzaSyCt7YXiR7I9lwCXyYDmayb3kJRzML8TxHY";
 exports.youtubeKey = youtubeKey;
 
 const herokuRedirect = "http://polar-sands-49796.herokuapp.com/";
+
 exports.herokuRedirect = herokuRedirect;
+
+const guideboxApi = "https://api-public.guidebox.com/v1.43/US/";
+
+exports.guideboxApi = guideboxApi;
+
+const guideboxKey = "TV7YbCpnxu54kJWJGsNxa7QwCZo0Ql";
+
+exports.guideboxKey = guideboxKey;

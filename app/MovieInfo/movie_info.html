@@ -49,41 +49,47 @@
                 </div>
             </div>
         </div>
-        <div ng-if="vm.shouldShowtime" class="theaters">
-            <span style="display: inline-block;" class="md-headline">
-                Showtime
-            </span>
-            <div style="margin-left: 20px" layout="row">
-                <md-content>
-                    <h4>Date</h4>
-                    <md-datepicker style="float: left" ng-model="vm.date.currentDate" md-placeholder="Enter date"
-                                   md-min-date="vm.date.minDate" md-max-date="vm.date.maxDate"></md-datepicker>
-                    <md-list ng-if="vm.info.theaters.length > 0" class="md-dense" flex style="width: 100%; clear: both; margin-top: 100px">
-                        <md-list-item  class="md-3-line" style="justify-content: space-between;" ng-repeat="theater in vm.info.theaters">
-                            <div class="theater-card">
-                                <b style="display: block">{{theater.name}}</b>
-                                <img style="float: left" class="md-avatar" ng-src="../img/icons/phone.svg" />
-                                <div style="float: left" class="md-list-item-text">
-                                    <p> {{theater.phoneNumber}} </p>
-                                </div>
-                            </div>
-                            <div class="showtime" layout="row">
-                                <table class="table">
-                                    <tbody>
-                                    <tr ng-repeat="movie in theater.movie">
-                                        <th>{{movie.name}}</th>
-                                        <td ng-repeat="time in movie.showtimes"><p style="display: block">{{time}}</p> <img ng-if="movie.showtime_tickets[time]" ng-click="vm.buyTicket(movie.showtime_tickets[time])" style="width: 50px; height: 20px" ng-src="../img/pic/ticket.png" /></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <md-divider ng-if="!$last"></md-divider>
-                        </md-list-item>
-                    </md-list>
-                </md-content>
-            </div>
-            <map ng-if="vm.info.theaters.length > 0" location="vm.location" theaters="vm.info.theaters"></map>
-        </div>
+        <md-content>
+            <md-tabs md-dynamic-height md-border-bottom>
+                <md-tab ng-if="vm.shouldShowtime" label="Showtime">
+                    <div class="theaters">
+                        <div style="margin-left: 20px" layout="row">
+                            <md-content>
+                                <h4>Date</h4>
+                                <md-datepicker style="float: left" ng-model="vm.date.currentDate" md-placeholder="Enter date"
+                                               md-min-date="vm.date.minDate" md-max-date="vm.date.maxDate"></md-datepicker>
+                                <md-list ng-if="vm.info.theaters.length > 0" class="md-dense" flex style="width: 100%; clear: both; margin-top: 100px">
+                                    <md-list-item  class="md-3-line" style="justify-content: space-between;" ng-repeat="theater in vm.info.theaters">
+                                        <div class="theater-card">
+                                            <b style="display: block">{{theater.name}}</b>
+                                            <img style="float: left" class="md-avatar" ng-src="../img/icons/phone.svg" />
+                                            <div style="float: left" class="md-list-item-text">
+                                                <p> {{theater.phoneNumber}} </p>
+                                            </div>
+                                        </div>
+                                        <div class="showtime" layout="row">
+                                            <table class="table">
+                                                <tbody>
+                                                <tr ng-repeat="movie in theater.movie">
+                                                    <th>{{movie.name}}</th>
+                                                    <td ng-repeat="time in movie.showtimes"><p style="display: block">{{time}}</p> <img ng-if="movie.showtime_tickets[time]" ng-click="vm.buyTicket(movie.showtime_tickets[time])" style="width: 50px; height: 20px" ng-src="../img/pic/ticket.png" /></td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <md-divider ng-if="!$last"></md-divider>
+                                    </md-list-item>
+                                </md-list>
+                            </md-content>
+                        </div>
+                        <map ng-if="vm.info.theaters.length > 0" location="vm.location" theaters="vm.info.theaters"></map>
+                    </div>
+                </md-tab>
+                <md-tab ng-if="vm.info.purchaseChannels" label="Avilable On">
+                    <channels channels="vm.info.purchaseChannels"></channels>
+                </md-tab>
+            </md-tabs>
+        </md-content>
         <div class="cast">
             <span style="display: inline-block;" class="md-headline">
                 Credit

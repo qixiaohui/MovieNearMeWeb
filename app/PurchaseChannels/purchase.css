@@ -1,0 +1,16 @@
+.channel-card {
+    float: left;
+    margin-left: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.purchase-info {
+    float: left;
+    width: 80%;
+}
+
+.purchase-info td {
+    padding-left: 20px;
+    padding-right: 20px;
+}

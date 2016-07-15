@@ -38,6 +38,7 @@ require('./tabs/tabs_directive').default(app);
 require('./movies/movies_directive').default(app);
 require('./MovieInfo/movie_info').default(app);
 require('./map/map_directive').default(app);
+require('./PurchaseChannels/purchase_channels').default(app);
 
 require('./router/router').default(app);
 

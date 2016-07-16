@@ -26,6 +26,6 @@ const guideboxApi = "https://api-public.guidebox.com/v1.43/US/";
 
 exports.guideboxApi = guideboxApi;
 
-const guideboxKey = "TV7YbCpnxu54kJWJGsNxa7QwCZo0Ql";
+const guideboxKey = "rKnB5DbnNDFUHmnmtcxfKzb4zXXo7zDR";
 
 exports.guideboxKey = guideboxKey;

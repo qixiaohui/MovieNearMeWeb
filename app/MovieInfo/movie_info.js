@@ -198,7 +198,8 @@ export default ngModule => {
                     });
 
                     //if false shouldn't call purchase
-                    if(vm.shouldPurchase) {
+                    //if it's in theater most likely there is no purchase yet
+                    if(vm.shouldPurchase && !vm.shouldShowtime) {
                         crud.GET(`/schedule/avilableon/webpurchase/${vm.info.id}`, {}).then((response) => {
                             vm.info.purchaseChannels = response.data;
                             $scope.$digest();

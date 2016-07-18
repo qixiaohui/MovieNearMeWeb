@@ -3,7 +3,7 @@
     <div class="info-container" layout="column">
         <div class="info-card">
             <md-card class="info-poster">
-                <img ng-src="{{vm.info.poster_path?'http://image.tmdb.org/t/p/w300'+vm.info.poster_path:'img/pic/NoImage.jpg'}}" class="md-card-image" alt="Washed Out">
+                <img ng-src="{{vm.info.poster_path?'https://image.tmdb.org/t/p/w300'+vm.info.poster_path:'img/pic/NoImage.jpg'}}" class="md-card-image" alt="Washed Out">
             </md-card>
             <div class="right-card">
                 <div>
@@ -30,25 +30,28 @@
                 </md-content>
             </div>
         </div>
-        <div class="video-list">
-            <span style="display: inline-block;" class="md-headline">
-                Videos
-            </span>
-            <div layout='row'>
-                <div ng-click="vm.openPlayer(video.link)" style="position: relative;" ng-repeat="video in vm.info.videos">
-                    <picture>
-                        <source srcSet='{{"https://i.ytimg.com/vi/"+video.id+"/mqdefault.jpg"}}' media="(min-width:991px)" />
-                        <source srcSet='{{"https://i.ytimg.com/vi/"+video.id+"/hqdefault.jpg"}}' media="(min-width:767px)" />
-                        <source srcSet='{{"https://i.ytimg.com/vi/"+video.id+"/sddefault.jpg"}}' />
-                        <img class="video-card" srcSet />
-                    </picture>
-                    <img class="play-button" src="../img/pic/play.png" />
-                    <div class="video-description">
-                        <p>{{video.title | limitTo: 40}}...</p>
+        <md-content>
+            <md-tabs md-dynamic-height md-border-bottom>
+                <md-tab label="Videos">
+                    <div class="video-list">
+                        <div layout='row'>
+                            <div ng-click="vm.openPlayer(video.link)" style="position: relative;" ng-repeat="video in vm.info.videos">
+                                <picture>
+                                    <source srcSet='{{"https://i.ytimg.com/vi/"+video.id+"/mqdefault.jpg"}}' media="(min-width:991px)" />
+                                    <source srcSet='{{"https://i.ytimg.com/vi/"+video.id+"/hqdefault.jpg"}}' media="(min-width:767px)" />
+                                    <source srcSet='{{"https://i.ytimg.com/vi/"+video.id+"/sddefault.jpg"}}' />
+                                    <img class="video-card" srcSet />
+                                </picture>
+                                <img class="play-button" src="../img/pic/play.png" />
+                                <div class="video-description">
+                                    <p>{{video.title | limitTo: 40}}...</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
+                </md-tab>
+            </md-tabs>
+        </md-content>
         <md-content>
             <md-tabs md-dynamic-height md-border-bottom>
                 <md-tab ng-if="vm.shouldShowtime" label="Showtime">
@@ -90,58 +93,61 @@
                 </md-tab>
             </md-tabs>
         </md-content>
-        <div class="cast">
-            <span style="display: inline-block;" class="md-headline">
-                Credit
-            </span>
-            <div ng-cloak layout-gt-sm="row" layout="column">
-                <div flex-gt-sm="50" flex>
-                    <md-toolbar layout="row" class="md-hue-3">
-                      <div class="md-toolbar-tools">
-                        <span>Crew</span>
-                      </div>
-                    </md-toolbar>
-                    <md-content>
-                        <md-list flex>
-                            <!-- <md-subheader class="md-no-sticky">Crew</md-subheader> -->
-                            <md-list-item class="md-3-line" ng-repeat="crew in vm.info.credit.crew | limitTo: 10" ng-click="vm.showPerson(crew)">
-                              <img ng-src="{{crew.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+crew.profile_path:'../img/pic/avatar.png'}}" class="md-avatar" />
-                              <div class="md-list-item-text" layout="column">
-                                <h4>department: {{crew.department}}</h4>
-                                <p>name: {{crew.name}}</p>
-                              </div>
-                            </md-list-item>
-                        </md-list>  
-                    </md-content>
-                </div>
-                <div flex-gt-sm="50" flex>
-                    <md-toolbar layout="row" class="md-hue-3">
-                      <div class="md-toolbar-tools">
-                        <span>Cast</span>
-                      </div>
-                    </md-toolbar>
-                    <md-content>
-                        <md-list flex>
-                            <!-- <md-subheader class="md-no-sticky">Cast</md-subheader> -->
-                            <md-list-item class="md-3-line" ng-repeat="cast in vm.info.credit.cast | limitTo: 10" ng-click="vm.showPerson(cast)">
-                              <img ng-src="{{cast.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+cast.profile_path:'../img/pic/avatar.png'}}" class="md-avatar" />
-                              <div class="md-list-item-text" layout="column">
-                                <h4>character: {{cast.character}}</h4>
-                                <p>name: {{cast.name}}</p>
-                              </div>
-                            </md-list-item>
-                        </md-list>
-                    </md-content>
-                </div>
-            </div>
-        </div>
+        <md-content>
+            <md-tabs md-dynamic-height md-border-bottom>
+                <md-tab label="Credit">
+                    <div class="cast">
+                        <div ng-cloak layout-gt-sm="row" layout="column">
+                            <div flex-gt-sm="50" flex>
+                                <md-toolbar layout="row" class="md-hue-3">
+                                  <div class="md-toolbar-tools">
+                                    <span>Crew</span>
+                                  </div>
+                                </md-toolbar>
+                                <md-content>
+                                    <md-list flex>
+                                        <!-- <md-subheader class="md-no-sticky">Crew</md-subheader> -->
+                                        <md-list-item class="md-3-line" ng-repeat="crew in vm.info.credit.crew | limitTo: 10" ng-click="vm.showPerson(crew)">
+                                          <img ng-src="{{crew.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+crew.profile_path:'../img/pic/avatar.png'}}" class="md-avatar" />
+                                          <div class="md-list-item-text" layout="column">
+                                            <h4>department: {{crew.department}}</h4>
+                                            <p>name: {{crew.name}}</p>
+                                          </div>
+                                        </md-list-item>
+                                    </md-list>
+                                </md-content>
+                            </div>
+                            <div flex-gt-sm="50" flex>
+                                <md-toolbar layout="row" class="md-hue-3">
+                                  <div class="md-toolbar-tools">
+                                    <span>Cast</span>
+                                  </div>
+                                </md-toolbar>
+                                <md-content>
+                                    <md-list flex>
+                                        <!-- <md-subheader class="md-no-sticky">Cast</md-subheader> -->
+                                        <md-list-item class="md-3-line" ng-repeat="cast in vm.info.credit.cast | limitTo: 10" ng-click="vm.showPerson(cast)">
+                                          <img ng-src="{{cast.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+cast.profile_path:'../img/pic/avatar.png'}}" class="md-avatar" />
+                                          <div class="md-list-item-text" layout="column">
+                                            <h4>character: {{cast.character}}</h4>
+                                            <p>name: {{cast.name}}</p>
+                                          </div>
+                                        </md-list-item>
+                                    </md-list>
+                                </md-content>
+                            </div>
+                        </div>
+                    </div>
+                </md-tab>
+            </md-tabs>
+        </md-content>
     </div>
     <md-sidenav flex class="md-sidenav-right md-whiteframe-4dp similiar" md-is-locked-open="$mdMedia('gt-md')" md-component-id="right">
         <h4 style="margin-top: 20px; margin-left: 20px">You may also like</h4>
         <md-divider ng-if="!$last"></md-divider>
         <md-list flex>
             <md-list-item class="md-3-line" ng-repeat="movie in vm.info.similar" ng-click="vm.loadSimilar(movie)">
-                <img ng-src="{{movie.poster_path?'http://image.tmdb.org/t/p/w92'+movie.poster_path:'img/pic/NoImage.jpg'}}" class="md-card-image similar-movie" />
+                <img ng-src="{{movie.poster_path?'https://image.tmdb.org/t/p/w92'+movie.poster_path:'img/pic/NoImage.jpg'}}" class="md-card-image similar-movie" />
                 <div class="md-list-item-text similar-summry" layout="column">
                     <h5>{{movie.title}}</h5>
                     <p>Rate: {{movie.vote_average}} by {{movie.vote_count}} people</p>

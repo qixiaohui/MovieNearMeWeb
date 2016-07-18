@@ -10,7 +10,6 @@ export default ngModule => {
             controllerAs: "vm",
             controller: function ($scope, $rootScope) {
                 const vm = this;
-                debugger;
                 vm.channels = $scope.channels;
 
                 vm.redirect = (url) => {

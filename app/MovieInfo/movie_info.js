@@ -62,20 +62,72 @@ export default ngModule => {
                     }
 
                     promise.then(() => {
-                        crud.GET(`/schedule/theaters/${vm.info.title}/${vm.zip}/${days}`, {}).then((response) => {
-                            vm.info.theaters = [];
-                            _.each(response.data, (theater) => {
-                                theater.movie = [];
-                                _.each(theater.movies, (movie) => {
-                                    if(movie.name.trim().toUpperCase().replace(/[^A-Z0-9]+/ig, "").indexOf(vm.info.title.trim().toUpperCase().replace(/[^A-Z0-9]+/ig, "")) > -1){
-                                        theater.movie.push(movie);
+                        let titleEncoded = vm.info.title.split(" ").join("+");
+                        crud.GET(`/schedule/theaters/${titleEncoded}/${vm.zip}/${days}`, {}).then((response) => {
+
+                            const pushShowTime = (schedules, container) => {
+                                _.each(schedules, (schedule) => {
+                                    container.showtimes.push(schedule.time);
+                                    if(schedule.url){
+                                        let replacedUrl = schedule.url.replace('/url?q=','');
+                                        let key = schedule.time;
+                                        container.showtime_tickets[key] = replacedUrl;
                                     }
                                 });
-                                if(theater.movie.length > 0){
-                                    theater.movies = null;
-                                    vm.info.theaters.push(theater);
-                                }
-                            });
+                            };
+
+                            const pushMovie = (theater) => {
+                                let obj = {
+                                    name: theater.theater,
+                                    address: theater.address,
+                                    movie: [{
+                                        name: response.data.movies[0].title,
+                                        showtimes: [],
+                                        showtime_tickets: {}
+                                    }]
+                                };
+
+                                pushShowTime(theater.schedule, obj.movie[0]);
+
+                                vm.info.theaters.push(obj);
+                            };
+
+                            vm.info.theaters = [];
+                            if(response.data.movies.length > 0){
+                                _.each(response.data.movies[0].theaters, (theater) => {
+                                    pushMovie(theater);
+                                });
+                            }
+
+                            if(response.data.movies.length > 1){
+                                response.data.movies.splice(0, 1);
+                                _.each(response.data.movies, (movieObj) => {
+                                    _.each(movieObj.theaters, (theaterObj) => {
+                                        let match = false;
+                                      _.find(vm.info.theaters, (theater) =>{
+                                            if(theater.name == theaterObj.theater){
+                                                match = true;
+                                                let matched = {
+                                                    name: movieObj.title,
+                                                    showtimes: [],
+                                                    showtime_tickets: {}
+                                                };
+
+                                                pushShowTime(theaterObj.schedule, matched);
+
+                                                theater.movie.push(matched);
+                                                return;
+                                            }
+                                        });
+
+                                        if(!match){
+                                            pushMovie(theaterObj);
+                                        }
+                                    });
+                                });
+                            }
+
+
                             $scope.$digest();
                         }).catch((err) => {
                             console.error(err);

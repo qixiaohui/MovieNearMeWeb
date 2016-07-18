@@ -14,7 +14,9 @@ router.get('/theaters/:name/:zip/:day', apicache('1 day'), function(req, res){
     let zip = req.params.zip;
     let day = req.params.day;
 
+    //redirect url to heroku server, since help relieve server burden also can't scrapper on aws since google block aws ip
     axios({method: 'GET', url: `${herokuRedirect}schedule/theaters/${name}/${zip}/${day}`}).then((response) => {
+        console.log(`${herokuRedirect}schedule/theaters/${name}/${zip}/${day}`);
         res.send(response.data);
     }).catch((err) => {
         res.status(400).send('Ooops something went wrong');

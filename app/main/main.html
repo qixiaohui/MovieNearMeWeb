@@ -1,5 +1,5 @@
 <div layout="column" layout-fill>
-    <md-toolbar md-scroll-shrink="true">
+    <md-toolbar md-scroll-shrink="true" style="position: fixed; z-index: 100">
         <div class="md-toolbar-tools">
             <md-button class="md-icon-button" aria-label="Settings" ng-disabled="true">
                 <md-icon ng-if="vm.state.currentPath.name == 'main.tabs'" md-svg-icon="img/icons/menu.svg"></md-icon>
@@ -8,8 +8,8 @@
             <span>{{appName}}</span>
             <!-- fill up the space between left and right area -->
             <span flex></span>
-            <md-button ng-if="!vm.user" ng-click="vm.signin()">
-                Sign in with facebook
+            <md-button ng-if="!vm.user && vm.state.currentPath.name != 'main.signin'" ng-click="vm.signinPage()">
+                Sign in
             </md-button>
             <div class="fb-appbar-login-area">
                 <md-menu class="fb-appear-menu">

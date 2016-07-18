@@ -27,7 +27,6 @@ export default (ngModule, firebase, provider) => {
                 $rootScope.$on('$stateChangeSuccess', function (ev, to, toParams, from, fromParams) {
                     vm.state.currentPath = to;
                     vm.state.previousPath = from;
-
                 });
                 
                 vm.statePop = () => {
@@ -52,6 +51,7 @@ export default (ngModule, firebase, provider) => {
                     if (user) {
                         // User is signed in.
                         vm.user = user;
+                        $location.path('/main/tabs');
                         $scope.$digest();
                     }else{
                         // User signed out
@@ -60,7 +60,7 @@ export default (ngModule, firebase, provider) => {
                     }
                 });
                 
-                vm.signin = () => {
+                $scope.fbsignin = () => {
                     firebase.auth().signInWithPopup(provider).then(function(result) {
                         // This gives you a Facebook Access Token. You can use it to access the Facebook API.
                         var token = result.credential.accessToken;
@@ -75,13 +75,17 @@ export default (ngModule, firebase, provider) => {
                     });
                 };
 
-                vm.logout = () => {
+                vm.fblogout = () => {
                     firebase.auth().signOut().then(function() {
                         // Sign-out successful.
                     }, function(error) {
                         // An error happened.
                     });
                 };
+
+                vm.signinPage = () => {
+                    $location.path('/main/signin');
+                }
             }
         };
     });

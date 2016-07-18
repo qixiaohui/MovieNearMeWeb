@@ -1,0 +1,50 @@
+.signinHeader {
+    height: 100px;
+    background: #3f51b5;
+}
+
+.signin-h3 {
+    padding-top: 50px;
+    text-align: center;
+    color: white;
+}
+
+.fblogin {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.fblogin button{
+    padding-right: 45px;
+    height: 35px;
+    background: none;
+    border: none;
+    display: table;
+    margin: 0 auto;
+    background-size: 35px 35px;
+    background-position: right center;
+    background-repeat: no-repeat;
+    border-radius: 4px;
+    color: white;
+    font-family:"Merriweather Sans", sans-serif;
+    font-size: 14px;
+    width: 205px;
+    border-bottom: 2px solid transparent;
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
+    box-shadow: 0 4px 2px -2px gray;
+    text-shadow: rgba(0, 0, 0, .5) -1px -1px 0;
+}
+
+button#facebook {
+    border-color: #2d5073;
+    background-color: #3b5998;
+    background-image: url(http://icons.iconarchive.com/icons/danleech/simple/512/facebook-icon.png);
+}
+
+.logingrouop {
+    display: flex;
+    width: 80%;
+    margin: auto;
+    flex-direction: column
+}

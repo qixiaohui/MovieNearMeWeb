@@ -18,16 +18,17 @@ router.get('/info/:id',apicache('1 day'), function(req, res){
 
     axios({method: 'GET',url: `${theMovieBaseUrl}${id}?api_key=${theMovieToken}&language=en`}).then((result) => {
         let data = result.data;
-        let promise = new Promise((resolve, reject) => {
-            imdbScrapper.infoByTitle(data.imdb_id, resolve, reject);
-        });
-        promise.then((response) => {
-            _.extend(data, response);
-            res.send(data);
-        }).catch((err) => {
-            console.error(err);
-            res.send(data);
-        });
+        // let promise = new Promise((resolve, reject) => {
+        //     imdbScrapper.infoByTitle(data.imdb_id, resolve, reject);
+        // });
+        // promise.then((response) => {
+        //     _.extend(data, response);
+        //     res.send(data);
+        // }).catch((err) => {
+        //     console.error(err);
+        //     res.send(data);
+        // });
+        res.send(data);
 
     }).catch((data) => {
         console.error(data);

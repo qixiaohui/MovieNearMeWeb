@@ -12,6 +12,7 @@ export default ngModule => {
             controllerAs: "vm",
             controller: function($scope, $rootScope, $location){
                 const vm = this;
+                vm.Math = window.Math;
                 vm.movies = {};
                 vm.category = $scope.category;
                 vm.index = $scope.index;

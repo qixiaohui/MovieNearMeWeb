@@ -18,16 +18,11 @@
                 <md-card-content>
                     <p>{{movie.overview | limitTo:100}}</p>
                 </md-card-content>
-                <md-card-actions layout="row" layout-align="end center">
-                    <md-button class="md-icon-button" aria-label="Favorite">
-                        <md-icon md-svg-icon="img/icons/favorite.svg"></md-icon>
+                <md-card-actions layout="row" layout-align="end">
+                    <md-button class="md-icon-button">
+                        <md-icon md-svg-icon="img/icons/popularity.svg"></md-icon>
                     </md-button>
-                    <md-button class="md-icon-button" aria-label="Settings">
-                        <md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
-                    </md-button>
-                    <md-button class="md-icon-button" aria-label="Share">
-                        <md-icon md-svg-icon="img/icons/share.svg"></md-icon>
-                    </md-button>
+                    <p ng-style="{'color': '#'+vm.Math.floor((movie.popularity/100)*16777215).toString(16)}" style="padding-right: 10px; padding-top: 10px">{{movie.popularity | limitTo: 4}}</p>
                 </md-card-actions>
             </md-card>
         </md-grid-tile>

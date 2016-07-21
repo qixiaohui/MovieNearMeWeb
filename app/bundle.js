@@ -111,6 +111,7 @@
 	__webpack_require__(/*! ./map/map_directive */ 77).default(app);
 	__webpack_require__(/*! ./PurchaseChannels/purchase_channels */ 82).default(app);
 	__webpack_require__(/*! ./signin/signin_directive */ 86).default(app);
+	__webpack_require__(/*! ./register/register_directive.js */ 91).default(app);
 	
 	__webpack_require__(/*! ./router/router */ 90).default(app);
 
@@ -72799,7 +72800,8 @@
 	                        // User is signed in.
 	                        vm.user = user;
 	                        $location.path('/main/tabs');
-	                        $scope.$digest();
+	                        // need to call apply since need to check update from rootscope
+	                        $scope.$apply();
 	                    } else {
 	                        // User signed out
 	                        vm.user = null;
@@ -72862,11 +72864,12 @@
 	                /**
 	                 * email password register
 	                 */
-	                $scope.emailregister = function () {
+	                $scope.emailregister = function (email, password) {
 	                    firebase.auth().createUserWithEmailAndPassword(email, password).catch(function (error) {
 	                        // Handle Errors here.
 	                        var errorCode = error.code;
-	                        var errorMessage = error.message;
+	                        $scope.registerErrorMessage = error.message;
+	                        $scope.$digest();
 	                        // ...
 	                    });
 	                };
@@ -72932,7 +72935,7 @@
   \************************/
 /***/ function(module, exports) {
 
-	module.exports = "<div layout=\"column\" layout-fill>\n    <md-toolbar md-scroll-shrink=\"true\" style=\"position: fixed; z-index: 100\">\n        <div class=\"md-toolbar-tools\">\n            <md-button class=\"md-icon-button\" aria-label=\"Settings\" ng-disabled=\"true\">\n                <md-icon ng-if=\"vm.state.currentPath.name == 'main.tabs'\" md-svg-icon=\"img/icons/menu.svg\"></md-icon>\n                <md-icon ng-click=\"vm.statePop()\" ng-if=\"vm.state.currentPath.name != 'main.tabs'\" md-svg-icon=\"img/icons/back.svg\"></md-icon>\n            </md-button>\n            <span>{{appName}}</span>\n            <!-- fill up the space between left and right area -->\n            <span flex></span>\n            <md-button ng-if=\"!vm.user && vm.state.currentPath.name != 'main.signin'\" ng-click=\"vm.signinPage()\">\n                Sign in\n            </md-button>\n            <div class=\"fb-appbar-login-area\">\n                <md-menu class=\"fb-appear-menu\">\n                    <button class=\"fb-appear-btn md-button md-gmp-blue-theme md-ink-ripple\" ng-click=\"$mdOpenMenu($event)\">\n                        <img ng-if=\"vm.user\" style=\"width: 40px; margin-right: 50px; border-radius: 50%\" ng-src=\"{{vm.user.photoURL}}\" />\n                        <div class=\"md-ripple-container\"></div>\n                    </button>\n                    <md-menu-content>\n                        <md-menu-item role=\"menuitem\" style=\"height: 90px\">\n                            <div layout=\"row\" class=\"logout\">\n                                <img ng-src=\"{{vm.user.photoURL}}\" />\n                                <div layout=\"column\" style=\"flex-direction: column\">\n                                    <div class=\"logout-email\">\n                                        {{vm.user.email}}\n                                    </div>\n                                    <div class=\"logout-btn\">\n                                        <a ng-click=\"vm.logout()\">SIGN OUT</a>\n                                    </div>\n                                </div>\n                            </div>\n                        </md-menu-item>\n                    </md-menu-content>\n                </md-menu>\n            </div>\n        </div>\n    </md-toolbar>\n    <div ui-view></div>\n</div>"
+	module.exports = "<div layout=\"column\" layout-fill>\n    <md-toolbar md-scroll-shrink=\"true\" style=\"position: fixed; z-index: 100\">\n        <div class=\"md-toolbar-tools\">\n            <md-button class=\"md-icon-button\" aria-label=\"Settings\" ng-disabled=\"true\">\n                <md-icon ng-if=\"vm.state.currentPath.name == 'main.tabs'\" md-svg-icon=\"img/icons/menu.svg\"></md-icon>\n                <md-icon ng-click=\"vm.statePop()\" ng-if=\"vm.state.currentPath.name != 'main.tabs'\" md-svg-icon=\"img/icons/back.svg\"></md-icon>\n            </md-button>\n            <span>{{appName}}</span>\n            <!-- fill up the space between left and right area -->\n            <span flex></span>\n            <md-button ng-if=\"!vm.user && ['main.signin', 'main.register'].indexOf(vm.state.currentPath.name) < 0 \" ng-click=\"vm.signinPage()\">\n                Sign in\n            </md-button>\n            <div class=\"fb-appbar-login-area\">\n                <md-menu class=\"fb-appear-menu\">\n                    <button class=\"fb-appear-btn md-button md-gmp-blue-theme md-ink-ripple\" ng-click=\"$mdOpenMenu($event)\">\n                        <img ng-if=\"vm.user.photoURL\" style=\"width: 40px; margin-right: 50px; border-radius: 50%\" ng-src=\"{{vm.user.photoURL}}\" />\n                        <p ng-if=\"!vm.user.photoURL\">{{vm.user.email}}</p>\n                        <div class=\"md-ripple-container\"></div>\n                    </button>\n                    <md-menu-content>\n                        <md-menu-item role=\"menuitem\" style=\"height: 90px\">\n                            <div layout=\"row\" class=\"logout\">\n                                <img ng-if=\"vm.user.photoURL\" ng-src=\"{{vm.user.photoURL}}\" />\n                                <div layout=\"column\" style=\"flex-direction: column\">\n                                    <div class=\"logout-email\">\n                                        {{vm.user.email}}\n                                    </div>\n                                    <div class=\"logout-btn\">\n                                        <a ng-click=\"vm.fblogout()\">SIGN OUT</a>\n                                    </div>\n                                </div>\n                            </div>\n                        </md-menu-item>\n                    </md-menu-content>\n                </md-menu>\n            </div>\n        </div>\n    </md-toolbar>\n    <div ui-view></div>\n</div>"
 
 /***/ },
 /* 41 */
@@ -77031,7 +77034,7 @@
 	            controller: function controller($scope, $rootScope, $location) {
 	                var vm = this;
 	
-	                vm.register = function () {
+	                vm.registerpage = function () {
 	                    $location.path('/main/register');
 	                };
 	            }
@@ -77092,7 +77095,7 @@
   \****************************/
 /***/ function(module, exports) {
 
-	module.exports = "<div style=\"margin-top: 60px\">\n    <div class=\"signinHeader\">\n        <h2 class=\"signin-h3\">Sign in</h2>\n    </div>\n    <div>\n        <div class=\"fblogin\">\n            <button id=\"facebook\" ng-click=\"fbsignin()\">Sign in with Facebook</button>\n        </div>\n        <div style=\"width: 30%; margin: auto\">\n            <md-divider></md-divider>\n            <div class=\"logingrouop\">\n                <md-input-container class=\"md-block\" flex-gt-sm>\n                    <label>Email</label>\n                    <input name=\"email\" ng-model=\"user.email\"\n                           required minlength=\"10\" maxlength=\"100\" ng-pattern=\"/^.+@.+\\..+$/\" />\n                </md-input-container>\n                <md-input-container class=\"md-block\" flex-gt-sm>\n                    <label>Password</label>\n                    <input name=\"password\" ng-model=\"user.password\" />\n                    <div ng-messages=\"userForm.password.$error\" ng-show=\"signinHint\">\n                        <div ng-message=\"pattern\">We can't find a match with your email and password.</div>\n                    </div>\n                </md-input-container>\n                <style>\n                    /*\n                     * The Material demos system does not currently allow targeting the body element, so this\n                     * must go here in the HTML.\n                     */\n                    body[dir=rtl] .hint {\n                        right: 2px;\n                        left: auto;\n                    }\n                </style>\n                <md-button class=\"md-raised md-primary\" style=\"width: 100%\" ng-click=\"emailsignin(user.email, user.password)\">login</md-button>\n                <a ng-click=\"vm.register()\">Register</a>\n            </div>\n        </div>\n    </div>\n</div>"
+	module.exports = "<div style=\"margin-top: 60px\">\n    <div class=\"signinHeader\">\n        <h2 class=\"signin-h3\">Sign in</h2>\n    </div>\n    <div>\n        <div class=\"fblogin\">\n            <button id=\"facebook\" ng-click=\"fbsignin()\">Sign in with Facebook</button>\n        </div>\n        <div style=\"width: 30%; margin: auto\">\n            <md-divider></md-divider>\n            <div class=\"logingrouop\">\n                <md-input-container class=\"md-block\" flex-gt-sm>\n                    <label>Email</label>\n                    <input name=\"email\" ng-model=\"user.email\"\n                           required minlength=\"10\" maxlength=\"100\" ng-pattern=\"/^.+@.+\\..+$/\" />\n                </md-input-container>\n                <md-input-container class=\"md-block\" flex-gt-sm>\n                    <label>Password</label>\n                    <input name=\"password\" ng-model=\"user.password\" />\n                    <div ng-messages=\"userForm.password.$error\" ng-show=\"signinHint\">\n                        <div ng-message=\"pattern\">We can't find a match with your email and password.</div>\n                    </div>\n                </md-input-container>\n                <style>\n                    /*\n                     * The Material demos system does not currently allow targeting the body element, so this\n                     * must go here in the HTML.\n                     */\n                    body[dir=rtl] .hint {\n                        right: 2px;\n                        left: auto;\n                    }\n                </style>\n                <md-button class=\"md-raised md-primary\" style=\"width: 100%\" ng-click=\"emailsignin(user.email, user.password)\">login</md-button>\n                <a style=\"margin-left: 15px\" ng-click=\"vm.registerpage()\">Register</a>\n            </div>\n        </div>\n    </div>\n</div>"
 
 /***/ },
 /* 90 */
@@ -77129,6 +77132,90 @@
 	        $urlRouterProvider.otherwise('/main/tabs');
 	    });
 	};
+
+/***/ },
+/* 91 */
+/*!****************************************!*\
+  !*** ./register/register_directive.js ***!
+  \****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	exports.default = function (ngModule) {
+	    ngModule.directive("register", function () {
+	        __webpack_require__(/*! ./register.css */ 92);
+	        var crud = __webpack_require__(/*! ../service/crud */ 48);
+	        return {
+	            restrict: "E",
+	            scope: true,
+	            template: __webpack_require__(/*! ./register.html */ 94),
+	            controllerAs: "vm",
+	            controller: function controller($scope, $rootScope, $location) {
+	                var vm = this;
+	            }
+	        };
+	    });
+	};
+
+/***/ },
+/* 92 */
+/*!*******************************!*\
+  !*** ./register/register.css ***!
+  \*******************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !./../../~/css-loader!./register.css */ 93);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./register.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./register.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 93 */
+/*!***********************************************!*\
+  !*** ../~/css-loader!./register/register.css ***!
+  \***********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".registerHeader {\n    height: 100px;\n    background: #3f51b5;\n}\n\n.register-h3 {\n    padding-top: 50px;\n    text-align: center;\n    color: white;\n}\n\n.registerrouop {\n    display: flex;\n    width: 80%;\n    margin: auto;\n    flex-direction: column\n}", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 94 */
+/*!********************************!*\
+  !*** ./register/register.html ***!
+  \********************************/
+/***/ function(module, exports) {
+
+	module.exports = "<div style=\"margin-top: 60px\">\n    <div class=\"registerHeader\">\n        <h2 class=\"register-h3\">Register</h2>\n    </div>\n    <div>\n        <div style=\"width: 30%; margin: auto\">\n            <form name=\"userForm\">\n                <div class=\"registergrouop\">\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Email</label>\n                        <input name=\"email\" ng-model=\"user.email\"\n                               required ng-pattern=\"/^.+@.+\\..+$/\" />\n                        <div style=\"color: #dd2c00\" ng-show=\"userForm.email.$invalid && userForm.email.$dirty\">\n                            Please input a valid email address\n                        </div>\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Password</label>\n                        <input name=\"password\" ng-pattern=\"/^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/\" required ng-model=\"user.password\" />\n                        <div class=\"hint\" >Password should contain at least one digit, one lower case character, one upper case character, and at least 8 from above mentioned characters</div>\n                        <div style=\"color: #dd2c00\" ng-show=\"userForm.password.$invalid && userForm.password.$dirty\">Your password doesn't match the criteria</div>\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Retype Password</label>\n                        <input name=\"repassword\" required ng-model=\"user.repassword\" />\n                        <div ng-show=\"userForm.repassword.$dirty && user.password != user.repassword\" style=\"color: #dd2c00\">Password doesn't match.</div>\n                    </md-input-container>\n                    <style>\n                        /*\n                         * The Material demos system does not currently allow targeting the body element, so this\n                         * must go here in the HTML.\n                         */\n                        body[dir=rtl] .hint {\n                            right: 2px;\n                            left: auto;\n                        }\n                    </style>\n                    <md-button ng-disabled=\"!userForm.$valid || user.password!=user.repassword\" class=\"md-raised md-primary\" style=\"width: 100%\" ng-click=\"emailregister(user.email, user.password)\">register</md-button>\n                    <div ng-if=\"registerErrorMessage\" style=\"color: #dd2c00\">{{registerErrorMessage}}</div>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>"
 
 /***/ }
 /******/ ]);

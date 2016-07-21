@@ -53,7 +53,8 @@ export default (ngModule, firebase, provider) => {
                         // User is signed in.
                         vm.user = user;
                         $location.path('/main/tabs');
-                        $scope.$digest();
+                        // need to call apply since need to check update from rootscope
+                        $scope.$apply();
                     }else{
                         // User signed out
                         vm.user = null;
@@ -116,11 +117,12 @@ export default (ngModule, firebase, provider) => {
                 /**
                  * email password register
                  */
-                $scope.emailregister = () => {
+                $scope.emailregister = (email, password) => {
                     firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
                         // Handle Errors here.
                         var errorCode = error.code;
-                        var errorMessage = error.message;
+                        $scope.registerErrorMessage = error.message;
+                        $scope.$digest();
                         // ...
                     });
                 };

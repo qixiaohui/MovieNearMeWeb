@@ -8,25 +8,26 @@
             <span>{{appName}}</span>
             <!-- fill up the space between left and right area -->
             <span flex></span>
-            <md-button ng-if="!vm.user && vm.state.currentPath.name != 'main.signin'" ng-click="vm.signinPage()">
+            <md-button ng-if="!vm.user && ['main.signin', 'main.register'].indexOf(vm.state.currentPath.name) < 0 " ng-click="vm.signinPage()">
                 Sign in
             </md-button>
             <div class="fb-appbar-login-area">
                 <md-menu class="fb-appear-menu">
                     <button class="fb-appear-btn md-button md-gmp-blue-theme md-ink-ripple" ng-click="$mdOpenMenu($event)">
-                        <img ng-if="vm.user" style="width: 40px; margin-right: 50px; border-radius: 50%" ng-src="{{vm.user.photoURL}}" />
+                        <img ng-if="vm.user.photoURL" style="width: 40px; margin-right: 50px; border-radius: 50%" ng-src="{{vm.user.photoURL}}" />
+                        <p ng-if="!vm.user.photoURL">{{vm.user.email}}</p>
                         <div class="md-ripple-container"></div>
                     </button>
                     <md-menu-content>
                         <md-menu-item role="menuitem" style="height: 90px">
                             <div layout="row" class="logout">
-                                <img ng-src="{{vm.user.photoURL}}" />
+                                <img ng-if="vm.user.photoURL" ng-src="{{vm.user.photoURL}}" />
                                 <div layout="column" style="flex-direction: column">
                                     <div class="logout-email">
                                         {{vm.user.email}}
                                     </div>
                                     <div class="logout-btn">
-                                        <a ng-click="vm.logout()">SIGN OUT</a>
+                                        <a ng-click="vm.fblogout()">SIGN OUT</a>
                                     </div>
                                 </div>
                             </div>

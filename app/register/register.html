@@ -16,13 +16,13 @@
                     </md-input-container>
                     <md-input-container class="md-block" flex-gt-sm>
                         <label>Password</label>
-                        <input name="password" ng-pattern="/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/" required ng-model="user.password" />
+                        <input type="password" name="password" ng-pattern="/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/" required ng-model="user.password" />
                         <div class="hint" >Password should contain at least one digit, one lower case character, one upper case character, and at least 8 from above mentioned characters</div>
                         <div style="color: #dd2c00" ng-show="userForm.password.$invalid && userForm.password.$dirty">Your password doesn't match the criteria</div>
                     </md-input-container>
                     <md-input-container class="md-block" flex-gt-sm>
                         <label>Retype Password</label>
-                        <input name="repassword" required ng-model="user.repassword" />
+                        <input type="password" name="repassword" required ng-model="user.repassword" />
                         <div ng-show="userForm.repassword.$dirty && user.password != user.repassword" style="color: #dd2c00">Password doesn't match.</div>
                     </md-input-container>
                     <style>

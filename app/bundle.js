@@ -112,8 +112,9 @@
 	__webpack_require__(/*! ./PurchaseChannels/purchase_channels */ 82).default(app);
 	__webpack_require__(/*! ./signin/signin_directive */ 86).default(app);
 	__webpack_require__(/*! ./register/register_directive.js */ 90).default(app);
+	__webpack_require__(/*! ./search/search_directive */ 94).default(app);
 	
-	__webpack_require__(/*! ./router/router */ 94).default(app);
+	__webpack_require__(/*! ./router/router */ 98).default(app);
 
 /***/ },
 /* 1 */
@@ -72770,10 +72771,14 @@
 	                $rootScope.stack = [];
 	
 	                var vm = this;
+	                vm.showSearch = false;
 	                vm.state = { currentPath: { name: 'main.tabs' }, previousPath: '' };
 	                $rootScope.appName = 'Movie near you(Alpha)';
 	                $rootScope.$on('$stateChangeSuccess', function (ev, to, toParams, from, fromParams) {
 	                    vm.state.currentPath = to;
+	                    if (vm.state.currentPath.name === 'main.tabs') {
+	                        $rootScope.appName = 'Movie near you(Alpha)';
+	                    }
 	                    vm.state.previousPath = from;
 	                });
 	
@@ -72789,6 +72794,27 @@
 	                        $rootScope.movieInfo = movie;
 	                        $rootScope.$broadcast('pop', {});
 	                    }
+	                };
+	
+	                //redirec to main.search on click search
+	                vm.searchPage = function () {
+	                    $location.path('/main/search');
+	                    vm.showSearch = !vm.showSearch;
+	                };
+	
+	                //redirect to main.tabs page
+	                vm.mainPage = function () {
+	                    $location.path('/main/tabs');
+	                    vm.showSearch = !vm.showSearch;
+	                    //clear the history when return
+	                    $scope.searchKeyword = null;
+	                    vm.searchContent = null;
+	                };
+	
+	                // call search onsubmit
+	                vm.search = function () {
+	                    //only update when on submit or ng click
+	                    $scope.searchKeyword = vm.searchContent;
 	                };
 	
 	                /**
@@ -72938,7 +72964,7 @@
   \************************/
 /***/ function(module, exports) {
 
-	module.exports = "<div layout=\"column\" layout-fill>\n    <md-toolbar md-scroll-shrink=\"true\" style=\"position: fixed; z-index: 100\">\n        <div class=\"md-toolbar-tools\">\n            <md-button class=\"md-icon-button\" aria-label=\"Settings\" ng-disabled=\"true\">\n                <md-icon ng-if=\"vm.state.currentPath.name == 'main.tabs'\" md-svg-icon=\"img/icons/menu.svg\"></md-icon>\n                <md-icon ng-click=\"vm.statePop()\" ng-if=\"vm.state.currentPath.name != 'main.tabs'\" md-svg-icon=\"img/icons/back.svg\"></md-icon>\n            </md-button>\n            <span>{{appName}}</span>\n            <!-- fill up the space between left and right area -->\n            <span flex></span>\n            <md-button ng-if=\"!vm.user && ['main.signin', 'main.register'].indexOf(vm.state.currentPath.name) < 0 \" ng-click=\"vm.signinPage()\">\n                Sign in\n            </md-button>\n            <div class=\"fb-appbar-login-area\">\n                <md-menu class=\"fb-appear-menu\">\n                    <button class=\"fb-appear-btn md-button md-gmp-blue-theme md-ink-ripple\" ng-click=\"$mdOpenMenu($event)\">\n                        <img ng-if=\"vm.user.photoURL\" style=\"width: 40px; margin-right: 50px; border-radius: 50%\" ng-src=\"{{vm.user.photoURL}}\" />\n                        <p ng-if=\"!vm.user.photoURL\">{{vm.user.email}}</p>\n                        <div class=\"md-ripple-container\"></div>\n                    </button>\n                    <md-menu-content>\n                        <md-menu-item role=\"menuitem\" style=\"height: 90px\">\n                            <div layout=\"row\" class=\"logout\">\n                                <img ng-if=\"vm.user.photoURL\" ng-src=\"{{vm.user.photoURL}}\" />\n                                <div layout=\"column\" style=\"flex-direction: column\">\n                                    <div class=\"logout-email\">\n                                        {{vm.user.email}}\n                                    </div>\n                                    <div class=\"logout-btn\">\n                                        <a ng-click=\"vm.fblogout()\">SIGN OUT</a>\n                                    </div>\n                                </div>\n                            </div>\n                        </md-menu-item>\n                    </md-menu-content>\n                </md-menu>\n            </div>\n        </div>\n    </md-toolbar>\n    <div ui-view></div>\n</div>"
+	module.exports = "<div layout=\"column\" layout-fill>\n    <md-toolbar ng-show=\"!vm.showSearch\" style=\"position: fixed; z-index: 100\">\n        <div class=\"md-toolbar-tools\">\n            <md-button class=\"md-icon-button\" aria-label=\"Settings\" ng-disabled=\"true\">\n                <md-icon ng-if=\"vm.state.currentPath.name == 'main.tabs'\" md-svg-icon=\"img/icons/menu.svg\"></md-icon>\n                <md-icon ng-click=\"vm.statePop()\" ng-if=\"vm.state.currentPath.name != 'main.tabs'\" md-svg-icon=\"img/icons/back.svg\"></md-icon>\n            </md-button>\n            <span>{{appName}}</span>\n            <!-- fill up the space between left and right area -->\n            <span flex></span>\n            <md-button aria-label=\"Search\" ng-click=\"vm.searchPage()\">\n                <md-icon md-svg-icon=\"img/icons/search_white.svg\"></md-icon>\n            </md-button>\n            <md-button ng-if=\"!vm.user && ['main.signin', 'main.register'].indexOf(vm.state.currentPath.name) < 0 \" ng-click=\"vm.signinPage()\">\n                Sign in\n            </md-button>\n            <div class=\"fb-appbar-login-area\">\n                <md-menu class=\"fb-appear-menu\">\n                    <button class=\"fb-appear-btn md-button md-gmp-blue-theme md-ink-ripple\" ng-click=\"$mdOpenMenu($event)\">\n                        <img ng-if=\"vm.user.photoURL\" style=\"width: 40px; margin-right: 50px; border-radius: 50%\" ng-src=\"{{vm.user.photoURL}}\" />\n                        <p ng-if=\"!vm.user.photoURL\">{{vm.user.email}}</p>\n                        <div class=\"md-ripple-container\"></div>\n                    </button>\n                    <md-menu-content>\n                        <md-menu-item role=\"menuitem\" style=\"height: 90px\">\n                            <div layout=\"row\" class=\"logout\">\n                                <img ng-if=\"vm.user.photoURL\" ng-src=\"{{vm.user.photoURL}}\" />\n                                <div layout=\"column\" style=\"flex-direction: column\">\n                                    <div class=\"logout-email\">\n                                        {{vm.user.email}}\n                                    </div>\n                                    <div class=\"logout-btn\">\n                                        <a ng-click=\"vm.fblogout()\">SIGN OUT</a>\n                                    </div>\n                                </div>\n                            </div>\n                        </md-menu-item>\n                    </md-menu-content>\n                </md-menu>\n            </div>\n        </div>\n    </md-toolbar>\n    <md-toolbar class=\"md-hue-1\" ng-show=\"vm.showSearch\">\n        <div class=\"md-toolbar-tools\">\n            <md-button ng-click=\"vm.mainPage()\" aria-label=\"Back\">\n                <md-icon md-svg-icon=\"img/icons/back_white.svg\"></md-icon>\n            </md-button>\n            <h3 flex=\"10\">\n                Back\n            </h3>\n            <md-input-container md-theme=\"input\" flex>\n                <label>&nbsp;</label>\n                <form ng-submit=\"vm.search()\">\n                    <input style=\"margin-top: 20px\" ng-model=\"vm.searchContent\" placeholder=\"enter search\">\n                </form>\n            </md-input-container>\n            <md-button aria-label=\"Search\" ng-click=\"showSearch = !showSearch\">\n                <md-icon ng-click=\"vm.search()\" md-svg-icon=\"img/icons/search.svg\"></md-icon>\n            </md-button>\n        </div>\n\n    </md-toolbar>\n    <div ui-view></div>\n</div>"
 
 /***/ },
 /* 41 */
@@ -73048,7 +73074,8 @@
 	            restrict: "E",
 	            scope: {
 	                category: '@',
-	                index: '='
+	                index: '=',
+	                keyword: '='
 	            },
 	            template: __webpack_require__(/*! ./movies.html */ 69),
 	            controllerAs: "vm",
@@ -73057,19 +73084,40 @@
 	                vm.Math = window.Math;
 	                vm.movies = {};
 	                vm.category = $scope.category;
+	                vm.keyword = $scope.keyword;
 	                vm.index = $scope.index;
 	                vm.totalPages = 0;
+	
+	                if (vm.category === 'search') {
+	                    //watch change in $scope.keyword
+	                    $scope.$watch('keyword', function (newvalue, oldvalue) {
+	                        if (newvalue !== oldvalue) {
+	                            vm.keyword = $scope.keyword;
+	                            vm.pagination(1);
+	                        }
+	                    });
+	                }
 	
 	                vm.pagination = function (index) {
 	                    vm.index = index;
 	                    // bind to rootscope categoryIndex
 	                    $scope.index = index;
-	                    crud.GET('/movies/' + vm.category + '/' + vm.index, {}).then(function (response) {
+	
+	                    if (vm.category !== 'search') {
+	                        var url = '/movies/category/' + vm.category + '/' + vm.index;
+	                    } else {
+	                        //the movie component is for search
+	                        var url = '/movies/search/' + vm.keyword + '/' + vm.index;
+	                    }
+	
+	                    crud.GET(url, {}).then(function (response) {
 	                        vm.movies = response.data;
 	                        vm.totalPages = response.data.total_pages;
 	                        $scope.$digest();
 	                        window.scrollTo(0, 0);
-	                        sessionStorage.setItem(vm.category, JSON.stringify(vm.movies));
+	                        if (vm.category !== 'search') {
+	                            sessionStorage.setItem(vm.category, JSON.stringify(vm.movies));
+	                        }
 	                    }).catch(function (err) {
 	                        console.error(err);
 	                    });
@@ -77099,7 +77147,7 @@
   \****************************/
 /***/ function(module, exports) {
 
-	module.exports = "<div style=\"margin-top: 60px\">\n    <div class=\"signinHeader\">\n        <h2 class=\"signin-h3\">Sign in</h2>\n    </div>\n    <div>\n        <div class=\"fblogin\">\n            <button id=\"facebook\" ng-click=\"fbsignin()\">Sign in with Facebook</button>\n        </div>\n        <div style=\"width: 30%; margin: auto\">\n            <md-divider></md-divider>\n            <form name=\"userForm\">\n                <div class=\"logingrouop\">\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Email</label>\n                        <input name=\"email\" ng-model=\"user.email\"\n                               required />\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Password</label>\n                        <input required name=\"password\" ng-model=\"user.password\" />\n                        <div style=\"color: #dd2c00\" ng-show=\"emailSigninError\">\n                            {{signinErrorMessage}}\n                        </div>\n                    </md-input-container>\n                    <style>\n                        /*\n                         * The Material demos system does not currently allow targeting the body element, so this\n                         * must go here in the HTML.\n                         */\n                        body[dir=rtl] .hint {\n                            right: 2px;\n                            left: auto;\n                        }\n                    </style>\n                    <md-button ng-disabled=\"userForm.$invalid\" class=\"md-raised md-primary\" style=\"width: 100%\" ng-click=\"emailsignin(user.email, user.password)\">login</md-button>\n                    <a style=\"margin-left: 15px\" ng-click=\"vm.registerpage()\">Register</a>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>"
+	module.exports = "<div style=\"margin-top: 60px\">\n    <div class=\"signinHeader\">\n        <h2 class=\"signin-h3\">Sign in</h2>\n    </div>\n    <div>\n        <div class=\"fblogin\">\n            <button id=\"facebook\" ng-click=\"fbsignin()\">Sign in with Facebook</button>\n        </div>\n        <div style=\"width: 30%; margin: auto\">\n            <md-divider></md-divider>\n            <form name=\"userForm\">\n                <div class=\"logingrouop\">\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Email</label>\n                        <input name=\"email\" ng-model=\"user.email\"\n                               required />\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Password</label>\n                        <input type=\"password\" required name=\"password\" ng-model=\"user.password\" />\n                        <div style=\"color: #dd2c00\" ng-show=\"emailSigninError\">\n                            {{signinErrorMessage}}\n                        </div>\n                    </md-input-container>\n                    <style>\n                        /*\n                         * The Material demos system does not currently allow targeting the body element, so this\n                         * must go here in the HTML.\n                         */\n                        body[dir=rtl] .hint {\n                            right: 2px;\n                            left: auto;\n                        }\n                    </style>\n                    <md-button ng-disabled=\"userForm.$invalid\" class=\"md-raised md-primary\" style=\"width: 100%\" ng-click=\"emailsignin(user.email, user.password)\">login</md-button>\n                    <a style=\"margin-left: 15px\" ng-click=\"vm.registerpage()\">Register</a>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>"
 
 /***/ },
 /* 90 */
@@ -77183,10 +77231,94 @@
   \********************************/
 /***/ function(module, exports) {
 
-	module.exports = "<div style=\"margin-top: 60px\">\n    <div class=\"registerHeader\">\n        <h2 class=\"register-h3\">Register</h2>\n    </div>\n    <div>\n        <div style=\"width: 30%; margin: auto\">\n            <form name=\"userForm\">\n                <div class=\"registergrouop\">\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Email</label>\n                        <input name=\"email\" ng-model=\"user.email\"\n                               required ng-pattern=\"/^.+@.+\\..+$/\" />\n                        <div style=\"color: #dd2c00\" ng-show=\"userForm.email.$invalid && userForm.email.$dirty\">\n                            Please input a valid email address\n                        </div>\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Password</label>\n                        <input name=\"password\" ng-pattern=\"/^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/\" required ng-model=\"user.password\" />\n                        <div class=\"hint\" >Password should contain at least one digit, one lower case character, one upper case character, and at least 8 from above mentioned characters</div>\n                        <div style=\"color: #dd2c00\" ng-show=\"userForm.password.$invalid && userForm.password.$dirty\">Your password doesn't match the criteria</div>\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Retype Password</label>\n                        <input name=\"repassword\" required ng-model=\"user.repassword\" />\n                        <div ng-show=\"userForm.repassword.$dirty && user.password != user.repassword\" style=\"color: #dd2c00\">Password doesn't match.</div>\n                    </md-input-container>\n                    <style>\n                        /*\n                         * The Material demos system does not currently allow targeting the body element, so this\n                         * must go here in the HTML.\n                         */\n                        body[dir=rtl] .hint {\n                            right: 2px;\n                            left: auto;\n                        }\n                    </style>\n                    <md-button ng-disabled=\"!userForm.$valid || user.password!=user.repassword\" class=\"md-raised md-primary\" style=\"width: 100%\" ng-click=\"emailregister(user.email, user.password)\">register</md-button>\n                    <div ng-if=\"registerErrorMessage\" style=\"color: #dd2c00\">{{registerErrorMessage}}</div>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>"
+	module.exports = "<div style=\"margin-top: 60px\">\n    <div class=\"registerHeader\">\n        <h2 class=\"register-h3\">Register</h2>\n    </div>\n    <div>\n        <div style=\"width: 30%; margin: auto\">\n            <form name=\"userForm\">\n                <div class=\"registergrouop\">\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Email</label>\n                        <input name=\"email\" ng-model=\"user.email\"\n                               required ng-pattern=\"/^.+@.+\\..+$/\" />\n                        <div style=\"color: #dd2c00\" ng-show=\"userForm.email.$invalid && userForm.email.$dirty\">\n                            Please input a valid email address\n                        </div>\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Password</label>\n                        <input type=\"password\" name=\"password\" ng-pattern=\"/^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/\" required ng-model=\"user.password\" />\n                        <div class=\"hint\" >Password should contain at least one digit, one lower case character, one upper case character, and at least 8 from above mentioned characters</div>\n                        <div style=\"color: #dd2c00\" ng-show=\"userForm.password.$invalid && userForm.password.$dirty\">Your password doesn't match the criteria</div>\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Retype Password</label>\n                        <input type=\"password\" name=\"repassword\" required ng-model=\"user.repassword\" />\n                        <div ng-show=\"userForm.repassword.$dirty && user.password != user.repassword\" style=\"color: #dd2c00\">Password doesn't match.</div>\n                    </md-input-container>\n                    <style>\n                        /*\n                         * The Material demos system does not currently allow targeting the body element, so this\n                         * must go here in the HTML.\n                         */\n                        body[dir=rtl] .hint {\n                            right: 2px;\n                            left: auto;\n                        }\n                    </style>\n                    <md-button ng-disabled=\"!userForm.$valid || user.password!=user.repassword\" class=\"md-raised md-primary\" style=\"width: 100%\" ng-click=\"emailregister(user.email, user.password)\">register</md-button>\n                    <div ng-if=\"registerErrorMessage\" style=\"color: #dd2c00\">{{registerErrorMessage}}</div>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>"
 
 /***/ },
 /* 94 */
+/*!************************************!*\
+  !*** ./search/search_directive.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	exports.default = function (ngModule) {
+	    ngModule.directive("search", function () {
+	        __webpack_require__(/*! ./search.css */ 95);
+	        var crud = __webpack_require__(/*! ../service/crud */ 48);
+	        return {
+	            restrict: "E",
+	            scope: true,
+	            template: __webpack_require__(/*! ./search.html */ 97),
+	            controllerAs: "vm",
+	            controller: function controller($scope, $rootScope, $location) {
+	                var vm = this;
+	            }
+	        };
+	    });
+	};
+
+/***/ },
+/* 95 */
+/*!***************************!*\
+  !*** ./search/search.css ***!
+  \***************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !./../../~/css-loader!./search.css */ 96);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./search.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./search.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 96 */
+/*!*******************************************!*\
+  !*** ../~/css-loader!./search/search.css ***!
+  \*******************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 97 */
+/*!****************************!*\
+  !*** ./search/search.html ***!
+  \****************************/
+/***/ function(module, exports) {
+
+	module.exports = "<div>\n    <md-content layout-padding style=\"height: 100vh\">\n        <h4 style=\"color: #9e9e9e\">Search results</h4>\n        <movies ng-if=\"searchKeyword\" category=\"search\" index='1' keyword=\"searchKeyword\"></movies>\n    </md-content>\n</div>"
+
+/***/ },
+/* 98 */
 /*!**************************!*\
   !*** ./router/router.js ***!
   \**************************/
@@ -77215,6 +77347,9 @@
 	        }).state('main.register', {
 	            url: '/register',
 	            template: '<register></register>'
+	        }).state('main.search', {
+	            url: '/search',
+	            template: '<search></search>'
 	        });
 	
 	        $urlRouterProvider.otherwise('/main/tabs');

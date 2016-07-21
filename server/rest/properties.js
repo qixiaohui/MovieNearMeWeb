@@ -6,6 +6,10 @@ const theMovieBaseUrl = "https://api.themoviedb.org/3/movie/";
 
 exports.theMovieBaseUrl = theMovieBaseUrl;
 
+const theMovieSearchurl = "https://api.themoviedb.org/3/search/movie?api_key=";
+
+exports.theMovieSearchurl = theMovieSearchurl;
+
 const theMoviePersonUrl = "https://api.themoviedb.org/3/person/";
 
 exports.theMoviePersonUrl = theMoviePersonUrl;

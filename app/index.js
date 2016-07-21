@@ -41,6 +41,7 @@ require('./map/map_directive').default(app);
 require('./PurchaseChannels/purchase_channels').default(app);
 require('./signin/signin_directive').default(app);
 require('./register/register_directive.js').default(app);
+require('./search/search_directive').default(app);
 
 require('./router/router').default(app);
 

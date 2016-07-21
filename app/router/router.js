@@ -25,6 +25,11 @@ export default ngModule => {
                 url: '/register',
                 template: '<register></register>'
             }
+        ).state(
+            'main.search', {
+                url: '/search',
+                template: '<search></search>'
+            }
         );
 
         $urlRouterProvider.otherwise('/main/tabs');

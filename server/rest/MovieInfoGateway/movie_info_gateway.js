@@ -31,7 +31,7 @@ router.get('/info/:id',apicache('1 day'), function(req, res){
         res.send(data);
 
     }).catch((data) => {
-        console.error(data);
+        console.error(data.data.status_message);
         res.status(400).send('Ooops something went wrong');
     });
 });
@@ -43,7 +43,7 @@ router.get('/similar/:id', apicache('1 day'), function(req, res){
     axios({method: 'GET', url: `${theMovieBaseUrl}${id}/similar?api_key=${theMovieToken}&language=en&page=1`}).then((result) => {
         res.send(result.data);
     }).catch((data) => {
-        console.error(data);
+        console.error(data.data.status_message);
         res.status(400).send('Ooops something went wrong');
     });
 });
@@ -75,7 +75,7 @@ router.get('/credit/:id', apicache('1 day'), function(req, res){
     axios({method: 'GET', url: `${theMovieBaseUrl}${id}/credits?api_key=${theMovieToken}`}).then((result) => {
         res.send(result.data);
     }).catch((data) => {
-        console.error(data);
+        console.error(data.data.status_message);
         res.status(400).send('Ooops something went wrong');
     });
 });
@@ -88,7 +88,7 @@ router.get('/person/:id', apicache('1 day'), function(req, res){
     axios({method: 'GET', url: `${theMoviePersonUrl}${id}?api_key=${theMovieToken}`}).then((result) => {
         res.send(result.data);
     }).catch((data) => {
-        console.error(data);
+        console.error(data.data.status_message);
         res.status(400).send('Ooops something went wrong');
     });
 });

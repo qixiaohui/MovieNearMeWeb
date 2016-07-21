@@ -6,7 +6,8 @@ export default ngModule => {
             restrict: "E",
             scope: {
                 category: '@',
-                index: '='
+                index: '=',
+                keyword: '='
             },
             template: require('./movies.html'),
             controllerAs: "vm",
@@ -15,19 +16,40 @@ export default ngModule => {
                 vm.Math = window.Math;
                 vm.movies = {};
                 vm.category = $scope.category;
+                vm.keyword = $scope.keyword;
                 vm.index = $scope.index;
                 vm.totalPages = 0;
+
+                if(vm.category === 'search'){
+                    //watch change in $scope.keyword
+                    $scope.$watch('keyword', (newvalue, oldvalue) => {
+                        if(newvalue !== oldvalue) {
+                            vm.keyword = $scope.keyword;
+                            vm.pagination(1);
+                        }
+                    });
+                }
 
                 vm.pagination = (index) => {
                     vm.index = index;
                     // bind to rootscope categoryIndex
                     $scope.index = index;
-                    crud.GET(`/movies/${vm.category}/${vm.index}`, {}).then((response) => {
+
+                    if(vm.category !== 'search') {
+                        var url = `/movies/category/${vm.category}/${vm.index}`;
+                    }else{
+                        //the movie component is for search
+                        var url = `/movies/search/${vm.keyword}/${vm.index}`;
+                    }
+
+                    crud.GET(url, {}).then((response) => {
                         vm.movies = response.data;
                         vm.totalPages = response.data.total_pages;
                         $scope.$digest();
                         window.scrollTo(0, 0);
-                        sessionStorage.setItem(vm.category, JSON.stringify(vm.movies));
+                        if(vm.category !== 'search') {
+                            sessionStorage.setItem(vm.category, JSON.stringify(vm.movies));
+                        }
                     }).catch((err) => {
                         console.error(err);
                     });

@@ -23,10 +23,14 @@ export default (ngModule, firebase, provider) => {
                 $rootScope.stack = [];
 
                 const vm = this;
+                vm.showSearch = false;
                 vm.state = {currentPath: {name: 'main.tabs'}, previousPath: ''};
                 $rootScope.appName = 'Movie near you(Alpha)';
                 $rootScope.$on('$stateChangeSuccess', function (ev, to, toParams, from, fromParams) {
                     vm.state.currentPath = to;
+                    if(vm.state.currentPath.name === 'main.tabs'){
+                        $rootScope.appName = 'Movie near you(Alpha)';
+                    }
                     vm.state.previousPath = from;
                 });
                 
@@ -42,6 +46,27 @@ export default (ngModule, firebase, provider) => {
                         $rootScope.movieInfo = movie;
                         $rootScope.$broadcast('pop', {});
                     }
+                };
+
+                //redirec to main.search on click search
+                vm.searchPage = () => {
+                    $location.path('/main/search');
+                    vm.showSearch = !vm.showSearch;
+                };
+
+                //redirect to main.tabs page
+                vm.mainPage = () => {
+                    $location.path('/main/tabs');
+                    vm.showSearch = !vm.showSearch;
+                    //clear the history when return
+                    $scope.searchKeyword = null;
+                    vm.searchContent = null;
+                };
+
+                // call search onsubmit
+                vm.search = () => {
+                    //only update when on submit or ng click
+                    $scope.searchKeyword = vm.searchContent;
                 };
 
                 /**

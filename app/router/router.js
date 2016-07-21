@@ -20,6 +20,11 @@ export default ngModule => {
                 url: '/signin',
                 template: '<signin></signin>'
             }
+        ).state(
+            'main.register', {
+                url: '/register',
+                template: '<register></register>'
+            }
         );
 
         $urlRouterProvider.otherwise('/main/tabs');

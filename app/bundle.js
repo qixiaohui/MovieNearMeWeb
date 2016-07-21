@@ -72761,6 +72761,7 @@
 	                    popular: 1,
 	                    upComing: 1
 	                };
+	                $scope.signinHint = false;
 	
 	                //this will use as a stack to hold the movies
 	                //when select a movie the previous movie will be pushed in
@@ -72806,6 +72807,9 @@
 	                    }
 	                });
 	
+	                /**
+	                 * signing in using facebook account
+	                 */
 	                $scope.fbsignin = function () {
 	                    firebase.auth().signInWithPopup(provider).then(function (result) {
 	                        // This gives you a Facebook Access Token. You can use it to access the Facebook API.
@@ -72821,11 +72825,49 @@
 	                    });
 	                };
 	
+	                /**
+	                 * signing out using facebook account
+	                 */
 	                vm.fblogout = function () {
 	                    firebase.auth().signOut().then(function () {
 	                        // Sign-out successful.
 	                    }, function (error) {
 	                        // An error happened.
+	                    });
+	                };
+	
+	                /**
+	                 * email password signin
+	                 */
+	                $scope.emailsignin = function (email, password) {
+	                    firebase.auth().signInWithEmailAndPassword(email, password).catch(function (error) {
+	                        // Handle Errors here.
+	                        var errorCode = error.code;
+	                        var errorMessage = error.message;
+	                        $scope.signinHint = true;
+	                    });
+	                };
+	
+	                /**
+	                 * email password signout
+	                 */
+	                vm.emailsignout = function () {
+	                    firebase.auth().signOut().then(function () {
+	                        // Sign-out successful.
+	                    }, function (error) {
+	                        // An error happened.
+	                    });
+	                };
+	
+	                /**
+	                 * email password register
+	                 */
+	                $scope.emailregister = function () {
+	                    firebase.auth().createUserWithEmailAndPassword(email, password).catch(function (error) {
+	                        // Handle Errors here.
+	                        var errorCode = error.code;
+	                        var errorMessage = error.message;
+	                        // ...
 	                    });
 	                };
 	
@@ -76988,6 +77030,10 @@
 	            controllerAs: "vm",
 	            controller: function controller($scope, $rootScope, $location) {
 	                var vm = this;
+	
+	                vm.register = function () {
+	                    $location.path('/main/register');
+	                };
 	            }
 	        };
 	    });
@@ -77046,7 +77092,7 @@
   \****************************/
 /***/ function(module, exports) {
 
-	module.exports = "<div style=\"margin-top: 60px\">\n    <div class=\"signinHeader\">\n        <h2 class=\"signin-h3\">Sign in</h2>\n    </div>\n    <div>\n        <div class=\"fblogin\">\n            <button id=\"facebook\" ng-click=\"fbsignin()\">Sign in with Facebook</button>\n        </div>\n        <div style=\"width: 30%; margin: auto\">\n            <md-divider></md-divider>\n            <div class=\"logingrouop\">\n                <md-input-container class=\"md-block\" flex-gt-sm>\n                    <label>Email</label>\n                    <input name=\"email\" ng-model=\"user.email\"\n                           required minlength=\"10\" maxlength=\"100\" ng-pattern=\"/^.+@.+\\..+$/\" />\n                    <div ng-messages=\"userForm.email.$error\" ng-hide=\"showHints\">\n                        <div ng-message-exp=\"['required', 'minlength', 'maxlength', 'pattern']\">\n                            Please make sure your email format is correct\n                        </div>\n                    </div>\n                </md-input-container>\n                <md-input-container class=\"md-block\" flex-gt-sm>\n                    <label>Password</label>\n                    <input name=\"password\" ng-model=\"user.password\" />\n                    <div ng-messages=\"userForm.password.$error\" ng-hide=\"showHints\">\n                        <div ng-message=\"pattern\">We can't find a match with your email and password.</div>\n                    </div>\n                </md-input-container>\n                <style>\n                    /*\n                     * The Material demos system does not currently allow targeting the body element, so this\n                     * must go here in the HTML.\n                     */\n                    body[dir=rtl] .hint {\n                        right: 2px;\n                        left: auto;\n                    }\n                </style>\n                <md-button class=\"md-raised md-primary\" style=\"width: 100%\">login</md-button>\n            </div>\n        </div>\n    </div>\n</div>"
+	module.exports = "<div style=\"margin-top: 60px\">\n    <div class=\"signinHeader\">\n        <h2 class=\"signin-h3\">Sign in</h2>\n    </div>\n    <div>\n        <div class=\"fblogin\">\n            <button id=\"facebook\" ng-click=\"fbsignin()\">Sign in with Facebook</button>\n        </div>\n        <div style=\"width: 30%; margin: auto\">\n            <md-divider></md-divider>\n            <div class=\"logingrouop\">\n                <md-input-container class=\"md-block\" flex-gt-sm>\n                    <label>Email</label>\n                    <input name=\"email\" ng-model=\"user.email\"\n                           required minlength=\"10\" maxlength=\"100\" ng-pattern=\"/^.+@.+\\..+$/\" />\n                </md-input-container>\n                <md-input-container class=\"md-block\" flex-gt-sm>\n                    <label>Password</label>\n                    <input name=\"password\" ng-model=\"user.password\" />\n                    <div ng-messages=\"userForm.password.$error\" ng-show=\"signinHint\">\n                        <div ng-message=\"pattern\">We can't find a match with your email and password.</div>\n                    </div>\n                </md-input-container>\n                <style>\n                    /*\n                     * The Material demos system does not currently allow targeting the body element, so this\n                     * must go here in the HTML.\n                     */\n                    body[dir=rtl] .hint {\n                        right: 2px;\n                        left: auto;\n                    }\n                </style>\n                <md-button class=\"md-raised md-primary\" style=\"width: 100%\" ng-click=\"emailsignin(user.email, user.password)\">login</md-button>\n                <a ng-click=\"vm.register()\">Register</a>\n            </div>\n        </div>\n    </div>\n</div>"
 
 /***/ },
 /* 90 */
@@ -77075,6 +77121,9 @@
 	        }).state('main.signin', {
 	            url: '/signin',
 	            template: '<signin></signin>'
+	        }).state('main.register', {
+	            url: '/register',
+	            template: '<register></register>'
 	        });
 	
 	        $urlRouterProvider.otherwise('/main/tabs');

@@ -9,6 +9,10 @@ export default ngModule => {
             controllerAs: "vm",
             controller: function ($scope, $rootScope, $location) {
                 const vm = this;
+
+                vm.register = () => {
+                    $location.path('/main/register');
+                };
             }
         }
     })

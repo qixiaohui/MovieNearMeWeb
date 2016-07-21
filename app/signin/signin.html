@@ -13,16 +13,11 @@
                     <label>Email</label>
                     <input name="email" ng-model="user.email"
                            required minlength="10" maxlength="100" ng-pattern="/^.+@.+\..+$/" />
-                    <div ng-messages="userForm.email.$error" ng-hide="showHints">
-                        <div ng-message-exp="['required', 'minlength', 'maxlength', 'pattern']">
-                            Please make sure your email format is correct
-                        </div>
-                    </div>
                 </md-input-container>
                 <md-input-container class="md-block" flex-gt-sm>
                     <label>Password</label>
                     <input name="password" ng-model="user.password" />
-                    <div ng-messages="userForm.password.$error" ng-hide="showHints">
+                    <div ng-messages="userForm.password.$error" ng-show="signinHint">
                         <div ng-message="pattern">We can't find a match with your email and password.</div>
                     </div>
                 </md-input-container>
@@ -36,7 +31,8 @@
                         left: auto;
                     }
                 </style>
-                <md-button class="md-raised md-primary" style="width: 100%">login</md-button>
+                <md-button class="md-raised md-primary" style="width: 100%" ng-click="emailsignin(user.email, user.password)">login</md-button>
+                <a ng-click="vm.register()">Register</a>
             </div>
         </div>
     </div>

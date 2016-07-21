@@ -15,6 +15,7 @@ export default (ngModule, firebase, provider) => {
                     popular: 1,
                     upComing: 1
                 };
+                $scope.signinHint = false;
 
                 //this will use as a stack to hold the movies
                 //when select a movie the previous movie will be pushed in
@@ -59,7 +60,10 @@ export default (ngModule, firebase, provider) => {
                         $scope.$digest();
                     }
                 });
-                
+
+                /**
+                 * signing in using facebook account
+                 */
                 $scope.fbsignin = () => {
                     firebase.auth().signInWithPopup(provider).then(function(result) {
                         // This gives you a Facebook Access Token. You can use it to access the Facebook API.
@@ -75,11 +79,49 @@ export default (ngModule, firebase, provider) => {
                     });
                 };
 
+                /**
+                 * signing out using facebook account
+                 */
                 vm.fblogout = () => {
                     firebase.auth().signOut().then(function() {
                         // Sign-out successful.
                     }, function(error) {
                         // An error happened.
+                    });
+                };
+
+                /**
+                 * email password signin
+                 */
+                $scope.emailsignin = (email, password) => {
+                    firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+                        // Handle Errors here.
+                        var errorCode = error.code;
+                        var errorMessage = error.message;
+                        $scope.signinHint =true;
+                    });
+                };
+
+                /**
+                 * email password signout
+                 */
+                vm.emailsignout = () => {
+                    firebase.auth().signOut().then(function() {
+                        // Sign-out successful.
+                    }, function(error) {
+                        // An error happened.
+                    });
+                };
+
+                /**
+                 * email password register
+                 */
+                $scope.emailregister = () => {
+                    firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+                        // Handle Errors here.
+                        var errorCode = error.code;
+                        var errorMessage = error.message;
+                        // ...
                     });
                 };
 

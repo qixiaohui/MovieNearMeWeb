@@ -1,0 +1,17 @@
+.registerHeader {
+    height: 100px;
+    background: #3f51b5;
+}
+
+.register-h3 {
+    padding-top: 50px;
+    text-align: center;
+    color: white;
+}
+
+.registerrouop {
+    display: flex;
+    width: 80%;
+    margin: auto;
+    flex-direction: column
+}

@@ -8,32 +8,34 @@
         </div>
         <div style="width: 30%; margin: auto">
             <md-divider></md-divider>
-            <div class="logingrouop">
-                <md-input-container class="md-block" flex-gt-sm>
-                    <label>Email</label>
-                    <input name="email" ng-model="user.email"
-                           required minlength="10" maxlength="100" ng-pattern="/^.+@.+\..+$/" />
-                </md-input-container>
-                <md-input-container class="md-block" flex-gt-sm>
-                    <label>Password</label>
-                    <input name="password" ng-model="user.password" />
-                    <div ng-messages="userForm.password.$error" ng-show="signinHint">
-                        <div ng-message="pattern">We can't find a match with your email and password.</div>
-                    </div>
-                </md-input-container>
-                <style>
-                    /*
-                     * The Material demos system does not currently allow targeting the body element, so this
-                     * must go here in the HTML.
-                     */
-                    body[dir=rtl] .hint {
-                        right: 2px;
-                        left: auto;
-                    }
-                </style>
-                <md-button class="md-raised md-primary" style="width: 100%" ng-click="emailsignin(user.email, user.password)">login</md-button>
-                <a style="margin-left: 15px" ng-click="vm.registerpage()">Register</a>
-            </div>
+            <form name="userForm">
+                <div class="logingrouop">
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>Email</label>
+                        <input name="email" ng-model="user.email"
+                               required />
+                    </md-input-container>
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>Password</label>
+                        <input required name="password" ng-model="user.password" />
+                        <div style="color: #dd2c00" ng-show="emailSigninError">
+                            {{signinErrorMessage}}
+                        </div>
+                    </md-input-container>
+                    <style>
+                        /*
+                         * The Material demos system does not currently allow targeting the body element, so this
+                         * must go here in the HTML.
+                         */
+                        body[dir=rtl] .hint {
+                            right: 2px;
+                            left: auto;
+                        }
+                    </style>
+                    <md-button ng-disabled="userForm.$invalid" class="md-raised md-primary" style="width: 100%" ng-click="emailsignin(user.email, user.password)">login</md-button>
+                    <a style="margin-left: 15px" ng-click="vm.registerpage()">Register</a>
+                </div>
+            </form>
         </div>
     </div>
 </div>

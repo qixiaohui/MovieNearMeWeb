@@ -53,6 +53,8 @@ export default (ngModule, firebase, provider) => {
                         // User is signed in.
                         vm.user = user;
                         $location.path('/main/tabs');
+                        $scope.emailSigninError = false;
+                        $scope.registerErrorMessage = null;
                         // need to call apply since need to check update from rootscope
                         $scope.$apply();
                     }else{
@@ -98,8 +100,9 @@ export default (ngModule, firebase, provider) => {
                     firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
                         // Handle Errors here.
                         var errorCode = error.code;
-                        var errorMessage = error.message;
-                        $scope.signinHint =true;
+                        $scope.signinErrorMessage = error.message;
+                        $scope.emailSigninError =true;
+                        $scope.$digest();
                     });
                 };
 

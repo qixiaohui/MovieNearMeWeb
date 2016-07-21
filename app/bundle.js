@@ -111,9 +111,9 @@
 	__webpack_require__(/*! ./map/map_directive */ 77).default(app);
 	__webpack_require__(/*! ./PurchaseChannels/purchase_channels */ 82).default(app);
 	__webpack_require__(/*! ./signin/signin_directive */ 86).default(app);
-	__webpack_require__(/*! ./register/register_directive.js */ 91).default(app);
+	__webpack_require__(/*! ./register/register_directive.js */ 90).default(app);
 	
-	__webpack_require__(/*! ./router/router */ 90).default(app);
+	__webpack_require__(/*! ./router/router */ 94).default(app);
 
 /***/ },
 /* 1 */
@@ -72800,6 +72800,8 @@
 	                        // User is signed in.
 	                        vm.user = user;
 	                        $location.path('/main/tabs');
+	                        $scope.emailSigninError = false;
+	                        $scope.registerErrorMessage = null;
 	                        // need to call apply since need to check update from rootscope
 	                        $scope.$apply();
 	                    } else {
@@ -72845,8 +72847,9 @@
 	                    firebase.auth().signInWithEmailAndPassword(email, password).catch(function (error) {
 	                        // Handle Errors here.
 	                        var errorCode = error.code;
-	                        var errorMessage = error.message;
-	                        $scope.signinHint = true;
+	                        $scope.signinErrorMessage = error.message;
+	                        $scope.emailSigninError = true;
+	                        $scope.$digest();
 	                    });
 	                };
 	
@@ -77095,10 +77098,94 @@
   \****************************/
 /***/ function(module, exports) {
 
-	module.exports = "<div style=\"margin-top: 60px\">\n    <div class=\"signinHeader\">\n        <h2 class=\"signin-h3\">Sign in</h2>\n    </div>\n    <div>\n        <div class=\"fblogin\">\n            <button id=\"facebook\" ng-click=\"fbsignin()\">Sign in with Facebook</button>\n        </div>\n        <div style=\"width: 30%; margin: auto\">\n            <md-divider></md-divider>\n            <div class=\"logingrouop\">\n                <md-input-container class=\"md-block\" flex-gt-sm>\n                    <label>Email</label>\n                    <input name=\"email\" ng-model=\"user.email\"\n                           required minlength=\"10\" maxlength=\"100\" ng-pattern=\"/^.+@.+\\..+$/\" />\n                </md-input-container>\n                <md-input-container class=\"md-block\" flex-gt-sm>\n                    <label>Password</label>\n                    <input name=\"password\" ng-model=\"user.password\" />\n                    <div ng-messages=\"userForm.password.$error\" ng-show=\"signinHint\">\n                        <div ng-message=\"pattern\">We can't find a match with your email and password.</div>\n                    </div>\n                </md-input-container>\n                <style>\n                    /*\n                     * The Material demos system does not currently allow targeting the body element, so this\n                     * must go here in the HTML.\n                     */\n                    body[dir=rtl] .hint {\n                        right: 2px;\n                        left: auto;\n                    }\n                </style>\n                <md-button class=\"md-raised md-primary\" style=\"width: 100%\" ng-click=\"emailsignin(user.email, user.password)\">login</md-button>\n                <a style=\"margin-left: 15px\" ng-click=\"vm.registerpage()\">Register</a>\n            </div>\n        </div>\n    </div>\n</div>"
+	module.exports = "<div style=\"margin-top: 60px\">\n    <div class=\"signinHeader\">\n        <h2 class=\"signin-h3\">Sign in</h2>\n    </div>\n    <div>\n        <div class=\"fblogin\">\n            <button id=\"facebook\" ng-click=\"fbsignin()\">Sign in with Facebook</button>\n        </div>\n        <div style=\"width: 30%; margin: auto\">\n            <md-divider></md-divider>\n            <form name=\"userForm\">\n                <div class=\"logingrouop\">\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Email</label>\n                        <input name=\"email\" ng-model=\"user.email\"\n                               required />\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Password</label>\n                        <input required name=\"password\" ng-model=\"user.password\" />\n                        <div style=\"color: #dd2c00\" ng-show=\"emailSigninError\">\n                            {{signinErrorMessage}}\n                        </div>\n                    </md-input-container>\n                    <style>\n                        /*\n                         * The Material demos system does not currently allow targeting the body element, so this\n                         * must go here in the HTML.\n                         */\n                        body[dir=rtl] .hint {\n                            right: 2px;\n                            left: auto;\n                        }\n                    </style>\n                    <md-button ng-disabled=\"userForm.$invalid\" class=\"md-raised md-primary\" style=\"width: 100%\" ng-click=\"emailsignin(user.email, user.password)\">login</md-button>\n                    <a style=\"margin-left: 15px\" ng-click=\"vm.registerpage()\">Register</a>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>"
 
 /***/ },
 /* 90 */
+/*!****************************************!*\
+  !*** ./register/register_directive.js ***!
+  \****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	exports.default = function (ngModule) {
+	    ngModule.directive("register", function () {
+	        __webpack_require__(/*! ./register.css */ 91);
+	        var crud = __webpack_require__(/*! ../service/crud */ 48);
+	        return {
+	            restrict: "E",
+	            scope: true,
+	            template: __webpack_require__(/*! ./register.html */ 93),
+	            controllerAs: "vm",
+	            controller: function controller($scope, $rootScope, $location) {
+	                var vm = this;
+	            }
+	        };
+	    });
+	};
+
+/***/ },
+/* 91 */
+/*!*******************************!*\
+  !*** ./register/register.css ***!
+  \*******************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !./../../~/css-loader!./register.css */ 92);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./register.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./register.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 92 */
+/*!***********************************************!*\
+  !*** ../~/css-loader!./register/register.css ***!
+  \***********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".registerHeader {\n    height: 100px;\n    background: #3f51b5;\n}\n\n.register-h3 {\n    padding-top: 50px;\n    text-align: center;\n    color: white;\n}\n\n.registerrouop {\n    display: flex;\n    width: 80%;\n    margin: auto;\n    flex-direction: column\n}", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 93 */
+/*!********************************!*\
+  !*** ./register/register.html ***!
+  \********************************/
+/***/ function(module, exports) {
+
+	module.exports = "<div style=\"margin-top: 60px\">\n    <div class=\"registerHeader\">\n        <h2 class=\"register-h3\">Register</h2>\n    </div>\n    <div>\n        <div style=\"width: 30%; margin: auto\">\n            <form name=\"userForm\">\n                <div class=\"registergrouop\">\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Email</label>\n                        <input name=\"email\" ng-model=\"user.email\"\n                               required ng-pattern=\"/^.+@.+\\..+$/\" />\n                        <div style=\"color: #dd2c00\" ng-show=\"userForm.email.$invalid && userForm.email.$dirty\">\n                            Please input a valid email address\n                        </div>\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Password</label>\n                        <input name=\"password\" ng-pattern=\"/^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/\" required ng-model=\"user.password\" />\n                        <div class=\"hint\" >Password should contain at least one digit, one lower case character, one upper case character, and at least 8 from above mentioned characters</div>\n                        <div style=\"color: #dd2c00\" ng-show=\"userForm.password.$invalid && userForm.password.$dirty\">Your password doesn't match the criteria</div>\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Retype Password</label>\n                        <input name=\"repassword\" required ng-model=\"user.repassword\" />\n                        <div ng-show=\"userForm.repassword.$dirty && user.password != user.repassword\" style=\"color: #dd2c00\">Password doesn't match.</div>\n                    </md-input-container>\n                    <style>\n                        /*\n                         * The Material demos system does not currently allow targeting the body element, so this\n                         * must go here in the HTML.\n                         */\n                        body[dir=rtl] .hint {\n                            right: 2px;\n                            left: auto;\n                        }\n                    </style>\n                    <md-button ng-disabled=\"!userForm.$valid || user.password!=user.repassword\" class=\"md-raised md-primary\" style=\"width: 100%\" ng-click=\"emailregister(user.email, user.password)\">register</md-button>\n                    <div ng-if=\"registerErrorMessage\" style=\"color: #dd2c00\">{{registerErrorMessage}}</div>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>"
+
+/***/ },
+/* 94 */
 /*!**************************!*\
   !*** ./router/router.js ***!
   \**************************/
@@ -77132,90 +77219,6 @@
 	        $urlRouterProvider.otherwise('/main/tabs');
 	    });
 	};
-
-/***/ },
-/* 91 */
-/*!****************************************!*\
-  !*** ./register/register_directive.js ***!
-  \****************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	exports.default = function (ngModule) {
-	    ngModule.directive("register", function () {
-	        __webpack_require__(/*! ./register.css */ 92);
-	        var crud = __webpack_require__(/*! ../service/crud */ 48);
-	        return {
-	            restrict: "E",
-	            scope: true,
-	            template: __webpack_require__(/*! ./register.html */ 94),
-	            controllerAs: "vm",
-	            controller: function controller($scope, $rootScope, $location) {
-	                var vm = this;
-	            }
-	        };
-	    });
-	};
-
-/***/ },
-/* 92 */
-/*!*******************************!*\
-  !*** ./register/register.css ***!
-  \*******************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./register.css */ 93);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./register.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./register.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 93 */
-/*!***********************************************!*\
-  !*** ../~/css-loader!./register/register.css ***!
-  \***********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 3)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, ".registerHeader {\n    height: 100px;\n    background: #3f51b5;\n}\n\n.register-h3 {\n    padding-top: 50px;\n    text-align: center;\n    color: white;\n}\n\n.registerrouop {\n    display: flex;\n    width: 80%;\n    margin: auto;\n    flex-direction: column\n}", ""]);
-	
-	// exports
-
-
-/***/ },
-/* 94 */
-/*!********************************!*\
-  !*** ./register/register.html ***!
-  \********************************/
-/***/ function(module, exports) {
-
-	module.exports = "<div style=\"margin-top: 60px\">\n    <div class=\"registerHeader\">\n        <h2 class=\"register-h3\">Register</h2>\n    </div>\n    <div>\n        <div style=\"width: 30%; margin: auto\">\n            <form name=\"userForm\">\n                <div class=\"registergrouop\">\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Email</label>\n                        <input name=\"email\" ng-model=\"user.email\"\n                               required ng-pattern=\"/^.+@.+\\..+$/\" />\n                        <div style=\"color: #dd2c00\" ng-show=\"userForm.email.$invalid && userForm.email.$dirty\">\n                            Please input a valid email address\n                        </div>\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Password</label>\n                        <input name=\"password\" ng-pattern=\"/^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/\" required ng-model=\"user.password\" />\n                        <div class=\"hint\" >Password should contain at least one digit, one lower case character, one upper case character, and at least 8 from above mentioned characters</div>\n                        <div style=\"color: #dd2c00\" ng-show=\"userForm.password.$invalid && userForm.password.$dirty\">Your password doesn't match the criteria</div>\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Retype Password</label>\n                        <input name=\"repassword\" required ng-model=\"user.repassword\" />\n                        <div ng-show=\"userForm.repassword.$dirty && user.password != user.repassword\" style=\"color: #dd2c00\">Password doesn't match.</div>\n                    </md-input-container>\n                    <style>\n                        /*\n                         * The Material demos system does not currently allow targeting the body element, so this\n                         * must go here in the HTML.\n                         */\n                        body[dir=rtl] .hint {\n                            right: 2px;\n                            left: auto;\n                        }\n                    </style>\n                    <md-button ng-disabled=\"!userForm.$valid || user.password!=user.repassword\" class=\"md-raised md-primary\" style=\"width: 100%\" ng-click=\"emailregister(user.email, user.password)\">register</md-button>\n                    <div ng-if=\"registerErrorMessage\" style=\"color: #dd2c00\">{{registerErrorMessage}}</div>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>"
 
 /***/ }
 /******/ ]);

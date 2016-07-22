@@ -6,7 +6,7 @@ export default (ngModule, firebase, provider) => {
             scope: true,
             template: require('./main.html'),
             controllerAs: "vm",
-            controller: function($rootScope, $location, $scope){
+            controller: function($rootScope, $location, $scope, $timeout, $mdSidenav){
                 //default add parameters on launch
                 $rootScope.tabIndex = 0;
                 $scope.categoryIndex = {
@@ -16,6 +16,31 @@ export default (ngModule, firebase, provider) => {
                     upComing: 1
                 };
                 $scope.signinHint = false;
+                $scope.toggleLeft = buildDelayedToggler('left');
+
+                function debounce(func, wait, context) {
+                  var timer;
+                  return function debounced() {
+                    var context = $scope,
+                        args = Array.prototype.slice.call(arguments);
+                    $timeout.cancel(timer);
+                    timer = $timeout(function() {
+                      timer = undefined;
+                      func.apply(context, args);
+                    }, wait || 10);
+                  };
+                }
+                
+                function buildDelayedToggler(navID) {
+                  return debounce(function() {
+                    // Component lookup should always be available since we are not using `ng-if`
+                    $mdSidenav(navID)
+                      .toggle()
+                      .then(function () {
+                        $log.debug("toggle " + navID + " is done");
+                      });
+                  }, 200);
+                }
 
                 //this will use as a stack to hold the movies
                 //when select a movie the previous movie will be pushed in

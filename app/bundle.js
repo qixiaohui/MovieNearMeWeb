@@ -72754,7 +72754,7 @@
 	            scope: true,
 	            template: __webpack_require__(/*! ./main.html */ 40),
 	            controllerAs: "vm",
-	            controller: function controller($rootScope, $location, $scope) {
+	            controller: function controller($rootScope, $location, $scope, $timeout, $mdSidenav) {
 	                //default add parameters on launch
 	                $rootScope.tabIndex = 0;
 	                $scope.categoryIndex = {
@@ -72764,6 +72764,29 @@
 	                    upComing: 1
 	                };
 	                $scope.signinHint = false;
+	                $scope.toggleLeft = buildDelayedToggler('left');
+	
+	                function debounce(func, wait, context) {
+	                    var timer;
+	                    return function debounced() {
+	                        var context = $scope,
+	                            args = Array.prototype.slice.call(arguments);
+	                        $timeout.cancel(timer);
+	                        timer = $timeout(function () {
+	                            timer = undefined;
+	                            func.apply(context, args);
+	                        }, wait || 10);
+	                    };
+	                }
+	
+	                function buildDelayedToggler(navID) {
+	                    return debounce(function () {
+	                        // Component lookup should always be available since we are not using `ng-if`
+	                        $mdSidenav(navID).toggle().then(function () {
+	                            $log.debug("toggle " + navID + " is done");
+	                        });
+	                    }, 200);
+	                }
 	
 	                //this will use as a stack to hold the movies
 	                //when select a movie the previous movie will be pushed in
@@ -72964,7 +72987,7 @@
   \************************/
 /***/ function(module, exports) {
 
-	module.exports = "<div layout=\"column\" layout-fill>\n    <md-toolbar ng-show=\"!vm.showSearch\" style=\"position: fixed; z-index: 100\">\n        <div class=\"md-toolbar-tools\">\n            <md-button class=\"md-icon-button\" aria-label=\"Settings\" ng-disabled=\"true\">\n                <md-icon ng-if=\"vm.state.currentPath.name == 'main.tabs'\" md-svg-icon=\"img/icons/menu.svg\"></md-icon>\n                <md-icon ng-click=\"vm.statePop()\" ng-if=\"vm.state.currentPath.name != 'main.tabs'\" md-svg-icon=\"img/icons/back.svg\"></md-icon>\n            </md-button>\n            <span>{{appName}}</span>\n            <!-- fill up the space between left and right area -->\n            <span flex></span>\n            <md-button aria-label=\"Search\" ng-click=\"vm.searchPage()\">\n                <md-icon md-svg-icon=\"img/icons/search_white.svg\"></md-icon>\n            </md-button>\n            <md-button ng-if=\"!vm.user && ['main.signin', 'main.register'].indexOf(vm.state.currentPath.name) < 0 \" ng-click=\"vm.signinPage()\">\n                Sign in\n            </md-button>\n            <div class=\"fb-appbar-login-area\">\n                <md-menu class=\"fb-appear-menu\">\n                    <button class=\"fb-appear-btn md-button md-gmp-blue-theme md-ink-ripple\" ng-click=\"$mdOpenMenu($event)\">\n                        <img ng-if=\"vm.user.photoURL\" style=\"width: 40px; margin-right: 50px; border-radius: 50%\" ng-src=\"{{vm.user.photoURL}}\" />\n                        <p ng-if=\"!vm.user.photoURL\">{{vm.user.email}}</p>\n                        <div class=\"md-ripple-container\"></div>\n                    </button>\n                    <md-menu-content>\n                        <md-menu-item role=\"menuitem\" style=\"height: 90px\">\n                            <div layout=\"row\" class=\"logout\">\n                                <img ng-if=\"vm.user.photoURL\" ng-src=\"{{vm.user.photoURL}}\" />\n                                <div layout=\"column\" style=\"flex-direction: column\">\n                                    <div class=\"logout-email\">\n                                        {{vm.user.email}}\n                                    </div>\n                                    <div class=\"logout-btn\">\n                                        <a ng-click=\"vm.fblogout()\">SIGN OUT</a>\n                                    </div>\n                                </div>\n                            </div>\n                        </md-menu-item>\n                    </md-menu-content>\n                </md-menu>\n            </div>\n        </div>\n    </md-toolbar>\n    <md-toolbar class=\"md-hue-1\" ng-show=\"vm.showSearch\">\n        <div class=\"md-toolbar-tools\">\n            <md-button ng-click=\"vm.mainPage()\" aria-label=\"Back\">\n                <md-icon md-svg-icon=\"img/icons/back_white.svg\"></md-icon>\n            </md-button>\n            <h3 flex=\"10\">\n                Back\n            </h3>\n            <md-input-container md-theme=\"input\" flex>\n                <label>&nbsp;</label>\n                <form ng-submit=\"vm.search()\">\n                    <input style=\"margin-top: 20px\" ng-model=\"vm.searchContent\" placeholder=\"enter search\">\n                </form>\n            </md-input-container>\n            <md-button aria-label=\"Search\" ng-click=\"showSearch = !showSearch\">\n                <md-icon ng-click=\"vm.search()\" md-svg-icon=\"img/icons/search.svg\"></md-icon>\n            </md-button>\n        </div>\n\n    </md-toolbar>\n    <div ui-view></div>\n</div>"
+	module.exports = "<div layout=\"column\" layout-fill>\n    <md-toolbar ng-show=\"!vm.showSearch\" style=\"position: fixed; z-index: 100\">\n        <div class=\"md-toolbar-tools\">\n            <md-button class=\"md-icon-button\" aria-label=\"Settings\" ng-disabled=\"true\">\n                <md-icon ng-if=\"vm.state.currentPath.name == 'main.tabs'\" ng-click=\"toggleLeft()\" md-svg-icon=\"img/icons/menu.svg\"></md-icon>\n                <md-icon ng-click=\"vm.statePop()\" ng-if=\"vm.state.currentPath.name != 'main.tabs'\" md-svg-icon=\"img/icons/back.svg\"></md-icon>\n            </md-button>\n            <span>{{appName}}</span>\n            <!-- fill up the space between left and right area -->\n            <span flex></span>\n            <md-button aria-label=\"Search\" ng-click=\"vm.searchPage()\">\n                <md-icon md-svg-icon=\"img/icons/search_white.svg\"></md-icon>\n            </md-button>\n            <md-button ng-if=\"!vm.user && ['main.signin', 'main.register'].indexOf(vm.state.currentPath.name) < 0 \" ng-click=\"vm.signinPage()\">\n                Sign in\n            </md-button>\n            <div class=\"fb-appbar-login-area\">\n                <md-menu class=\"fb-appear-menu\">\n                    <button class=\"fb-appear-btn md-button md-gmp-blue-theme md-ink-ripple\" ng-click=\"$mdOpenMenu($event)\">\n                        <img ng-if=\"vm.user.photoURL\" style=\"width: 40px; margin-right: 50px; border-radius: 50%\" ng-src=\"{{vm.user.photoURL}}\" />\n                        <p ng-if=\"!vm.user.photoURL\">{{vm.user.email}}</p>\n                        <div class=\"md-ripple-container\"></div>\n                    </button>\n                    <md-menu-content>\n                        <md-menu-item role=\"menuitem\" style=\"height: 90px\">\n                            <div layout=\"row\" class=\"logout\">\n                                <img ng-if=\"vm.user.photoURL\" ng-src=\"{{vm.user.photoURL}}\" />\n                                <div layout=\"column\" style=\"flex-direction: column\">\n                                    <div class=\"logout-email\">\n                                        {{vm.user.email}}\n                                    </div>\n                                    <div class=\"logout-btn\">\n                                        <a ng-click=\"vm.fblogout()\">SIGN OUT</a>\n                                    </div>\n                                </div>\n                            </div>\n                        </md-menu-item>\n                    </md-menu-content>\n                </md-menu>\n            </div>\n        </div>\n    </md-toolbar>\n    <md-toolbar class=\"md-hue-1\" ng-show=\"vm.showSearch\">\n        <div class=\"md-toolbar-tools\">\n            <md-button ng-click=\"vm.mainPage()\" aria-label=\"Back\">\n                <md-icon md-svg-icon=\"img/icons/back_white.svg\"></md-icon>\n            </md-button>\n            <h3 flex=\"10\">\n                Back\n            </h3>\n            <md-input-container md-theme=\"input\" flex>\n                <label>&nbsp;</label>\n                <form ng-submit=\"vm.search()\">\n                    <input style=\"margin-top: 20px\" ng-model=\"vm.searchContent\" placeholder=\"enter search\">\n                </form>\n            </md-input-container>\n            <md-button aria-label=\"Search\" ng-click=\"showSearch = !showSearch\">\n                <md-icon ng-click=\"vm.search()\" md-svg-icon=\"img/icons/search.svg\"></md-icon>\n            </md-button>\n        </div>\n\n    </md-toolbar>\n    <div ui-view></div>\n</div>"
 
 /***/ },
 /* 41 */
@@ -72990,9 +73013,32 @@
 	            controller: function controller($rootScope, $scope) {
 	                var vm = this;
 	                vm.sd = $scope.categoryIndex;
+	                $scope.toggleLeft = buildDelayedToggler('left');
 	                vm.setTab = function (index) {
 	                    $rootScope.tabIndex = index;
 	                };
+	
+	                function debounce(func, wait, context) {
+	                    var timer;
+	                    return function debounced() {
+	                        var context = $scope,
+	                            args = Array.prototype.slice.call(arguments);
+	                        $timeout.cancel(timer);
+	                        timer = $timeout(function () {
+	                            timer = undefined;
+	                            func.apply(context, args);
+	                        }, wait || 10);
+	                    };
+	                }
+	
+	                function buildDelayedToggler(navID) {
+	                    return debounce(function () {
+	                        // Component lookup should always be available since we are not using `ng-if`
+	                        $mdSidenav(navID).toggle().then(function () {
+	                            $log.debug("toggle " + navID + " is done");
+	                        });
+	                    }, 200);
+	                }
 	            }
 	        };
 	    });
@@ -73051,7 +73097,7 @@
   \************************/
 /***/ function(module, exports) {
 
-	module.exports = "<md-content style=\"margin-top: 65px;\">\n    <md-tabs md-selected=\"tabIndex\" md-dynamic-height md-border-bottom>\n        <md-tab ng-click=\"vm.setTab(0)\" label=\"Now Playing\">\n            <md-content class=\"md-padding\">\n                <movies category=\"now_playing\" index='categoryIndex.nowPlaying'></movies>\n            </md-content>\n        </md-tab>\n        <md-tab ng-click=\"vm.setTab(1)\" label=\"Popular\">\n            <md-content class=\"md-padding\">\n                <movies category=\"popular\" index='categoryIndex.popular'></movies>\n            </md-content>\n        </md-tab>\n        <md-tab ng-click=\"vm.setTab(2)\" label=\"Top Rated\">\n            <md-content class=\"md-padding\">\n                <movies category=\"top_rated\" index='categoryIndex.topRate'></movies>\n            </md-content>\n        </md-tab>\n        <md-tab ng-click=\"vm.setTab(3)\" label=\"Upcoming\">\n            <md-content class=\"md-padding\">\n                <movies category=\"upcoming\" index='categoryIndex.upComing'></movies>\n            </md-content>\n        </md-tab>\n    </md-tabs>\n</md-content>"
+	module.exports = "<div layout=\"column\" ng-cloak>\n    <section layout=\"row\" flex>\n        <md-sidenav\n            class=\"md-sidenav-left\"\n            md-component-id=\"left\"\n            md-disable-backdrop\n            md-whiteframe=\"4\">\n          <md-toolbar class=\"md-theme-indigo\">\n            <h1 class=\"md-toolbar-tools\">Sidenav Left</h1>\n          </md-toolbar>\n          <md-content layout-padding>\n            <md-button ng-click=\"close()\" class=\"md-primary\" hide-gt-md>\n              Close Sidenav Left\n            </md-button>\n            <p hide show-gt-md>\n              This sidenav is locked open on your device. To go back to the default behavior,\n              narrow your display.\n            </p>\n          </md-content>\n        </md-sidenav>\n        <md-content flex layout-padding style=\"margin-top: 65px;\">\n            <md-tabs md-selected=\"tabIndex\" md-dynamic-height md-border-bottom>\n                <md-tab ng-click=\"vm.setTab(0)\" label=\"Now Playing\">\n                    <md-content class=\"md-padding\">\n                        <movies category=\"now_playing\" index='categoryIndex.nowPlaying'></movies>\n                    </md-content>\n                </md-tab>\n                <md-tab ng-click=\"vm.setTab(1)\" label=\"Popular\">\n                    <md-content class=\"md-padding\">\n                        <movies category=\"popular\" index='categoryIndex.popular'></movies>\n                    </md-content>\n                </md-tab>\n                <md-tab ng-click=\"vm.setTab(2)\" label=\"Top Rated\">\n                    <md-content class=\"md-padding\">\n                        <movies category=\"top_rated\" index='categoryIndex.topRate'></movies>\n                    </md-content>\n                </md-tab>\n                <md-tab ng-click=\"vm.setTab(3)\" label=\"Upcoming\">\n                    <md-content class=\"md-padding\">\n                        <movies category=\"upcoming\" index='categoryIndex.upComing'></movies>\n                    </md-content>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n    </section>\n</div>"
 
 /***/ },
 /* 45 */

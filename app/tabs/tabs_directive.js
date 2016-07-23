@@ -1,4 +1,4 @@
-export default ngModule => {
+export default (ngModule, firebase, database) => {
     ngModule.directive("tabs", () => {
         require('./tabs.css');
         return {
@@ -6,37 +6,27 @@ export default ngModule => {
             scope: true,
             template: require('./tabs.html'),
             controllerAs: "vm",
-            controller: function($rootScope, $scope){
+            controller: function($rootScope, $scope, $location, $mdDialog){
                 const vm = this;
                 vm.sd = $scope.categoryIndex;
-                $scope.toggleLeft = buildDelayedToggler('left');
                 vm.setTab = (index) => {
                     $rootScope.tabIndex = index;
                 };
 
-                function debounce(func, wait, context) {
-                  var timer;
-                  return function debounced() {
-                    var context = $scope,
-                        args = Array.prototype.slice.call(arguments);
-                    $timeout.cancel(timer);
-                    timer = $timeout(function() {
-                      timer = undefined;
-                      func.apply(context, args);
-                    }, wait || 10);
-                  };
-                }
-                
-                function buildDelayedToggler(navID) {
-                  return debounce(function() {
-                    // Component lookup should always be available since we are not using `ng-if`
-                    $mdSidenav(navID)
-                      .toggle()
-                      .then(function () {
-                        $log.debug("toggle " + navID + " is done");
-                      });
-                  }, 200);
-                }
+                vm.collectionPage = () => {
+                    if(!firebase.auth().currentUser){
+                        $mdDialog.show(
+                            $mdDialog.alert()
+                                .parent(angular.element(document.querySelector('body')))
+                                .clickOutsideToClose(true)
+                                .title('Signin')
+                                .textContent('Please signin first.')
+                                .ok('Got it!')
+                        );
+                    }else {
+                        $location.path('/main/mycollection');
+                    }
+                };
             }
         };
     });

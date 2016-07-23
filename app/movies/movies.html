@@ -3,23 +3,26 @@
             md-cols="1" md-cols-sm="2" md-cols-md="3" md-cols-gt-md="6"
             md-row-height-gt-md="1:1" md-row-height="4:3"
             md-gutter="8px" md-gutter-gt-sm="4px" >
-        <md-grid-tile ng-click="vm.forwardInfo(movie)" ng-repeat="movie in vm.movies.results"
+        <md-grid-tile ng-repeat="movie in vm.movies.results"
                       md-rowspan="3"
                       md-colspan="1"
                       md-colspan-sm="1"
                       md-colspan-xs="1">
             <md-card>
-                <img ng-src="{{movie.poster_path?'https://image.tmdb.org/t/p/w300'+movie.poster_path:'img/pic/NoImage.jpg'}}" class="md-card-image" alt="Washed Out">
-                <md-card-title>
+                <img ng-click="vm.forwardInfo(movie)" ng-src="{{movie.poster_path?'https://image.tmdb.org/t/p/w300'+movie.poster_path:'img/pic/NoImage.jpg'}}" class="md-card-image" alt="Washed Out">
+                <md-card-title ng-click="vm.forwardInfo(movie)">
                     <md-card-title-text>
                         <h4>{{movie.title}}</h4>
                     </md-card-title-text>
                 </md-card-title>
-                <md-card-content>
+                <md-card-content ng-click="vm.forwardInfo(movie)">
                     <p>{{movie.overview | limitTo:100}}</p>
                 </md-card-content>
                 <md-card-actions layout="row" layout-align="end">
-                    <md-button class="md-icon-button">
+                    <md-button ng-click="addcollection()(movie)" class="md-icon-button" aria-label="popularity">
+                        <md-icon md-svg-icon="img/icons/collection.svg"></md-icon>
+                    </md-button>
+                    <md-button class="md-icon-button" aria-label="popularity">
                         <md-icon md-svg-icon="img/icons/popularity.svg"></md-icon>
                     </md-button>
                     <p ng-style="{'color': '#'+vm.Math.floor((movie.popularity/100)*16777215).toString(16)}" style="padding-right: 10px; padding-top: 10px">{{movie.popularity | limitTo: 4}}</p>

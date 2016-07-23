@@ -1,0 +1,17 @@
+<md-content flex layout-padding style="margin-top: 65px;height: 100vh;">
+    <div class="centerDiv" ng-if="vm.noContent">
+        <h3 style="color: #9e9e9e">Seems like you haven't build your collection yet</h3>
+    </div>
+    <div ng-if="!vm.noContent">
+        <div ng-repeat="(key, value) in vm.collection" class="list-item">
+            <img class="poster-img" ng-click="vm.forwardInfo(value)" ng-src="{{value.poster_path?'https://image.tmdb.org/t/p/w300'+value.poster_path:'img/pic/NoImage.jpg'}}" class="md-card-image" alt="Washed Out">
+            <div class="poster-info" ng-click="vm.forwardInfo(value)">
+                <h4>{{value.title}}</h4>
+                <h5>Rated {{value.vote_average}} by {{value.vote_count}} people</h5>
+                <h5>Release data: {{value.release_date}}</h5>
+                <h5>Description: {{value.overview | limitTo:300}}</h5>
+            </div>
+            <md-icon ng-click="vm.removeItem(key)" class="clear-btn" md-svg-icon="img/icons/clear.svg"></md-icon>
+        </div>
+    </div>
+</md-content>

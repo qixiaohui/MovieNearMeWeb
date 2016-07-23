@@ -114,3 +114,11 @@
 #map {
     height: 100%;
 }
+
+.collectionBtn {
+    margin-right: 20px;
+}
+
+.collectionBtn:hover {
+    cursor: pointer;
+}

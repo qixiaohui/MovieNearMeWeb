@@ -30,18 +30,20 @@ var config = {
 firebase.initializeApp(config);
 
 const provider = new firebase.auth.FacebookAuthProvider();
+const database = new firebase.database();
 
 const app = angular.module('app', [angularMaterial, angularAnimate, angularUIRouter]);
 
-require('./main/main_directive').default(app, firebase, provider);
-require('./tabs/tabs_directive').default(app);
+require('./main/main_directive').default(app, firebase, provider, database);
+require('./tabs/tabs_directive').default(app, firebase, database);
 require('./movies/movies_directive').default(app);
-require('./MovieInfo/movie_info').default(app);
+require('./MovieInfo/movie_info').default(app, firebase, database);
 require('./map/map_directive').default(app);
 require('./PurchaseChannels/purchase_channels').default(app);
 require('./signin/signin_directive').default(app);
 require('./register/register_directive.js').default(app);
 require('./search/search_directive').default(app);
+require('./mycollection/mycollection_directive').default(app, firebase, database);
 
 require('./router/router').default(app);
 

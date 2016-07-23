@@ -3,7 +3,7 @@ const crud = require('../service/crud');
 const util = require('../util/util');
 const key = 'AIzaSyDOjFm5V6Ar1QeNIDa0_d_jjfDQ2KGR2Ts';
 
-export default ngModule => {
+export default (ngModule, firebase, database) => {
     ngModule.directive("info", () => {
         require('./movie_info.css');
         return {
@@ -263,6 +263,13 @@ export default ngModule => {
                 });
 
                 vm.reload();
+
+                /**
+                 * call addcollection
+                 */
+                vm.addMovieToCollection = () => {
+                    $scope.addCollection($rootScope.movieInfo);
+                };
 
             }
         

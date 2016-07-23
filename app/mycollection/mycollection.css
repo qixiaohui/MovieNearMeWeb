@@ -1,0 +1,49 @@
+.centerDiv {
+    margin-top: 200px;
+    text-align: center;
+}
+
+.centerDiv h3 {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.list-item {
+    width: 70%;
+    margin: auto;
+    height: 200px;
+    margin-bottom: 50px;
+    background: #f0f0f0;
+    box-shadow: 8px 8px 5px #c9c9c9;
+    position: relative;
+}
+
+.poster-img {
+    position: absolute;
+    top:0;
+    left: 0;
+    height: 100%;
+}
+
+.poster-info {
+    position: absolute;
+    top:0;
+    left: 160px;
+    width: 60%;
+}
+
+.poster-info:hover {
+    cursor: pointer;
+}
+
+.clear-btn {
+    margin-top: 10px;
+    margin-right: 10px;
+    position: absolute;
+    top:0;
+    right: 0;
+}
+
+.clear-btn:hover {
+    cursor: pointer;
+}

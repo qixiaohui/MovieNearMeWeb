@@ -7,7 +7,8 @@ export default ngModule => {
             scope: {
                 category: '@',
                 index: '=',
-                keyword: '='
+                keyword: '=',
+                addcollection: '&'
             },
             template: require('./movies.html'),
             controllerAs: "vm",

@@ -8,7 +8,11 @@
             <div class="right-card">
                 <div>
                     <div class="top-card">
-                        <span class="md-headline">
+                        <div class="collectionBtn" ng-click="vm.addMovieToCollection()">
+                            <p style="float: right"> Add to my collection </p>
+                            <md-icon style="float: right" md-svg-icon="img/icons/collection.svg"></md-icon>
+                        </div>
+                        <span style="clear: both" class="md-headline">
                             {{vm.info.tagline}}
                         </span>
                         <h5>Rated {{vm.info.vote_average}} by {{vm.info.vote_count}} people</h5>

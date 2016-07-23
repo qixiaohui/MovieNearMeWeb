@@ -30,6 +30,11 @@ export default ngModule => {
                 url: '/search',
                 template: '<search></search>'
             }
+        ).state(
+            'main.mycollection', {
+                url: '/mycollection',
+                template: '<mycollection></mycollection>'
+            }
         );
 
         $urlRouterProvider.otherwise('/main/tabs');

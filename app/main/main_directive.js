@@ -1,4 +1,4 @@
-export default (ngModule, firebase, provider) => {
+export default (ngModule, firebase, provider, database) => {
     ngModule.directive("main", () => {
         require('./main.css');
         return {
@@ -6,7 +6,7 @@ export default (ngModule, firebase, provider) => {
             scope: true,
             template: require('./main.html'),
             controllerAs: "vm",
-            controller: function($rootScope, $location, $scope, $timeout, $mdSidenav){
+            controller: function($rootScope, $location, $scope, $timeout, $mdSidenav, $mdDialog){
                 //default add parameters on launch
                 $rootScope.tabIndex = 0;
                 $scope.categoryIndex = {
@@ -30,14 +30,14 @@ export default (ngModule, firebase, provider) => {
                     }, wait || 10);
                   };
                 }
-                
+
                 function buildDelayedToggler(navID) {
                   return debounce(function() {
                     // Component lookup should always be available since we are not using `ng-if`
                     $mdSidenav(navID)
                       .toggle()
                       .then(function () {
-                        $log.debug("toggle " + navID + " is done");
+                        console.debug("toggle " + navID + " is done");
                       });
                   }, 200);
                 }
@@ -92,6 +92,76 @@ export default (ngModule, firebase, provider) => {
                 vm.search = () => {
                     //only update when on submit or ng click
                     $scope.searchKeyword = vm.searchContent;
+                };
+
+                /**
+                 * add movie to collection
+                 * @param movie
+                 */
+                $scope.addCollection = (movieCopy) => {
+                    let movie = angular.copy(movieCopy);
+                    if(!firebase.auth().currentUser){
+                        $mdDialog.show(
+                            $mdDialog.alert()
+                                .parent(angular.element(document.querySelector('body')))
+                                .clickOutsideToClose(true)
+                                .title('Signin')
+                                .textContent('Please signin first.')
+                                .ok('Got it!')
+                        );
+                    }else{
+                        var userId = firebase.auth().currentUser.uid;
+                        database.ref(`/users/${userId}`).once('value').then((snapshot) => {
+                            if((snapshot.val() && snapshot.val().mycollection) && (Object.keys(snapshot.val().mycollection).length >=50)){
+                                $mdDialog.show(
+                                    $mdDialog.alert()
+                                        .parent(angular.element(document.querySelector('body')))
+                                        .clickOutsideToClose(true)
+                                        .title('Maximum capacity')
+                                        .textContent('Sorry about the inconvinent, we can only store up to 50 movies at this time, please delete some movie and try again.')
+                                        .ok('Got it!')
+                                );
+                                return;
+                            }
+
+                            let push = () => {
+                                database.ref(`users/${userId}/mycollection/`).push(movie);
+                                $mdDialog.show(
+                                    $mdDialog.alert()
+                                        .parent(angular.element(document.querySelector('body')))
+                                        .clickOutsideToClose(true)
+                                        .title('Success')
+                                        .textContent('New movie added!')
+                                        .ok('Got it!')
+                                );
+                            };
+
+                            if((snapshot.val() && snapshot.val().mycollection)){
+                                let showDialog = () => {
+                                    $mdDialog.show(
+                                        $mdDialog.alert()
+                                            .parent(angular.element(document.querySelector('body')))
+                                            .clickOutsideToClose(true)
+                                            .title('Duplicate')
+                                            .textContent('Seems like you already have this movie in your collection.')
+                                            .ok('Got it!')
+                                    );
+                                };
+
+                                for(let key in snapshot.val().mycollection){
+                                    if(snapshot.val().mycollection[key].id === movie.id){
+                                        showDialog();
+                                        return;
+                                    }
+                                }
+
+                                push();
+
+                            }else{
+                                push();
+                            }
+                        });
+                    }
                 };
 
                 /**

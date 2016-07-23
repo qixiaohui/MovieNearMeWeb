@@ -114,9 +114,9 @@
 	__webpack_require__(/*! ./signin/signin_directive */ 86).default(app);
 	__webpack_require__(/*! ./register/register_directive.js */ 90).default(app);
 	__webpack_require__(/*! ./search/search_directive */ 94).default(app);
-	__webpack_require__(/*! ./mycollection/mycollection_directive */ 99).default(app, firebase, database);
+	__webpack_require__(/*! ./mycollection/mycollection_directive */ 98).default(app, firebase, database);
 	
-	__webpack_require__(/*! ./router/router */ 98).default(app);
+	__webpack_require__(/*! ./router/router */ 102).default(app);
 
 /***/ },
 /* 1 */
@@ -74871,7 +74871,8 @@
 	
 	                    if (util.compareDate(vm.today, releaseDate) > 60) {
 	                        vm.shouldShowtime = false;
-	                    } else if (util.compareDate(releaseDate, vm.today) > 1) {
+	                    } else if (util.compareDate(releaseDate, vm.today) > 0) {
+	                        releaseDate.setDate(releaseDate.getDate() + 1);
 	                        vm.today = releaseDate;
 	                        // movie is not released yet, no purchase option avilable
 	                        vm.shouldPurchase = false;
@@ -76661,7 +76662,7 @@
   \***********************************/
 /***/ function(module, exports) {
 
-	module.exports = "\n<section layout=\"row\" style=\"margin-top: 65px\" flex>\n    <div class=\"info-container\" layout=\"column\">\n        <div class=\"info-card\">\n            <md-card class=\"info-poster\">\n                <img ng-src=\"{{vm.info.poster_path?'https://image.tmdb.org/t/p/w300'+vm.info.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image\" alt=\"Washed Out\">\n            </md-card>\n            <div class=\"right-card\">\n                <div>\n                    <div class=\"top-card\">\n                        <div class=\"collectionBtn\" ng-click=\"vm.addMovieToCollection()\">\n                            <p style=\"float: right\"> Add to my collection </p>\n                            <md-icon style=\"float: right\" md-svg-icon=\"img/icons/collection.svg\"></md-icon>\n                        </div>\n                        <span style=\"clear: both\" class=\"md-headline\">\n                            {{vm.info.tagline}}\n                        </span>\n                        <h5>Rated {{vm.info.vote_average}} by {{vm.info.vote_count}} people</h5>\n                        <h5>Release data: {{vm.info.release_date}}</h5>\n                        <h5>Runtime: {{vm.info.runtime}} minutes</h5>\n                        <h5>Original language: {{vm.info.original_language}}</h5>\n                        <h5 style=\"display: inline;\"><p style=\"float: left; display: inline; padding-top: 15px\">Genre:</p></h5>\n                        <md-chips style=\"float: left\">\n                            <md-chip ng-repeat=\"genre in vm.info.genres\">\n                                {{genre.name}}\n                            </md-chip>\n                        </md-chips>\n                    </div>\n                </div>\n                <div>\n                </div>\n                <md-content class=\"description\" flex layout-padding>\n                    <p style=\"padding-left: 5px\">Storyline: {{vm.info.overview}}</p>\n                </md-content>\n            </div>\n        </div>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab label=\"Videos\">\n                    <div class=\"video-list\">\n                        <div layout='row'>\n                            <div ng-click=\"vm.openPlayer(video.link)\" style=\"position: relative;\" ng-repeat=\"video in vm.info.videos\">\n                                <picture>\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/mqdefault.jpg\"}}' media=\"(min-width:991px)\" />\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/hqdefault.jpg\"}}' media=\"(min-width:767px)\" />\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/sddefault.jpg\"}}' />\n                                    <img class=\"video-card\" srcSet />\n                                </picture>\n                                <img class=\"play-button\" src=\"../img/pic/play.png\" />\n                                <div class=\"video-description\">\n                                    <p>{{video.title | limitTo: 40}}...</p>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab ng-if=\"vm.shouldShowtime\" label=\"Showtime\">\n                    <div class=\"theaters\">\n                        <div style=\"margin-left: 20px\" layout=\"row\">\n                            <md-content>\n                                <h4>Date</h4>\n                                <md-datepicker style=\"float: left\" ng-model=\"vm.date.currentDate\" md-placeholder=\"Enter date\"\n                                               md-min-date=\"vm.date.minDate\" md-max-date=\"vm.date.maxDate\"></md-datepicker>\n                                <md-list ng-if=\"vm.info.theaters.length > 0\" class=\"md-dense\" flex style=\"width: 100%; clear: both; margin-top: 100px\">\n                                    <md-list-item  class=\"md-3-line\" style=\"justify-content: space-between;\" ng-repeat=\"theater in vm.info.theaters\">\n                                        <div class=\"theater-card\">\n                                            <b style=\"display: block\">{{theater.name}}</b>\n                                            <!--<img style=\"float: left\" class=\"md-avatar\" ng-src=\"../img/icons/phone.svg\" />-->\n                                            <!--<div style=\"float: left\" class=\"md-list-item-text\">-->\n                                                <!--<p> {{theater.phoneNumber}} </p>-->\n                                            <!--</div>-->\n                                        </div>\n                                        <div class=\"showtime\" layout=\"row\">\n                                            <table class=\"table\">\n                                                <tbody>\n                                                <tr ng-repeat=\"movie in theater.movie\">\n                                                    <th>{{movie.name}}</th>\n                                                    <td ng-repeat=\"time in movie.showtimes\"><p style=\"display: block\">{{time}}</p> <img ng-if=\"movie.showtime_tickets[time]\" ng-click=\"vm.buyTicket(movie.showtime_tickets[time])\" style=\"width: 50px; height: 20px\" ng-src=\"../img/pic/ticket.png\" /></td>\n                                                </tr>\n                                                </tbody>\n                                            </table>\n                                        </div>\n                                        <md-divider ng-if=\"!$last\"></md-divider>\n                                    </md-list-item>\n                                </md-list>\n                            </md-content>\n                        </div>\n                        <map ng-if=\"vm.info.theaters.length > 0\" location=\"vm.location\" theaters=\"vm.info.theaters\"></map>\n                    </div>\n                </md-tab>\n                <md-tab ng-if=\"vm.info.purchaseChannels\" label=\"Avilable On\">\n                    <channels channels=\"vm.info.purchaseChannels\"></channels>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab label=\"Credit\">\n                    <div class=\"cast\">\n                        <div ng-cloak layout-gt-sm=\"row\" layout=\"column\">\n                            <div flex-gt-sm=\"50\" flex>\n                                <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                                  <div class=\"md-toolbar-tools\">\n                                    <span>Crew</span>\n                                  </div>\n                                </md-toolbar>\n                                <md-content>\n                                    <md-list flex>\n                                        <!-- <md-subheader class=\"md-no-sticky\">Crew</md-subheader> -->\n                                        <md-list-item class=\"md-3-line\" ng-repeat=\"crew in vm.info.credit.crew | limitTo: 10\" ng-click=\"vm.showPerson(crew)\">\n                                          <img ng-src=\"{{crew.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+crew.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                                          <div class=\"md-list-item-text\" layout=\"column\">\n                                            <h4>department: {{crew.department}}</h4>\n                                            <p>name: {{crew.name}}</p>\n                                          </div>\n                                        </md-list-item>\n                                    </md-list>\n                                </md-content>\n                            </div>\n                            <div flex-gt-sm=\"50\" flex>\n                                <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                                  <div class=\"md-toolbar-tools\">\n                                    <span>Cast</span>\n                                  </div>\n                                </md-toolbar>\n                                <md-content>\n                                    <md-list flex>\n                                        <!-- <md-subheader class=\"md-no-sticky\">Cast</md-subheader> -->\n                                        <md-list-item class=\"md-3-line\" ng-repeat=\"cast in vm.info.credit.cast | limitTo: 10\" ng-click=\"vm.showPerson(cast)\">\n                                          <img ng-src=\"{{cast.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+cast.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                                          <div class=\"md-list-item-text\" layout=\"column\">\n                                            <h4>character: {{cast.character}}</h4>\n                                            <p>name: {{cast.name}}</p>\n                                          </div>\n                                        </md-list-item>\n                                    </md-list>\n                                </md-content>\n                            </div>\n                        </div>\n                    </div>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n    </div>\n    <md-sidenav flex class=\"md-sidenav-right md-whiteframe-4dp similiar\" md-is-locked-open=\"$mdMedia('gt-md')\" md-component-id=\"right\">\n        <h4 style=\"margin-top: 20px; margin-left: 20px\">You may also like</h4>\n        <md-divider ng-if=\"!$last\"></md-divider>\n        <md-list flex>\n            <md-list-item class=\"md-3-line\" ng-repeat=\"movie in vm.info.similar\" ng-click=\"vm.loadSimilar(movie)\">\n                <img ng-src=\"{{movie.poster_path?'https://image.tmdb.org/t/p/w92'+movie.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image similar-movie\" />\n                <div class=\"md-list-item-text similar-summry\" layout=\"column\">\n                    <h5>{{movie.title}}</h5>\n                    <p>Rate: {{movie.vote_average}} by {{movie.vote_count}} people</p>\n                </div>\n                <md-divider ng-if=\"!$last\"></md-divider>\n            </md-list-item>\n        </md-list>\n    </md-sidenav>\n</section>\n"
+	module.exports = "\n<section layout=\"row\" style=\"margin-top: 65px\" flex>\n    <div class=\"info-container\" layout=\"column\">\n        <div class=\"info-card\">\n            <md-card class=\"info-poster\">\n                <img ng-src=\"{{vm.info.poster_path?'https://image.tmdb.org/t/p/w300'+vm.info.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image\" alt=\"Washed Out\">\n            </md-card>\n            <div class=\"right-card\">\n                <div>\n                    <div class=\"top-card\">\n                        <div class=\"collectionBtn\">\n                            <p style=\"float: right\"> Add to my collection </p>\n                            <md-icon style=\"float: right\" md-svg-icon=\"img/icons/collection.svg\"></md-icon>\n                        </div>\n                        <span style=\"clear: both\" class=\"md-headline\">\n                            {{vm.info.tagline}}\n                        </span>\n                        <h5>Rated {{vm.info.vote_average}} by {{vm.info.vote_count}} people</h5>\n                        <h5>Release data: {{vm.info.release_date}}</h5>\n                        <h5>Runtime: {{vm.info.runtime}} minutes</h5>\n                        <h5>Original language: {{vm.info.original_language}}</h5>\n                        <h5 style=\"display: inline;\"><p style=\"float: left; display: inline; padding-top: 15px\">Genre:</p></h5>\n                        <md-chips style=\"float: left\">\n                            <md-chip ng-repeat=\"genre in vm.info.genres\">\n                                {{genre.name}}\n                            </md-chip>\n                        </md-chips>\n                    </div>\n                </div>\n                <div>\n                </div>\n                <md-content class=\"description\" flex layout-padding>\n                    <p style=\"padding-left: 5px\">Storyline: {{vm.info.overview}}</p>\n                </md-content>\n            </div>\n        </div>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab label=\"Videos\">\n                    <div class=\"video-list\">\n                        <div layout='row'>\n                            <div ng-click=\"vm.openPlayer(video.link)\" style=\"position: relative;\" ng-repeat=\"video in vm.info.videos\">\n                                <picture>\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/mqdefault.jpg\"}}' media=\"(min-width:991px)\" />\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/hqdefault.jpg\"}}' media=\"(min-width:767px)\" />\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/sddefault.jpg\"}}' />\n                                    <img class=\"video-card\" srcSet />\n                                </picture>\n                                <img class=\"play-button\" src=\"../img/pic/play.png\" />\n                                <div class=\"video-description\">\n                                    <p>{{video.title | limitTo: 40}}...</p>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab ng-if=\"vm.shouldShowtime\" label=\"Showtime\">\n                    <div class=\"theaters\">\n                        <div style=\"margin-left: 20px\" layout=\"row\">\n                            <md-content>\n                                <h4>Date</h4>\n                                <md-datepicker style=\"float: left\" ng-model=\"vm.date.currentDate\" md-placeholder=\"Enter date\"\n                                               md-min-date=\"vm.date.minDate\" md-max-date=\"vm.date.maxDate\"></md-datepicker>\n                                <md-list ng-if=\"vm.info.theaters.length > 0\" class=\"md-dense\" flex style=\"width: 100%; clear: both; margin-top: 100px\">\n                                    <md-list-item  class=\"md-3-line\" style=\"justify-content: space-between;\" ng-repeat=\"theater in vm.info.theaters\">\n                                        <div class=\"theater-card\">\n                                            <b style=\"display: block\">{{theater.name}}</b>\n                                            <!--<img style=\"float: left\" class=\"md-avatar\" ng-src=\"../img/icons/phone.svg\" />-->\n                                            <!--<div style=\"float: left\" class=\"md-list-item-text\">-->\n                                                <!--<p> {{theater.phoneNumber}} </p>-->\n                                            <!--</div>-->\n                                        </div>\n                                        <div class=\"showtime\" layout=\"row\">\n                                            <table class=\"table\">\n                                                <tbody>\n                                                <tr ng-repeat=\"movie in theater.movie\">\n                                                    <th>{{movie.name}}</th>\n                                                    <td ng-repeat=\"time in movie.showtimes\"><p style=\"display: block\">{{time}}</p> <img ng-if=\"movie.showtime_tickets[time]\" ng-click=\"vm.buyTicket(movie.showtime_tickets[time])\" style=\"width: 50px; height: 20px\" ng-src=\"../img/pic/ticket.png\" /></td>\n                                                </tr>\n                                                </tbody>\n                                            </table>\n                                        </div>\n                                        <md-divider ng-if=\"!$last\"></md-divider>\n                                    </md-list-item>\n                                </md-list>\n                            </md-content>\n                        </div>\n                        <map ng-if=\"vm.info.theaters.length > 0\" location=\"vm.location\" theaters=\"vm.info.theaters\"></map>\n                    </div>\n                </md-tab>\n                <md-tab ng-if=\"vm.info.purchaseChannels\" label=\"Avilable On\">\n                    <channels channels=\"vm.info.purchaseChannels\"></channels>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab label=\"Credit\">\n                    <div class=\"cast\">\n                        <div ng-cloak layout-gt-sm=\"row\" layout=\"column\">\n                            <div flex-gt-sm=\"50\" flex>\n                                <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                                  <div class=\"md-toolbar-tools\">\n                                    <span>Crew</span>\n                                  </div>\n                                </md-toolbar>\n                                <md-content>\n                                    <md-list flex>\n                                        <!-- <md-subheader class=\"md-no-sticky\">Crew</md-subheader> -->\n                                        <md-list-item class=\"md-3-line\" ng-repeat=\"crew in vm.info.credit.crew | limitTo: 10\" ng-click=\"vm.showPerson(crew)\">\n                                          <img ng-src=\"{{crew.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+crew.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                                          <div class=\"md-list-item-text\" layout=\"column\">\n                                            <h4>department: {{crew.department}}</h4>\n                                            <p>name: {{crew.name}}</p>\n                                          </div>\n                                        </md-list-item>\n                                    </md-list>\n                                </md-content>\n                            </div>\n                            <div flex-gt-sm=\"50\" flex>\n                                <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                                  <div class=\"md-toolbar-tools\">\n                                    <span>Cast</span>\n                                  </div>\n                                </md-toolbar>\n                                <md-content>\n                                    <md-list flex>\n                                        <!-- <md-subheader class=\"md-no-sticky\">Cast</md-subheader> -->\n                                        <md-list-item class=\"md-3-line\" ng-repeat=\"cast in vm.info.credit.cast | limitTo: 10\" ng-click=\"vm.showPerson(cast)\">\n                                          <img ng-src=\"{{cast.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+cast.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                                          <div class=\"md-list-item-text\" layout=\"column\">\n                                            <h4>character: {{cast.character}}</h4>\n                                            <p>name: {{cast.name}}</p>\n                                          </div>\n                                        </md-list-item>\n                                    </md-list>\n                                </md-content>\n                            </div>\n                        </div>\n                    </div>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n    </div>\n    <md-sidenav flex class=\"md-sidenav-right md-whiteframe-4dp similiar\" md-is-locked-open=\"$mdMedia('gt-md')\" md-component-id=\"right\">\n        <h4 style=\"margin-top: 20px; margin-left: 20px\">You may also like</h4>\n        <md-divider ng-if=\"!$last\"></md-divider>\n        <md-list flex>\n            <md-list-item class=\"md-3-line\" ng-repeat=\"movie in vm.info.similar\" ng-click=\"vm.loadSimilar(movie)\">\n                <img ng-src=\"{{movie.poster_path?'https://image.tmdb.org/t/p/w92'+movie.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image similar-movie\" />\n                <div class=\"md-list-item-text similar-summry\" layout=\"column\">\n                    <h5>{{movie.title}}</h5>\n                    <p>Rate: {{movie.vote_average}} by {{movie.vote_count}} people</p>\n                </div>\n                <md-divider ng-if=\"!$last\"></md-divider>\n            </md-list-item>\n        </md-list>\n    </md-sidenav>\n</section>\n"
 
 /***/ },
 /* 76 */
@@ -77401,6 +77402,116 @@
 
 /***/ },
 /* 98 */
+/*!************************************************!*\
+  !*** ./mycollection/mycollection_directive.js ***!
+  \************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	exports.default = function (ngModule, firebase, database) {
+	    ngModule.directive("mycollection", function () {
+	        __webpack_require__(/*! ./mycollection.css */ 99);
+	        var crud = __webpack_require__(/*! ../service/crud */ 48);
+	        return {
+	            restrict: "E",
+	            scope: true,
+	            template: __webpack_require__(/*! ./mycollection.html */ 101),
+	            controllerAs: "vm",
+	            controller: function controller($scope, $rootScope, $location, $mdDialog) {
+	                var vm = this;
+	                vm.noContent = true;
+	
+	                vm.forwardInfo = function (info) {
+	                    $rootScope.appName = info.title;
+	                    $rootScope.movieInfo = info;
+	                    $location.path('/main/info');
+	                };
+	
+	                vm.removeItem = function (key) {
+	                    delete vm.collection[key];
+	                    var userId = firebase.auth().currentUser.uid;
+	                    if (userId) {
+	                        database.ref('/users/' + userId + '/mycollection/' + key).remove();
+	                    } else {
+	                        $mdDialog.show($mdDialog.alert().parent(angular.element(document.querySelector('body'))).clickOutsideToClose(true).title('Signin').textContent('Please signin first.').ok('Got it!'));
+	                    }
+	                };
+	
+	                var userId = firebase.auth().currentUser.uid;
+	                database.ref('/users/' + userId).once('value').then(function (snapshot) {
+	                    if (snapshot.val() && snapshot.val().mycollection) {
+	                        vm.noContent = false;
+	                        vm.collection = snapshot.val().mycollection;
+	                        $scope.$digest();
+	                    }
+	                });
+	            }
+	        };
+	    });
+	};
+
+/***/ },
+/* 99 */
+/*!***************************************!*\
+  !*** ./mycollection/mycollection.css ***!
+  \***************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !./../../~/css-loader!./mycollection.css */ 100);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./mycollection.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./mycollection.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 100 */
+/*!*******************************************************!*\
+  !*** ../~/css-loader!./mycollection/mycollection.css ***!
+  \*******************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".centerDiv {\n    margin-top: 200px;\n    text-align: center;\n}\n\n.centerDiv h3 {\n    display: inline-block;\n    vertical-align: middle;\n}\n\n.list-item {\n    width: 70%;\n    margin: auto;\n    height: 200px;\n    margin-bottom: 50px;\n    background: #f0f0f0;\n    box-shadow: 8px 8px 5px #c9c9c9;\n    position: relative;\n}\n\n.poster-img {\n    position: absolute;\n    top:0;\n    left: 0;\n    height: 100%;\n}\n\n.poster-info {\n    position: absolute;\n    top:0;\n    left: 160px;\n    width: 60%;\n}\n\n.poster-info:hover {\n    cursor: pointer;\n}\n\n.clear-btn {\n    margin-top: 10px;\n    margin-right: 10px;\n    position: absolute;\n    top:0;\n    right: 0;\n}\n\n.clear-btn:hover {\n    cursor: pointer;\n}", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 101 */
+/*!****************************************!*\
+  !*** ./mycollection/mycollection.html ***!
+  \****************************************/
+/***/ function(module, exports) {
+
+	module.exports = "<md-content flex layout-padding style=\"margin-top: 65px;height: 100vh;\">\n    <div class=\"centerDiv\" ng-if=\"vm.noContent\">\n        <h3 style=\"color: #9e9e9e\">Seems like you haven't build your collection yet</h3>\n    </div>\n    <div ng-if=\"!vm.noContent\">\n        <div ng-repeat=\"(key, value) in vm.collection\" class=\"list-item\">\n            <img class=\"poster-img\" ng-click=\"vm.forwardInfo(value)\" ng-src=\"{{value.poster_path?'https://image.tmdb.org/t/p/w300'+value.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image\" alt=\"Washed Out\">\n            <div class=\"poster-info\" ng-click=\"vm.forwardInfo(value)\">\n                <h4>{{value.title}}</h4>\n                <h5>Rated {{value.vote_average}} by {{value.vote_count}} people</h5>\n                <h5>Release data: {{value.release_date}}</h5>\n                <h5>Description: {{value.overview | limitTo:300}}</h5>\n            </div>\n            <md-icon ng-click=\"vm.removeItem(key)\" class=\"clear-btn\" md-svg-icon=\"img/icons/clear.svg\"></md-icon>\n        </div>\n    </div>\n</md-content>"
+
+/***/ },
+/* 102 */
 /*!**************************!*\
   !*** ./router/router.js ***!
   \**************************/
@@ -77440,116 +77551,6 @@
 	        $urlRouterProvider.otherwise('/main/tabs');
 	    });
 	};
-
-/***/ },
-/* 99 */
-/*!************************************************!*\
-  !*** ./mycollection/mycollection_directive.js ***!
-  \************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	exports.default = function (ngModule, firebase, database) {
-	    ngModule.directive("mycollection", function () {
-	        __webpack_require__(/*! ./mycollection.css */ 100);
-	        var crud = __webpack_require__(/*! ../service/crud */ 48);
-	        return {
-	            restrict: "E",
-	            scope: true,
-	            template: __webpack_require__(/*! ./mycollection.html */ 102),
-	            controllerAs: "vm",
-	            controller: function controller($scope, $rootScope, $location, $mdDialog) {
-	                var vm = this;
-	                vm.noContent = true;
-	
-	                vm.forwardInfo = function (info) {
-	                    $rootScope.appName = info.title;
-	                    $rootScope.movieInfo = info;
-	                    $location.path('/main/info');
-	                };
-	
-	                vm.removeItem = function (key) {
-	                    delete vm.collection[key];
-	                    var userId = firebase.auth().currentUser.uid;
-	                    if (userId) {
-	                        database.ref('/users/' + userId + '/mycollection/' + key).remove();
-	                    } else {
-	                        $mdDialog.show($mdDialog.alert().parent(angular.element(document.querySelector('body'))).clickOutsideToClose(true).title('Signin').textContent('Please signin first.').ok('Got it!'));
-	                    }
-	                };
-	
-	                var userId = firebase.auth().currentUser.uid;
-	                database.ref('/users/' + userId).once('value').then(function (snapshot) {
-	                    if (snapshot.val() && snapshot.val().mycollection) {
-	                        vm.noContent = false;
-	                        vm.collection = snapshot.val().mycollection;
-	                        $scope.$digest();
-	                    }
-	                });
-	            }
-	        };
-	    });
-	};
-
-/***/ },
-/* 100 */
-/*!***************************************!*\
-  !*** ./mycollection/mycollection.css ***!
-  \***************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./mycollection.css */ 101);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./mycollection.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./mycollection.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 101 */
-/*!*******************************************************!*\
-  !*** ../~/css-loader!./mycollection/mycollection.css ***!
-  \*******************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 3)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, ".centerDiv {\n    margin-top: 200px;\n    text-align: center;\n}\n\n.centerDiv h3 {\n    display: inline-block;\n    vertical-align: middle;\n}\n\n.list-item {\n    width: 70%;\n    margin: auto;\n    height: 200px;\n    margin-bottom: 50px;\n    background: #f0f0f0;\n    box-shadow: 8px 8px 5px #c9c9c9;\n    position: relative;\n}\n\n.poster-img {\n    position: absolute;\n    top:0;\n    left: 0;\n    height: 100%;\n}\n\n.poster-info {\n    position: absolute;\n    top:0;\n    left: 160px;\n    width: 60%;\n}\n\n.poster-info:hover {\n    cursor: pointer;\n}\n\n.clear-btn {\n    margin-top: 10px;\n    margin-right: 10px;\n    position: absolute;\n    top:0;\n    right: 0;\n}\n\n.clear-btn:hover {\n    cursor: pointer;\n}", ""]);
-	
-	// exports
-
-
-/***/ },
-/* 102 */
-/*!****************************************!*\
-  !*** ./mycollection/mycollection.html ***!
-  \****************************************/
-/***/ function(module, exports) {
-
-	module.exports = "<md-content flex layout-padding style=\"margin-top: 65px;height: 100vh;\">\n    <div class=\"centerDiv\" ng-if=\"vm.noContent\">\n        <h3 style=\"color: #9e9e9e\">Seems like you haven't build your collection yet</h3>\n    </div>\n    <div ng-if=\"!vm.noContent\">\n        <div ng-repeat=\"(key, value) in vm.collection\" class=\"list-item\">\n            <img class=\"poster-img\" ng-click=\"vm.forwardInfo(value)\" ng-src=\"{{value.poster_path?'https://image.tmdb.org/t/p/w300'+value.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image\" alt=\"Washed Out\">\n            <div class=\"poster-info\" ng-click=\"vm.forwardInfo(value)\">\n                <h4>{{value.title}}</h4>\n                <h5>Rated {{value.vote_average}} by {{value.vote_count}} people</h5>\n                <h5>Release data: {{value.release_date}}</h5>\n                <h5>Description: {{value.overview | limitTo:300}}</h5>\n            </div>\n            <md-icon ng-click=\"vm.removeItem(key)\" class=\"clear-btn\" md-svg-icon=\"img/icons/clear.svg\"></md-icon>\n        </div>\n    </div>\n</md-content>"
 
 /***/ }
 /******/ ]);

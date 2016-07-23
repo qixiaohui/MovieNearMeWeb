@@ -152,7 +152,8 @@ export default (ngModule, firebase, database) => {
 
                     if(util.compareDate(vm.today, releaseDate) > 60){
                         vm.shouldShowtime = false;
-                    }else if(util.compareDate(releaseDate, vm.today) > 1){
+                    }else if(util.compareDate(releaseDate, vm.today) > 0){
+                        releaseDate.setDate(releaseDate.getDate() + 1);
                         vm.today = releaseDate;
                         // movie is not released yet, no purchase option avilable
                         vm.shouldPurchase = false;

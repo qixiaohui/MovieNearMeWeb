@@ -45,7 +45,7 @@ var secureServer = https.createServer({
     ca: fs.readFileSync('./ssl/ca.crt'),
     requestCert: true,
     rejectUnauthorized: false
-}, app).listen('8443', function() {
+}, app).listen(process.env.PORT || '8443', function() {
     console.log("Secure Express server listening on port 8443");
 });
 

@@ -42,7 +42,7 @@
     "youtube-search": "^1.0.4"
   },
   "scripts": {
-    "start": "node server/app.js",
+    "start": "NODE_ENV=production webpack -p & cp app/index.html dist/index.html & node server/app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack -d --watch & nodemon server/app.js",
     "build": "NODE_ENV=production webpack -p & cp app/index.html dist/index.html & node server/app.js"

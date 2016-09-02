@@ -39,13 +39,17 @@ app.get('/ping', function(req, res) {
 	res.send('pong');
 });
 
-var secureServer = https.createServer({
-    key: fs.readFileSync('./ssl/server.key'),
-    cert: fs.readFileSync('./ssl/server.crt'),
-    ca: fs.readFileSync('./ssl/ca.crt'),
-    requestCert: true,
-    rejectUnauthorized: false
-}, app).listen(process.env.PORT || '8443', function() {
-    console.log("Secure Express server listening on port 8443");
+app.listen(process.env.PORT || port, function(){
+	console.log("server listening on port: "+(process.env.PORT || port));
 });
+
+// var secureServer = https.createServer({
+//     key: fs.readFileSync('./ssl/server.key'),
+//     cert: fs.readFileSync('./ssl/server.crt'),
+//     ca: fs.readFileSync('./ssl/ca.crt'),
+//     requestCert: true,
+//     rejectUnauthorized: false
+// }, app).listen(process.env.PORT || '8443', function() {
+//     console.log("Secure Express server listening on port"+process.env.PORT);
+// });
 

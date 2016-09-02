@@ -13,13 +13,8 @@ var port = 8080;
 const router = require('./router');
 
 app.get('/', function (req, res) {
-	if(process.env.NODE_ENV == 'production'){
-		app.use(express.static('./dist/'));
-		res.sendfile('./dist/index.html');
-	}else{
-		app.use(express.static('./app/'));
-		res.sendfile('./app/index.html');
-	}
+	app.use(express.static('./app/'));
+	res.sendfile('./app/index.html');
 });
 
 app.use(bodyParser.urlencoded({extend: true}));

@@ -1,9 +1,9 @@
 'use strict';
 
-const https = require('https');
-const fs = require('fs');
 const express = require('express');
 const app = express();
+const https = require('https');
+const fs = require('fs');
 const bodyParser = require('body-parser');
 const compress = require('compression');
 const cors = require('cors');
@@ -11,6 +11,16 @@ const logger = require('morgan');
 const _ = require('underscore');
 var port = 8080;
 const router = require('./router');
+
+app.get('/', function (req, res) {
+	if(process.env.NODE_ENV == 'production'){
+		app.use(express.static('./dist/'));
+		res.sendfile('./dist/index.html');
+	}else{
+		app.use(express.static('./app/'));
+		res.sendfile('./app/index.html');
+	}
+});
 
 app.use(bodyParser.urlencoded({extend: true}));
 app.use(bodyParser.json());
@@ -24,16 +34,6 @@ if(process.env.NODE_ENV == 'production') {
 }else{
 	app.use(logger('dev'));
 }
-
-app.get('/', function (req, res) {
-	if(process.env.NODE_ENV == 'production'){
-		app.use(express.static('./dist/'));
-		res.sendfile('./dist/index.html');
-	}else{
-		app.use(express.static('./app/'));
-		res.sendfile('./app/index.html');
-	}
-});
 
 app.get('/ping', function(req, res) {
 	res.send('pong');

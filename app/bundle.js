@@ -73276,8 +73276,11 @@
 	'use strict';
 	
 	var axios = __webpack_require__(/*! axios */ 49);
+	var domain = 'https://sheltered-peak-44325.herokuapp.com';
 	var crud = {
 	    GET: function GET(url, headers) {
+	        debugger;
+	        console.log('' + domain + url);
 	        return axios({
 	            method: 'get',
 	            url: url,

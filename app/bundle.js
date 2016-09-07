@@ -109,14 +109,14 @@
 	__webpack_require__(/*! ./tabs/tabs_directive */ 41).default(app, firebase, database);
 	__webpack_require__(/*! ./movies/movies_directive */ 45).default(app);
 	__webpack_require__(/*! ./MovieInfo/movie_info */ 70).default(app, firebase, database);
-	__webpack_require__(/*! ./map/map_directive */ 77).default(app);
-	__webpack_require__(/*! ./PurchaseChannels/purchase_channels */ 82).default(app);
-	__webpack_require__(/*! ./signin/signin_directive */ 86).default(app);
-	__webpack_require__(/*! ./register/register_directive.js */ 90).default(app);
-	__webpack_require__(/*! ./search/search_directive */ 94).default(app);
-	__webpack_require__(/*! ./mycollection/mycollection_directive */ 98).default(app, firebase, database);
+	__webpack_require__(/*! ./map/map_directive */ 71).default(app);
+	__webpack_require__(/*! ./PurchaseChannels/purchase_channels */ 77).default(app);
+	__webpack_require__(/*! ./signin/signin_directive */ 81).default(app);
+	__webpack_require__(/*! ./register/register_directive.js */ 85).default(app);
+	__webpack_require__(/*! ./search/search_directive */ 89).default(app);
+	__webpack_require__(/*! ./mycollection/mycollection_directive */ 93).default(app, firebase, database);
 	
-	__webpack_require__(/*! ./router/router */ 102).default(app);
+	__webpack_require__(/*! ./router/router */ 97).default(app);
 
 /***/ },
 /* 1 */
@@ -74717,18 +74717,18 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	var _ = __webpack_require__(/*! underscore */ 71);
+	var _ = __webpack_require__(/*! underscore */ 72);
 	var crud = __webpack_require__(/*! ../service/crud */ 48);
-	var util = __webpack_require__(/*! ../util/util */ 72);
+	var util = __webpack_require__(/*! ../util/util */ 98);
 	var key = 'AIzaSyDOjFm5V6Ar1QeNIDa0_d_jjfDQ2KGR2Ts';
 	
 	exports.default = function (ngModule, firebase, database) {
 	    ngModule.directive("info", function () {
-	        __webpack_require__(/*! ./movie_info.css */ 73);
+	        __webpack_require__(/*! ./movie_info.css */ 99);
 	        return {
 	            restrict: "E",
 	            scope: true,
-	            template: __webpack_require__(/*! ./movie_info.html */ 75),
+	            template: __webpack_require__(/*! ./movie_info.html */ 101),
 	            controllerAs: "vm",
 	            controller: function controller($scope, $rootScope, $mdDialog, $mdMedia) {
 	                var vm = this;
@@ -74952,7 +74952,7 @@
 	                };
 	
 	                vm.buyTicket = function (url) {
-	                    window.open(url, '_blank');
+	                    window.open('https://www.google.com/url?q=' + url, '_blank');
 	                };
 	
 	                vm.showPerson = function (person) {
@@ -74960,7 +74960,7 @@
 	
 	                    $mdDialog.show({
 	                        controller: DialogController,
-	                        template: __webpack_require__(/*! ./person.html */ 76),
+	                        template: __webpack_require__(/*! ./person.html */ 102),
 	                        locals: {
 	                            person: person
 	                        },
@@ -75019,6 +75019,104 @@
 
 /***/ },
 /* 71 */
+/*!******************************!*\
+  !*** ./map/map_directive.js ***!
+  \******************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var _ = __webpack_require__(/*! underscore */ 72);
+	var GoogleMapsLoader = __webpack_require__(/*! google-maps */ 73);
+	
+	GoogleMapsLoader.KEY = 'AIzaSyDOjFm5V6Ar1QeNIDa0_d_jjfDQ2KGR2Ts';
+	
+	exports.default = function (ngModule) {
+	    ngModule.directive("map", function () {
+	        __webpack_require__(/*! ./map.css */ 74);
+	        return {
+	            restrict: "E",
+	            scope: {
+	                location: '=',
+	                theaters: '='
+	            },
+	            template: __webpack_require__(/*! ./map.html */ 76),
+	            controllerAs: "vm",
+	            controller: function controller($scope, $rootScope) {
+	
+	                var vm = this;
+	                var map;
+	                var geocoder;
+	                var bounds;
+	
+	                GoogleMapsLoader.load(function (google) {
+	
+	                    var infoWindow = function infoWindow(marker, map, title, address) {
+	                        google.maps.event.addListener(marker, 'click', function () {
+	                            var html = "<div><h3>" + title + "</h3><p>" + address + "</p></div>";
+	                            var iw = new google.maps.InfoWindow({
+	                                content: html,
+	                                maxWidth: 350
+	                            });
+	                            iw.open(map, marker);
+	                        });
+	                    };
+	
+	                    var geocodeAddress = function geocodeAddress(address, title) {
+	                        geocoder.geocode({ 'address': address }, function (results, status) {
+	                            if (status == google.maps.GeocoderStatus.OK) {
+	                                var marker = new google.maps.Marker({
+	                                    icon: './img/pic/blueMark.png',
+	                                    map: map,
+	                                    animation: google.maps.Animation.DROP,
+	                                    position: results[0].geometry.location,
+	                                    title: title,
+	                                    address: address
+	                                });
+	                                infoWindow(marker, map, title, address);
+	                                bounds.extend(marker.getPosition());
+	                                map.fitBounds(bounds);
+	                            } else {
+	                                alert("geocode of " + address + " failed:" + status);
+	                            }
+	                        });
+	                    };
+	
+	                    bounds = new google.maps.LatLngBounds();
+	                    map = new google.maps.Map(document.getElementById('map'), {
+	                        zoom: 8,
+	                        center: { lat: $scope.location.lati, lng: $scope.location.longi },
+	                        mapTypeId: google.maps.MapTypeId.ROADMAP,
+	                        scrollwheel: false
+	                    });
+	                    var marker = new google.maps.Marker({
+	                        position: { lat: $scope.location.lati, lng: $scope.location.longi },
+	                        map: map,
+	                        title: 'Your current location'
+	                    });
+	                    google.maps.event.addListener(map, 'click', function (event) {
+	                        this.setOptions({ scrollwheel: true });
+	                    });
+	                    geocoder = new google.maps.Geocoder();
+	
+	                    //loop through theater address
+	                    _.each($scope.theaters, function (theater) {
+	                        geocodeAddress(theater.address, theater.name);
+	                    });
+	                });
+	
+	                //initialize map
+	                //vm.initMap();
+	            }
+	        };
+	    });
+	};
+
+/***/ },
+/* 72 */
 /*!*************************************!*\
   !*** ../~/underscore/underscore.js ***!
   \*************************************/
@@ -76575,207 +76673,7 @@
 
 
 /***/ },
-/* 72 */
-/*!**********************!*\
-  !*** ./util/util.js ***!
-  \**********************/
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	var util = {
-	    compareDate: function compareDate(date1, date2) {
-	        Date.prototype.addHours = function (h) {
-	            this.setHours(this.getHours() + h);
-	            return this;
-	        };
-	
-	        // adjust diff for for daylight savings
-	        var hoursToAdjust = Math.abs(date1.getTimezoneOffset() / 60) - Math.abs(date2.getTimezoneOffset() / 60);
-	        // apply the tz offset
-	        date2.addHours(hoursToAdjust);
-	
-	        // The number of milliseconds in one day
-	        var ONE_DAY = 1000 * 60 * 60 * 24;
-	
-	        // Convert both dates to milliseconds
-	        var date1_ms = date1.getTime();
-	        var date2_ms = date2.getTime();
-	
-	        // Calculate the difference in milliseconds
-	        var difference_ms = date1_ms - date2_ms;
-	
-	        // Convert back to days and return
-	        return Math.round(difference_ms / ONE_DAY);
-	    }
-	};
-	
-	module.exports = util;
-
-/***/ },
 /* 73 */
-/*!**********************************!*\
-  !*** ./MovieInfo/movie_info.css ***!
-  \**********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./movie_info.css */ 74);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./movie_info.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./movie_info.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 74 */
-/*!**************************************************!*\
-  !*** ../~/css-loader!./MovieInfo/movie_info.css ***!
-  \**************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 3)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, ".info-container {\n    margin-top: 10px;\n    margin-left: 10px;\n    width: 80%;\n    height: 100%;\n    display: flex;\n}\n\n.video-list {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.cast {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.theaters {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.avilableon {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.info-poster {\n    width: 20%;\n    float: left;\n}\n\n.top-card {\n    margin-left: 20px;\n    padding-top: 10px;\n}\n\n.right-card {\n    width: 80%;\n    position: relative;\n}\n\n.description {\n    margin-right: 20px;\n    position: absolute;\n    bottom: 0;\n}\n\n.inlineText {\n    float: left;\n    padding-left: 10px;\n}\n\n.similiar {\n    height: 100%;\n}\n\n.similar-movie {\n    margin-top: 5px;\n    margin-bottom: 5px;\n}\n\n.similar-summry {\n    padding-left: 10px;\n}\n\n.video-card {\n    width: 90%;\n    margin: auto;\n}\n\n.video-card:hover {\n    cursor: pointer;\n}\n\n.info-card {\n    width: 100%;\n    display: flex;\n}\n\n.play-button {\n    opacity: 0.8;\n    position: absolute;\n    left: 30%;\n    top: 20%; \n    width: 30%;\n}\n\n.video-description {\n    background-color: rgba(0, 0, 0, 0.7);\n    width: 90%;\n}\n\n.video-description p {\n    color: white;\n}\n\n.theater-card {\n    float: left;\n    margin-right: 10px;\n    width: 20%;\n}\n\n.showtime {\n    float: left;\n    width: 80%;\n}\n\n#map {\n    height: 100%;\n}\n\n.collectionBtn {\n    margin-right: 20px;\n}\n\n.collectionBtn:hover {\n    cursor: pointer;\n}", ""]);
-	
-	// exports
-
-
-/***/ },
-/* 75 */
-/*!***********************************!*\
-  !*** ./MovieInfo/movie_info.html ***!
-  \***********************************/
-/***/ function(module, exports) {
-
-	module.exports = "\n<section layout=\"row\" style=\"margin-top: 65px\" flex>\n    <div class=\"info-container\" layout=\"column\">\n        <div class=\"info-card\">\n            <md-card class=\"info-poster\">\n                <img ng-src=\"{{vm.info.poster_path?'https://image.tmdb.org/t/p/w300'+vm.info.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image\" alt=\"Washed Out\">\n            </md-card>\n            <div class=\"right-card\">\n                <div>\n                    <div class=\"top-card\">\n                        <div class=\"collectionBtn\" ng-click=\"vm.addMovieToCollection()\">\n                            <p style=\"float: right\"> Add to my collection </p>\n                            <md-icon style=\"float: right\" md-svg-icon=\"img/icons/collection.svg\"></md-icon>\n                        </div>\n                        <span style=\"clear: both\" class=\"md-headline\">\n                            {{vm.info.tagline}}\n                        </span>\n                        <h5>Rated {{vm.info.vote_average}} by {{vm.info.vote_count}} people</h5>\n                        <h5>Release data: {{vm.info.release_date}}</h5>\n                        <h5>Runtime: {{vm.info.runtime}} minutes</h5>\n                        <h5>Original language: {{vm.info.original_language}}</h5>\n                        <h5 style=\"display: inline;\"><p style=\"float: left; display: inline; padding-top: 15px\">Genre:</p></h5>\n                        <md-chips style=\"float: left\">\n                            <md-chip ng-repeat=\"genre in vm.info.genres\">\n                                {{genre.name}}\n                            </md-chip>\n                        </md-chips>\n                    </div>\n                </div>\n                <div>\n                </div>\n                <md-content class=\"description\" flex layout-padding>\n                    <p style=\"padding-left: 5px\">Storyline: {{vm.info.overview}}</p>\n                </md-content>\n            </div>\n        </div>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab label=\"Videos\">\n                    <div class=\"video-list\">\n                        <div layout='row'>\n                            <div ng-click=\"vm.openPlayer(video.link)\" style=\"position: relative;\" ng-repeat=\"video in vm.info.videos\">\n                                <picture>\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/mqdefault.jpg\"}}' media=\"(min-width:991px)\" />\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/hqdefault.jpg\"}}' media=\"(min-width:767px)\" />\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/sddefault.jpg\"}}' />\n                                    <img class=\"video-card\" srcSet />\n                                </picture>\n                                <img class=\"play-button\" src=\"../img/pic/play.png\" />\n                                <div class=\"video-description\">\n                                    <p>{{video.title | limitTo: 40}}...</p>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab ng-if=\"vm.shouldShowtime\" label=\"Showtime\">\n                    <div class=\"theaters\">\n                        <div style=\"margin-left: 20px\" layout=\"row\">\n                            <md-content>\n                                <h4>Date</h4>\n                                <md-datepicker style=\"float: left\" ng-model=\"vm.date.currentDate\" md-placeholder=\"Enter date\"\n                                               md-min-date=\"vm.date.minDate\" md-max-date=\"vm.date.maxDate\"></md-datepicker>\n                                <md-list ng-if=\"vm.info.theaters.length > 0\" class=\"md-dense\" flex style=\"width: 100%; clear: both; margin-top: 100px\">\n                                    <md-list-item  class=\"md-3-line\" style=\"justify-content: space-between;\" ng-repeat=\"theater in vm.info.theaters\">\n                                        <div class=\"theater-card\">\n                                            <b style=\"display: block\">{{theater.name}}</b>\n                                            <!--<img style=\"float: left\" class=\"md-avatar\" ng-src=\"../img/icons/phone.svg\" />-->\n                                            <!--<div style=\"float: left\" class=\"md-list-item-text\">-->\n                                                <!--<p> {{theater.phoneNumber}} </p>-->\n                                            <!--</div>-->\n                                        </div>\n                                        <div class=\"showtime\" layout=\"row\">\n                                            <table class=\"table\">\n                                                <tbody>\n                                                <tr ng-repeat=\"movie in theater.movie\">\n                                                    <th>{{movie.name}}</th>\n                                                    <td ng-repeat=\"time in movie.showtimes\"><p style=\"display: block\">{{time}}</p> <img ng-if=\"movie.showtime_tickets[time]\" ng-click=\"vm.buyTicket(movie.showtime_tickets[time])\" style=\"width: 50px; height: 20px\" ng-src=\"../img/pic/ticket.png\" /></td>\n                                                </tr>\n                                                </tbody>\n                                            </table>\n                                        </div>\n                                        <md-divider ng-if=\"!$last\"></md-divider>\n                                    </md-list-item>\n                                </md-list>\n                            </md-content>\n                        </div>\n                        <map ng-if=\"vm.info.theaters.length > 0\" location=\"vm.location\" theaters=\"vm.info.theaters\"></map>\n                    </div>\n                </md-tab>\n                <md-tab ng-if=\"vm.info.purchaseChannels\" label=\"Avilable On\">\n                    <channels channels=\"vm.info.purchaseChannels\"></channels>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab label=\"Credit\">\n                    <div class=\"cast\">\n                        <div ng-cloak layout-gt-sm=\"row\" layout=\"column\">\n                            <div flex-gt-sm=\"50\" flex>\n                                <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                                  <div class=\"md-toolbar-tools\">\n                                    <span>Crew</span>\n                                  </div>\n                                </md-toolbar>\n                                <md-content>\n                                    <md-list flex>\n                                        <!-- <md-subheader class=\"md-no-sticky\">Crew</md-subheader> -->\n                                        <md-list-item class=\"md-3-line\" ng-repeat=\"crew in vm.info.credit.crew | limitTo: 10\" ng-click=\"vm.showPerson(crew)\">\n                                          <img ng-src=\"{{crew.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+crew.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                                          <div class=\"md-list-item-text\" layout=\"column\">\n                                            <h4>department: {{crew.department}}</h4>\n                                            <p>name: {{crew.name}}</p>\n                                          </div>\n                                        </md-list-item>\n                                    </md-list>\n                                </md-content>\n                            </div>\n                            <div flex-gt-sm=\"50\" flex>\n                                <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                                  <div class=\"md-toolbar-tools\">\n                                    <span>Cast</span>\n                                  </div>\n                                </md-toolbar>\n                                <md-content>\n                                    <md-list flex>\n                                        <!-- <md-subheader class=\"md-no-sticky\">Cast</md-subheader> -->\n                                        <md-list-item class=\"md-3-line\" ng-repeat=\"cast in vm.info.credit.cast | limitTo: 10\" ng-click=\"vm.showPerson(cast)\">\n                                          <img ng-src=\"{{cast.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+cast.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                                          <div class=\"md-list-item-text\" layout=\"column\">\n                                            <h4>character: {{cast.character}}</h4>\n                                            <p>name: {{cast.name}}</p>\n                                          </div>\n                                        </md-list-item>\n                                    </md-list>\n                                </md-content>\n                            </div>\n                        </div>\n                    </div>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n    </div>\n    <md-sidenav flex class=\"md-sidenav-right md-whiteframe-4dp similiar\" md-is-locked-open=\"$mdMedia('gt-md')\" md-component-id=\"right\">\n        <h4 style=\"margin-top: 20px; margin-left: 20px\">You may also like</h4>\n        <md-divider ng-if=\"!$last\"></md-divider>\n        <md-list flex>\n            <md-list-item class=\"md-3-line\" ng-repeat=\"movie in vm.info.similar\" ng-click=\"vm.loadSimilar(movie)\">\n                <img ng-src=\"{{movie.poster_path?'https://image.tmdb.org/t/p/w92'+movie.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image similar-movie\" />\n                <div class=\"md-list-item-text similar-summry\" layout=\"column\">\n                    <h5>{{movie.title}}</h5>\n                    <p>Rate: {{movie.vote_average}} by {{movie.vote_count}} people</p>\n                </div>\n                <md-divider ng-if=\"!$last\"></md-divider>\n            </md-list-item>\n        </md-list>\n    </md-sidenav>\n</section>\n"
-
-/***/ },
-/* 76 */
-/*!*******************************!*\
-  !*** ./MovieInfo/person.html ***!
-  \*******************************/
-/***/ function(module, exports) {
-
-	module.exports = "<md-dialog   ng-cloak>\n  <form>\n    <md-toolbar>\n      <div class=\"md-toolbar-tools\">\n        <h2>{{person.name}}</h2>\n        <span flex></span>\n        <md-button class=\"md-icon-button\" ng-click=\"cancel()\">\n          <md-icon md-svg-src=\"img/icons/close.svg\" aria-label=\"Close dialog\"></md-icon>\n        </md-button>\n      </div>\n    </md-toolbar>\n    <md-dialog-content>\n      <div class=\"md-dialog-content\" style=\"width: 800px\">\n        <img style=\"float: left; max-width: 200px;\" alt=\"Lush mango tree\" ng-src=\"{{person.profile_path?'https://image.tmdb.org/t/p/w300_and_h450_bestv2/'+person.profile_path:'../img/pic/avatar.png'}}\">\n        <div style=\"float: left; width: 400px; margin-left: 20px\">\n        <label>Birthday</label>\n          <p>\n            {{person.birthday}}\n          </p>\n        <label>Place of birth</label>\n          <p>\n            {{person.place_of_birth}}\n          </p>\n        <label>Biography</label>\n          <p>\n            {{person.biography}}\n          </p>\n        </div>\n      </div>\n    </md-dialog-content>\n    <md-dialog-actions layout=\"row\">\n      <md-button ng-href=\"{{'http://www.imdb.com/name/'+person.imdb_id}}\" target=\"_blank\" md-autofocus>\n        IMDB profile\n      </md-button>\n      <span flex></span>\n    </md-dialog-actions>\n  </form>\n</md-dialog>"
-
-/***/ },
-/* 77 */
-/*!******************************!*\
-  !*** ./map/map_directive.js ***!
-  \******************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	var _ = __webpack_require__(/*! underscore */ 71);
-	var GoogleMapsLoader = __webpack_require__(/*! google-maps */ 78);
-	
-	GoogleMapsLoader.KEY = 'AIzaSyDOjFm5V6Ar1QeNIDa0_d_jjfDQ2KGR2Ts';
-	
-	exports.default = function (ngModule) {
-	    ngModule.directive("map", function () {
-	        __webpack_require__(/*! ./map.css */ 79);
-	        return {
-	            restrict: "E",
-	            scope: {
-	                location: '=',
-	                theaters: '='
-	            },
-	            template: __webpack_require__(/*! ./map.html */ 81),
-	            controllerAs: "vm",
-	            controller: function controller($scope, $rootScope) {
-	
-	                var vm = this;
-	                var map;
-	                var geocoder;
-	                var bounds;
-	
-	                GoogleMapsLoader.load(function (google) {
-	
-	                    var infoWindow = function infoWindow(marker, map, title, address) {
-	                        google.maps.event.addListener(marker, 'click', function () {
-	                            var html = "<div><h3>" + title + "</h3><p>" + address + "</p></div>";
-	                            var iw = new google.maps.InfoWindow({
-	                                content: html,
-	                                maxWidth: 350
-	                            });
-	                            iw.open(map, marker);
-	                        });
-	                    };
-	
-	                    var geocodeAddress = function geocodeAddress(address, title) {
-	                        geocoder.geocode({ 'address': address }, function (results, status) {
-	                            if (status == google.maps.GeocoderStatus.OK) {
-	                                var marker = new google.maps.Marker({
-	                                    icon: './img/pic/blueMark.png',
-	                                    map: map,
-	                                    animation: google.maps.Animation.DROP,
-	                                    position: results[0].geometry.location,
-	                                    title: title,
-	                                    address: address
-	                                });
-	                                infoWindow(marker, map, title, address);
-	                                bounds.extend(marker.getPosition());
-	                                map.fitBounds(bounds);
-	                            } else {
-	                                alert("geocode of " + address + " failed:" + status);
-	                            }
-	                        });
-	                    };
-	
-	                    bounds = new google.maps.LatLngBounds();
-	                    map = new google.maps.Map(document.getElementById('map'), {
-	                        zoom: 8,
-	                        center: { lat: $scope.location.lati, lng: $scope.location.longi },
-	                        mapTypeId: google.maps.MapTypeId.ROADMAP,
-	                        scrollwheel: false
-	                    });
-	                    var marker = new google.maps.Marker({
-	                        position: { lat: $scope.location.lati, lng: $scope.location.longi },
-	                        map: map,
-	                        title: 'Your current location'
-	                    });
-	                    google.maps.event.addListener(map, 'click', function (event) {
-	                        this.setOptions({ scrollwheel: true });
-	                    });
-	                    geocoder = new google.maps.Geocoder();
-	
-	                    //loop through theater address
-	                    _.each($scope.theaters, function (theater) {
-	                        geocodeAddress(theater.address, theater.name);
-	                    });
-	                });
-	
-	                //initialize map
-	                //vm.initMap();
-	            }
-	        };
-	    });
-	};
-
-/***/ },
-/* 78 */
 /*!**************************************!*\
   !*** ../~/google-maps/lib/Google.js ***!
   \**************************************/
@@ -77003,7 +76901,7 @@
 
 
 /***/ },
-/* 79 */
+/* 74 */
 /*!*********************!*\
   !*** ./map/map.css ***!
   \*********************/
@@ -77012,7 +76910,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./map.css */ 80);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./map.css */ 75);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
@@ -77032,7 +76930,7 @@
 	}
 
 /***/ },
-/* 80 */
+/* 75 */
 /*!*************************************!*\
   !*** ../~/css-loader!./map/map.css ***!
   \*************************************/
@@ -77049,7 +76947,7 @@
 
 
 /***/ },
-/* 81 */
+/* 76 */
 /*!**********************!*\
   !*** ./map/map.html ***!
   \**********************/
@@ -77058,7 +76956,7 @@
 	module.exports = "<div id=\"map\"></div>"
 
 /***/ },
-/* 82 */
+/* 77 */
 /*!***********************************************!*\
   !*** ./PurchaseChannels/purchase_channels.js ***!
   \***********************************************/
@@ -77072,13 +76970,13 @@
 	
 	exports.default = function (ngModule) {
 	    ngModule.directive("channels", function () {
-	        __webpack_require__(/*! ./purchase.css */ 83);
+	        __webpack_require__(/*! ./purchase.css */ 78);
 	        return {
 	            restrict: "E",
 	            scope: {
 	                channels: "="
 	            },
-	            template: __webpack_require__(/*! ./purchase.html */ 85),
+	            template: __webpack_require__(/*! ./purchase.html */ 80),
 	            controllerAs: "vm",
 	            controller: function controller($scope, $rootScope) {
 	                var vm = this;
@@ -77093,7 +76991,7 @@
 	};
 
 /***/ },
-/* 83 */
+/* 78 */
 /*!***************************************!*\
   !*** ./PurchaseChannels/purchase.css ***!
   \***************************************/
@@ -77102,7 +77000,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./purchase.css */ 84);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./purchase.css */ 79);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
@@ -77122,7 +77020,7 @@
 	}
 
 /***/ },
-/* 84 */
+/* 79 */
 /*!*******************************************************!*\
   !*** ../~/css-loader!./PurchaseChannels/purchase.css ***!
   \*******************************************************/
@@ -77139,7 +77037,7 @@
 
 
 /***/ },
-/* 85 */
+/* 80 */
 /*!****************************************!*\
   !*** ./PurchaseChannels/purchase.html ***!
   \****************************************/
@@ -77148,7 +77046,7 @@
 	module.exports = "<div>\n    <md-list ng-if=\"vm.channels.length > 0\" class=\"md-dense\" flex style=\"width: 100%; clear: both; margin-top: 10px\">\n        <md-list-item  class=\"md-3-line\" style=\"justify-content: space-between;\" ng-repeat=\"channel in vm.channels\" ng-click=\"vm.redirect(channel.link)\">\n            <div class=\"channel-card\">\n                <img class=\"md-avatar\" ng-src=\"{{'img/channels/'+channel.source+'.png'}}\" />\n                <p style=\"font-size: 10px\">{{channel.display_name}}</p>\n            </div>\n            <div class=\"purchase-info\" layout=\"row\">\n                <table>\n                    <tbody>\n                    <tr>\n                        <td ng-repeat=\"info in channel.formats\"><p style=\"display: block\">{{info.price}}$</p><p>{{info.type}} {{info.format}}</p></td>\n                    </tr>\n                    </tbody>\n                </table>\n            </div>\n            <md-divider ng-if=\"!$last\"></md-divider>\n        </md-list-item>\n    </md-list>\n</div>"
 
 /***/ },
-/* 86 */
+/* 81 */
 /*!************************************!*\
   !*** ./signin/signin_directive.js ***!
   \************************************/
@@ -77162,12 +77060,12 @@
 	
 	exports.default = function (ngModule) {
 	    ngModule.directive("signin", function () {
-	        __webpack_require__(/*! ./signin.css */ 87);
+	        __webpack_require__(/*! ./signin.css */ 82);
 	        var crud = __webpack_require__(/*! ../service/crud */ 48);
 	        return {
 	            restrict: "E",
 	            scope: true,
-	            template: __webpack_require__(/*! ./signin.html */ 89),
+	            template: __webpack_require__(/*! ./signin.html */ 84),
 	            controllerAs: "vm",
 	            controller: function controller($scope, $rootScope, $location) {
 	                var vm = this;
@@ -77181,7 +77079,7 @@
 	};
 
 /***/ },
-/* 87 */
+/* 82 */
 /*!***************************!*\
   !*** ./signin/signin.css ***!
   \***************************/
@@ -77190,7 +77088,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./signin.css */ 88);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./signin.css */ 83);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
@@ -77210,7 +77108,7 @@
 	}
 
 /***/ },
-/* 88 */
+/* 83 */
 /*!*******************************************!*\
   !*** ../~/css-loader!./signin/signin.css ***!
   \*******************************************/
@@ -77227,7 +77125,7 @@
 
 
 /***/ },
-/* 89 */
+/* 84 */
 /*!****************************!*\
   !*** ./signin/signin.html ***!
   \****************************/
@@ -77236,7 +77134,7 @@
 	module.exports = "<div style=\"margin-top: 60px\">\n    <div class=\"signinHeader\">\n        <h2 class=\"signin-h3\">Sign in</h2>\n    </div>\n    <div>\n        <div class=\"fblogin\">\n            <button id=\"facebook\" ng-click=\"fbsignin()\">Sign in with Facebook</button>\n        </div>\n        <div style=\"width: 30%; margin: auto\">\n            <md-divider></md-divider>\n            <form name=\"userForm\">\n                <div class=\"logingrouop\">\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Email</label>\n                        <input name=\"email\" ng-model=\"user.email\"\n                               required />\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Password</label>\n                        <input type=\"password\" required name=\"password\" ng-model=\"user.password\" />\n                        <div style=\"color: #dd2c00\" ng-show=\"emailSigninError\">\n                            {{signinErrorMessage}}\n                        </div>\n                    </md-input-container>\n                    <style>\n                        /*\n                         * The Material demos system does not currently allow targeting the body element, so this\n                         * must go here in the HTML.\n                         */\n                        body[dir=rtl] .hint {\n                            right: 2px;\n                            left: auto;\n                        }\n                    </style>\n                    <md-button ng-disabled=\"userForm.$invalid\" class=\"md-raised md-primary\" style=\"width: 100%\" ng-click=\"emailsignin(user.email, user.password)\">login</md-button>\n                    <a style=\"margin-left: 15px\" ng-click=\"vm.registerpage()\">Register</a>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>"
 
 /***/ },
-/* 90 */
+/* 85 */
 /*!****************************************!*\
   !*** ./register/register_directive.js ***!
   \****************************************/
@@ -77250,12 +77148,12 @@
 	
 	exports.default = function (ngModule) {
 	    ngModule.directive("register", function () {
-	        __webpack_require__(/*! ./register.css */ 91);
+	        __webpack_require__(/*! ./register.css */ 86);
 	        var crud = __webpack_require__(/*! ../service/crud */ 48);
 	        return {
 	            restrict: "E",
 	            scope: true,
-	            template: __webpack_require__(/*! ./register.html */ 93),
+	            template: __webpack_require__(/*! ./register.html */ 88),
 	            controllerAs: "vm",
 	            controller: function controller($scope, $rootScope, $location) {
 	                var vm = this;
@@ -77265,7 +77163,7 @@
 	};
 
 /***/ },
-/* 91 */
+/* 86 */
 /*!*******************************!*\
   !*** ./register/register.css ***!
   \*******************************/
@@ -77274,7 +77172,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./register.css */ 92);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./register.css */ 87);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
@@ -77294,7 +77192,7 @@
 	}
 
 /***/ },
-/* 92 */
+/* 87 */
 /*!***********************************************!*\
   !*** ../~/css-loader!./register/register.css ***!
   \***********************************************/
@@ -77311,7 +77209,7 @@
 
 
 /***/ },
-/* 93 */
+/* 88 */
 /*!********************************!*\
   !*** ./register/register.html ***!
   \********************************/
@@ -77320,7 +77218,7 @@
 	module.exports = "<div style=\"margin-top: 60px\">\n    <div class=\"registerHeader\">\n        <h2 class=\"register-h3\">Register</h2>\n    </div>\n    <div>\n        <div style=\"width: 30%; margin: auto\">\n            <form name=\"userForm\">\n                <div class=\"registergrouop\">\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Email</label>\n                        <input name=\"email\" ng-model=\"user.email\"\n                               required ng-pattern=\"/^.+@.+\\..+$/\" />\n                        <div style=\"color: #dd2c00\" ng-show=\"userForm.email.$invalid && userForm.email.$dirty\">\n                            Please input a valid email address\n                        </div>\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Password</label>\n                        <input type=\"password\" name=\"password\" ng-pattern=\"/^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/\" required ng-model=\"user.password\" />\n                        <div class=\"hint\" >Password should contain at least one digit, one lower case character, one upper case character, and at least 8 from above mentioned characters</div>\n                        <div style=\"color: #dd2c00\" ng-show=\"userForm.password.$invalid && userForm.password.$dirty\">Your password doesn't match the criteria</div>\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Retype Password</label>\n                        <input type=\"password\" name=\"repassword\" required ng-model=\"user.repassword\" />\n                        <div ng-show=\"userForm.repassword.$dirty && user.password != user.repassword\" style=\"color: #dd2c00\">Password doesn't match.</div>\n                    </md-input-container>\n                    <style>\n                        /*\n                         * The Material demos system does not currently allow targeting the body element, so this\n                         * must go here in the HTML.\n                         */\n                        body[dir=rtl] .hint {\n                            right: 2px;\n                            left: auto;\n                        }\n                    </style>\n                    <md-button ng-disabled=\"!userForm.$valid || user.password!=user.repassword\" class=\"md-raised md-primary\" style=\"width: 100%\" ng-click=\"emailregister(user.email, user.password)\">register</md-button>\n                    <div ng-if=\"registerErrorMessage\" style=\"color: #dd2c00\">{{registerErrorMessage}}</div>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>"
 
 /***/ },
-/* 94 */
+/* 89 */
 /*!************************************!*\
   !*** ./search/search_directive.js ***!
   \************************************/
@@ -77334,12 +77232,12 @@
 	
 	exports.default = function (ngModule) {
 	    ngModule.directive("search", function () {
-	        __webpack_require__(/*! ./search.css */ 95);
+	        __webpack_require__(/*! ./search.css */ 90);
 	        var crud = __webpack_require__(/*! ../service/crud */ 48);
 	        return {
 	            restrict: "E",
 	            scope: true,
-	            template: __webpack_require__(/*! ./search.html */ 97),
+	            template: __webpack_require__(/*! ./search.html */ 92),
 	            controllerAs: "vm",
 	            controller: function controller($scope, $rootScope, $location) {
 	                var vm = this;
@@ -77349,7 +77247,7 @@
 	};
 
 /***/ },
-/* 95 */
+/* 90 */
 /*!***************************!*\
   !*** ./search/search.css ***!
   \***************************/
@@ -77358,7 +77256,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./search.css */ 96);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./search.css */ 91);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
@@ -77378,7 +77276,7 @@
 	}
 
 /***/ },
-/* 96 */
+/* 91 */
 /*!*******************************************!*\
   !*** ../~/css-loader!./search/search.css ***!
   \*******************************************/
@@ -77395,7 +77293,7 @@
 
 
 /***/ },
-/* 97 */
+/* 92 */
 /*!****************************!*\
   !*** ./search/search.html ***!
   \****************************/
@@ -77404,7 +77302,7 @@
 	module.exports = "<div>\n    <md-content layout-padding style=\"height: 100vh\">\n        <h4 style=\"color: #9e9e9e\">Search results</h4>\n        <movies ng-if=\"searchKeyword\" category=\"search\" index='1' keyword=\"searchKeyword\"></movies>\n    </md-content>\n</div>"
 
 /***/ },
-/* 98 */
+/* 93 */
 /*!************************************************!*\
   !*** ./mycollection/mycollection_directive.js ***!
   \************************************************/
@@ -77418,12 +77316,12 @@
 	
 	exports.default = function (ngModule, firebase, database) {
 	    ngModule.directive("mycollection", function () {
-	        __webpack_require__(/*! ./mycollection.css */ 99);
+	        __webpack_require__(/*! ./mycollection.css */ 94);
 	        var crud = __webpack_require__(/*! ../service/crud */ 48);
 	        return {
 	            restrict: "E",
 	            scope: true,
-	            template: __webpack_require__(/*! ./mycollection.html */ 101),
+	            template: __webpack_require__(/*! ./mycollection.html */ 96),
 	            controllerAs: "vm",
 	            controller: function controller($scope, $rootScope, $location, $mdDialog) {
 	                var vm = this;
@@ -77459,7 +77357,7 @@
 	};
 
 /***/ },
-/* 99 */
+/* 94 */
 /*!***************************************!*\
   !*** ./mycollection/mycollection.css ***!
   \***************************************/
@@ -77468,7 +77366,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./mycollection.css */ 100);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./mycollection.css */ 95);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
@@ -77488,7 +77386,7 @@
 	}
 
 /***/ },
-/* 100 */
+/* 95 */
 /*!*******************************************************!*\
   !*** ../~/css-loader!./mycollection/mycollection.css ***!
   \*******************************************************/
@@ -77505,7 +77403,7 @@
 
 
 /***/ },
-/* 101 */
+/* 96 */
 /*!****************************************!*\
   !*** ./mycollection/mycollection.html ***!
   \****************************************/
@@ -77514,7 +77412,7 @@
 	module.exports = "<md-content flex layout-padding style=\"margin-top: 65px;height: 100vh;\">\n    <div class=\"centerDiv\" ng-if=\"vm.noContent\">\n        <h3 style=\"color: #9e9e9e\">Seems like you haven't build your collection yet</h3>\n    </div>\n    <div ng-if=\"!vm.noContent\">\n        <div ng-repeat=\"(key, value) in vm.collection\" class=\"list-item\">\n            <img class=\"poster-img\" ng-click=\"vm.forwardInfo(value)\" ng-src=\"{{value.poster_path?'https://image.tmdb.org/t/p/w300'+value.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image\" alt=\"Washed Out\">\n            <div class=\"poster-info\" ng-click=\"vm.forwardInfo(value)\">\n                <h4>{{value.title}}</h4>\n                <h5>Rated {{value.vote_average}} by {{value.vote_count}} people</h5>\n                <h5>Release data: {{value.release_date}}</h5>\n                <h5>Description: {{value.overview | limitTo:300}}</h5>\n            </div>\n            <md-icon ng-click=\"vm.removeItem(key)\" class=\"clear-btn\" md-svg-icon=\"img/icons/clear.svg\"></md-icon>\n        </div>\n    </div>\n</md-content>"
 
 /***/ },
-/* 102 */
+/* 97 */
 /*!**************************!*\
   !*** ./router/router.js ***!
   \**************************/
@@ -77554,6 +77452,108 @@
 	        $urlRouterProvider.otherwise('/main/tabs');
 	    });
 	};
+
+/***/ },
+/* 98 */
+/*!**********************!*\
+  !*** ./util/util.js ***!
+  \**********************/
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	var util = {
+	    compareDate: function compareDate(date1, date2) {
+	        Date.prototype.addHours = function (h) {
+	            this.setHours(this.getHours() + h);
+	            return this;
+	        };
+	
+	        // adjust diff for for daylight savings
+	        var hoursToAdjust = Math.abs(date1.getTimezoneOffset() / 60) - Math.abs(date2.getTimezoneOffset() / 60);
+	        // apply the tz offset
+	        date2.addHours(hoursToAdjust);
+	
+	        // The number of milliseconds in one day
+	        var ONE_DAY = 1000 * 60 * 60 * 24;
+	
+	        // Convert both dates to milliseconds
+	        var date1_ms = date1.getTime();
+	        var date2_ms = date2.getTime();
+	
+	        // Calculate the difference in milliseconds
+	        var difference_ms = date1_ms - date2_ms;
+	
+	        // Convert back to days and return
+	        return Math.round(difference_ms / ONE_DAY);
+	    }
+	};
+	
+	module.exports = util;
+
+/***/ },
+/* 99 */
+/*!**********************************!*\
+  !*** ./MovieInfo/movie_info.css ***!
+  \**********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !./../../~/css-loader!./movie_info.css */ 100);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./movie_info.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./movie_info.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 100 */
+/*!**************************************************!*\
+  !*** ../~/css-loader!./MovieInfo/movie_info.css ***!
+  \**************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".info-container {\n    margin-top: 10px;\n    margin-left: 10px;\n    width: 80%;\n    height: 100%;\n    display: flex;\n}\n\n.video-list {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.cast {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.theaters {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.avilableon {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.info-poster {\n    width: 20%;\n    float: left;\n}\n\n.top-card {\n    margin-left: 20px;\n    padding-top: 10px;\n}\n\n.right-card {\n    width: 80%;\n    position: relative;\n}\n\n.description {\n    margin-right: 20px;\n    position: absolute;\n    bottom: 0;\n}\n\n.inlineText {\n    float: left;\n    padding-left: 10px;\n}\n\n.similiar {\n    height: 100%;\n}\n\n.similar-movie {\n    margin-top: 5px;\n    margin-bottom: 5px;\n}\n\n.similar-summry {\n    padding-left: 10px;\n}\n\n.video-card {\n    width: 90%;\n    margin: auto;\n}\n\n.video-card:hover {\n    cursor: pointer;\n}\n\n.info-card {\n    width: 100%;\n    display: flex;\n}\n\n.play-button {\n    opacity: 0.8;\n    position: absolute;\n    left: 30%;\n    top: 20%; \n    width: 30%;\n}\n\n.video-description {\n    background-color: rgba(0, 0, 0, 0.7);\n    width: 90%;\n}\n\n.video-description p {\n    color: white;\n}\n\n.theater-card {\n    float: left;\n    margin-right: 10px;\n    width: 20%;\n}\n\n.showtime {\n    float: left;\n    width: 80%;\n}\n\n#map {\n    height: 100%;\n}\n\n.collectionBtn {\n    margin-right: 20px;\n}\n\n.collectionBtn:hover {\n    cursor: pointer;\n}", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 101 */
+/*!***********************************!*\
+  !*** ./MovieInfo/movie_info.html ***!
+  \***********************************/
+/***/ function(module, exports) {
+
+	module.exports = "\n<section layout=\"row\" style=\"margin-top: 65px\" flex>\n    <div class=\"info-container\" layout=\"column\">\n        <div class=\"info-card\">\n            <md-card class=\"info-poster\">\n                <img ng-src=\"{{vm.info.poster_path?'https://image.tmdb.org/t/p/w300'+vm.info.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image\" alt=\"Washed Out\">\n            </md-card>\n            <div class=\"right-card\">\n                <div>\n                    <div class=\"top-card\">\n                        <div class=\"collectionBtn\" ng-click=\"vm.addMovieToCollection()\">\n                            <p style=\"float: right\"> Add to my collection </p>\n                            <md-icon style=\"float: right\" md-svg-icon=\"img/icons/collection.svg\"></md-icon>\n                        </div>\n                        <span style=\"clear: both\" class=\"md-headline\">\n                            {{vm.info.tagline}}\n                        </span>\n                        <h5>Rated {{vm.info.vote_average}} by {{vm.info.vote_count}} people</h5>\n                        <h5>Release data: {{vm.info.release_date}}</h5>\n                        <h5>Runtime: {{vm.info.runtime}} minutes</h5>\n                        <h5>Original language: {{vm.info.original_language}}</h5>\n                        <h5 style=\"display: inline;\"><p style=\"float: left; display: inline; padding-top: 15px\">Genre:</p></h5>\n                        <md-chips style=\"float: left\">\n                            <md-chip ng-repeat=\"genre in vm.info.genres\">\n                                {{genre.name}}\n                            </md-chip>\n                        </md-chips>\n                    </div>\n                </div>\n                <div>\n                </div>\n                <md-content class=\"description\" flex layout-padding>\n                    <p style=\"padding-left: 5px\">Storyline: {{vm.info.overview}}</p>\n                </md-content>\n            </div>\n        </div>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab label=\"Videos\">\n                    <div class=\"video-list\">\n                        <div layout='row'>\n                            <div ng-click=\"vm.openPlayer(video.link)\" style=\"position: relative;\" ng-repeat=\"video in vm.info.videos\">\n                                <picture>\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/mqdefault.jpg\"}}' media=\"(min-width:991px)\" />\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/hqdefault.jpg\"}}' media=\"(min-width:767px)\" />\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/sddefault.jpg\"}}' />\n                                    <img class=\"video-card\" srcSet />\n                                </picture>\n                                <img class=\"play-button\" src=\"../img/pic/play.png\" />\n                                <div class=\"video-description\">\n                                    <p>{{video.title | limitTo: 40}}...</p>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab ng-if=\"vm.shouldShowtime\" label=\"Showtime\">\n                    <div class=\"theaters\">\n                        <div style=\"margin-left: 20px\" layout=\"row\">\n                            <md-content>\n                                <h4>Date</h4>\n                                <md-datepicker style=\"float: left\" ng-model=\"vm.date.currentDate\" md-placeholder=\"Enter date\"\n                                               md-min-date=\"vm.date.minDate\" md-max-date=\"vm.date.maxDate\"></md-datepicker>\n                                <md-list ng-if=\"vm.info.theaters.length > 0\" class=\"md-dense\" flex style=\"width: 100%; clear: both; margin-top: 100px\">\n                                    <md-list-item  class=\"md-3-line\" style=\"justify-content: space-between;\" ng-repeat=\"theater in vm.info.theaters\">\n                                        <div class=\"theater-card\">\n                                            <b style=\"display: block\">{{theater.name}}</b>\n                                            <!--<img style=\"float: left\" class=\"md-avatar\" ng-src=\"../img/icons/phone.svg\" />-->\n                                            <!--<div style=\"float: left\" class=\"md-list-item-text\">-->\n                                                <!--<p> {{theater.phoneNumber}} </p>-->\n                                            <!--</div>-->\n                                        </div>\n                                        <div class=\"showtime\" layout=\"row\">\n                                            <table class=\"table\">\n                                                <tbody>\n                                                <tr ng-repeat=\"movie in theater.movie\">\n                                                    <th>{{movie.name}}</th>\n                                                    <td ng-repeat=\"time in movie.showtimes\"><p style=\"display: block\">{{time}}</p> <img ng-if=\"movie.showtime_tickets[time]\" ng-click=\"vm.buyTicket(movie.showtime_tickets[time])\" style=\"width: 50px; height: 20px\" ng-src=\"../img/pic/ticket.png\" /></td>\n                                                </tr>\n                                                </tbody>\n                                            </table>\n                                        </div>\n                                        <md-divider ng-if=\"!$last\"></md-divider>\n                                    </md-list-item>\n                                </md-list>\n                            </md-content>\n                        </div>\n                        <map ng-if=\"vm.info.theaters.length > 0\" location=\"vm.location\" theaters=\"vm.info.theaters\"></map>\n                    </div>\n                </md-tab>\n                <md-tab ng-if=\"vm.info.purchaseChannels\" label=\"Avilable On\">\n                    <channels channels=\"vm.info.purchaseChannels\"></channels>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab label=\"Credit\">\n                    <div class=\"cast\">\n                        <div ng-cloak layout-gt-sm=\"row\" layout=\"column\">\n                            <div flex-gt-sm=\"50\" flex>\n                                <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                                  <div class=\"md-toolbar-tools\">\n                                    <span>Crew</span>\n                                  </div>\n                                </md-toolbar>\n                                <md-content>\n                                    <md-list flex>\n                                        <!-- <md-subheader class=\"md-no-sticky\">Crew</md-subheader> -->\n                                        <md-list-item class=\"md-3-line\" ng-repeat=\"crew in vm.info.credit.crew | limitTo: 10\" ng-click=\"vm.showPerson(crew)\">\n                                          <img ng-src=\"{{crew.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+crew.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                                          <div class=\"md-list-item-text\" layout=\"column\">\n                                            <h4>department: {{crew.department}}</h4>\n                                            <p>name: {{crew.name}}</p>\n                                          </div>\n                                        </md-list-item>\n                                    </md-list>\n                                </md-content>\n                            </div>\n                            <div flex-gt-sm=\"50\" flex>\n                                <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                                  <div class=\"md-toolbar-tools\">\n                                    <span>Cast</span>\n                                  </div>\n                                </md-toolbar>\n                                <md-content>\n                                    <md-list flex>\n                                        <!-- <md-subheader class=\"md-no-sticky\">Cast</md-subheader> -->\n                                        <md-list-item class=\"md-3-line\" ng-repeat=\"cast in vm.info.credit.cast | limitTo: 10\" ng-click=\"vm.showPerson(cast)\">\n                                          <img ng-src=\"{{cast.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+cast.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                                          <div class=\"md-list-item-text\" layout=\"column\">\n                                            <h4>character: {{cast.character}}</h4>\n                                            <p>name: {{cast.name}}</p>\n                                          </div>\n                                        </md-list-item>\n                                    </md-list>\n                                </md-content>\n                            </div>\n                        </div>\n                    </div>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n    </div>\n    <md-sidenav flex class=\"md-sidenav-right md-whiteframe-4dp similiar\" md-is-locked-open=\"$mdMedia('gt-md')\" md-component-id=\"right\">\n        <h4 style=\"margin-top: 20px; margin-left: 20px\">You may also like</h4>\n        <md-divider ng-if=\"!$last\"></md-divider>\n        <md-list flex>\n            <md-list-item class=\"md-3-line\" ng-repeat=\"movie in vm.info.similar\" ng-click=\"vm.loadSimilar(movie)\">\n                <img ng-src=\"{{movie.poster_path?'https://image.tmdb.org/t/p/w92'+movie.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image similar-movie\" />\n                <div class=\"md-list-item-text similar-summry\" layout=\"column\">\n                    <h5>{{movie.title}}</h5>\n                    <p>Rate: {{movie.vote_average}} by {{movie.vote_count}} people</p>\n                </div>\n                <md-divider ng-if=\"!$last\"></md-divider>\n            </md-list-item>\n        </md-list>\n    </md-sidenav>\n</section>\n"
+
+/***/ },
+/* 102 */
+/*!*******************************!*\
+  !*** ./MovieInfo/person.html ***!
+  \*******************************/
+/***/ function(module, exports) {
+
+	module.exports = "<md-dialog   ng-cloak>\n  <form>\n    <md-toolbar>\n      <div class=\"md-toolbar-tools\">\n        <h2>{{person.name}}</h2>\n        <span flex></span>\n        <md-button class=\"md-icon-button\" ng-click=\"cancel()\">\n          <md-icon md-svg-src=\"img/icons/close.svg\" aria-label=\"Close dialog\"></md-icon>\n        </md-button>\n      </div>\n    </md-toolbar>\n    <md-dialog-content>\n      <div class=\"md-dialog-content\" style=\"width: 800px\">\n        <img style=\"float: left; max-width: 200px;\" alt=\"Lush mango tree\" ng-src=\"{{person.profile_path?'https://image.tmdb.org/t/p/w300_and_h450_bestv2/'+person.profile_path:'../img/pic/avatar.png'}}\">\n        <div style=\"float: left; width: 400px; margin-left: 20px\">\n        <label>Birthday</label>\n          <p>\n            {{person.birthday}}\n          </p>\n        <label>Place of birth</label>\n          <p>\n            {{person.place_of_birth}}\n          </p>\n        <label>Biography</label>\n          <p>\n            {{person.biography}}\n          </p>\n        </div>\n      </div>\n    </md-dialog-content>\n    <md-dialog-actions layout=\"row\">\n      <md-button ng-href=\"{{'http://www.imdb.com/name/'+person.imdb_id}}\" target=\"_blank\" md-autofocus>\n        IMDB profile\n      </md-button>\n      <span flex></span>\n    </md-dialog-actions>\n  </form>\n</md-dialog>"
 
 /***/ }
 /******/ ]);

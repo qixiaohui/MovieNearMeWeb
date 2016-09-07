@@ -233,7 +233,7 @@ export default (ngModule, firebase, database) => {
                 };
 
                 vm.buyTicket = (url) => {
-                    window.open(url,'_blank');
+                    window.open(`https://www.google.com/url?q=${url}`,'_blank');
                 };
 
                 vm.showPerson = (person) => {

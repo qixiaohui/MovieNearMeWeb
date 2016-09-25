@@ -69,11 +69,23 @@
 	
 	var _angularUiRouter2 = _interopRequireDefault(_angularUiRouter);
 	
+	var _angularSanitize = __webpack_require__(/*! angular-sanitize */ 29);
+	
+	var _angularSanitize2 = _interopRequireDefault(_angularSanitize);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	/**
 	 * initialize firebase
 	 */
+	
+	// Router
+	
+	// Animation
+	
+	// Material design css
+	var firebase = __webpack_require__(/*! firebase/app */ 31);
+	//ng sanitize
 	
 	
 	// Materail Design lib
@@ -81,16 +93,10 @@
 	// Icons
 	
 	// Import angular
-	var firebase = __webpack_require__(/*! firebase/app */ 29);
-	// Router
 	
-	// Animation
-	
-	// Material design css
-	
-	__webpack_require__(/*! firebase/auth */ 31);
-	__webpack_require__(/*! firebase/database */ 33);
-	__webpack_require__(/*! firebase/storage */ 35);
+	__webpack_require__(/*! firebase/auth */ 33);
+	__webpack_require__(/*! firebase/database */ 35);
+	__webpack_require__(/*! firebase/storage */ 37);
 	
 	var config = {
 	    apiKey: "AIzaSyDgY5Gm7VLSiy83zLSSlmcVNhNFgAP7JQ0",
@@ -103,20 +109,21 @@
 	var provider = new firebase.auth.FacebookAuthProvider();
 	var database = new firebase.database();
 	
-	var app = angular.module('app', [_angularMaterial2.default, _angularAnimate2.default, _angularUiRouter2.default]);
+	var app = angular.module('app', [_angularMaterial2.default, _angularAnimate2.default, _angularUiRouter2.default, _angularSanitize2.default]);
 	
-	__webpack_require__(/*! ./main/main_directive */ 37).default(app, firebase, provider, database);
-	__webpack_require__(/*! ./tabs/tabs_directive */ 41).default(app, firebase, database);
-	__webpack_require__(/*! ./movies/movies_directive */ 45).default(app);
-	__webpack_require__(/*! ./MovieInfo/movie_info */ 70).default(app, firebase, database);
-	__webpack_require__(/*! ./map/map_directive */ 71).default(app);
-	__webpack_require__(/*! ./PurchaseChannels/purchase_channels */ 77).default(app);
-	__webpack_require__(/*! ./signin/signin_directive */ 81).default(app);
-	__webpack_require__(/*! ./register/register_directive.js */ 85).default(app);
-	__webpack_require__(/*! ./search/search_directive */ 89).default(app);
-	__webpack_require__(/*! ./mycollection/mycollection_directive */ 93).default(app, firebase, database);
+	__webpack_require__(/*! ./main/main_directive */ 39).default(app, firebase, provider, database);
+	__webpack_require__(/*! ./tabs/tabs_directive */ 43).default(app, firebase, database);
+	__webpack_require__(/*! ./movies/movies_directive */ 47).default(app);
+	__webpack_require__(/*! ./MovieInfo/movie_info */ 72).default(app, firebase, database);
+	__webpack_require__(/*! ./map/map_directive */ 80).default(app);
+	__webpack_require__(/*! ./PurchaseChannels/purchase_channels */ 85).default(app);
+	__webpack_require__(/*! ./signin/signin_directive */ 89).default(app);
+	__webpack_require__(/*! ./register/register_directive.js */ 93).default(app);
+	__webpack_require__(/*! ./search/search_directive */ 97).default(app);
+	__webpack_require__(/*! ./mycollection/mycollection_directive */ 101).default(app, firebase, database);
+	__webpack_require__(/*! ./reviews/reviews_directive */ 105).default(app);
 	
-	__webpack_require__(/*! ./router/router */ 97).default(app);
+	__webpack_require__(/*! ./router/router */ 109).default(app);
 
 /***/ },
 /* 1 */
@@ -72053,6 +72060,764 @@
 
 /***/ },
 /* 29 */
+/*!**************************************!*\
+  !*** ../~/angular-sanitize/index.js ***!
+  \**************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(/*! ./angular-sanitize */ 30);
+	module.exports = 'ngSanitize';
+
+
+/***/ },
+/* 30 */
+/*!*************************************************!*\
+  !*** ../~/angular-sanitize/angular-sanitize.js ***!
+  \*************************************************/
+/***/ function(module, exports) {
+
+	/**
+	 * @license AngularJS v1.5.8
+	 * (c) 2010-2016 Google, Inc. http://angularjs.org
+	 * License: MIT
+	 */
+	(function(window, angular) {'use strict';
+	
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 *     Any commits to this file should be reviewed with security in mind.  *
+	 *   Changes to this file can potentially create security vulnerabilities. *
+	 *          An approval from 2 Core members with history of modifying      *
+	 *                         this file is required.                          *
+	 *                                                                         *
+	 *  Does the change somehow allow for arbitrary javascript to be executed? *
+	 *    Or allows for someone to change the prototype of built-in objects?   *
+	 *     Or gives undesired access to variables likes document or window?    *
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	
+	var $sanitizeMinErr = angular.$$minErr('$sanitize');
+	var bind;
+	var extend;
+	var forEach;
+	var isDefined;
+	var lowercase;
+	var noop;
+	var htmlParser;
+	var htmlSanitizeWriter;
+	
+	/**
+	 * @ngdoc module
+	 * @name ngSanitize
+	 * @description
+	 *
+	 * # ngSanitize
+	 *
+	 * The `ngSanitize` module provides functionality to sanitize HTML.
+	 *
+	 *
+	 * <div doc-module-components="ngSanitize"></div>
+	 *
+	 * See {@link ngSanitize.$sanitize `$sanitize`} for usage.
+	 */
+	
+	/**
+	 * @ngdoc service
+	 * @name $sanitize
+	 * @kind function
+	 *
+	 * @description
+	 *   Sanitizes an html string by stripping all potentially dangerous tokens.
+	 *
+	 *   The input is sanitized by parsing the HTML into tokens. All safe tokens (from a whitelist) are
+	 *   then serialized back to properly escaped html string. This means that no unsafe input can make
+	 *   it into the returned string.
+	 *
+	 *   The whitelist for URL sanitization of attribute values is configured using the functions
+	 *   `aHrefSanitizationWhitelist` and `imgSrcSanitizationWhitelist` of {@link ng.$compileProvider
+	 *   `$compileProvider`}.
+	 *
+	 *   The input may also contain SVG markup if this is enabled via {@link $sanitizeProvider}.
+	 *
+	 * @param {string} html HTML input.
+	 * @returns {string} Sanitized HTML.
+	 *
+	 * @example
+	   <example module="sanitizeExample" deps="angular-sanitize.js">
+	   <file name="index.html">
+	     <script>
+	         angular.module('sanitizeExample', ['ngSanitize'])
+	           .controller('ExampleController', ['$scope', '$sce', function($scope, $sce) {
+	             $scope.snippet =
+	               '<p style="color:blue">an html\n' +
+	               '<em onmouseover="this.textContent=\'PWN3D!\'">click here</em>\n' +
+	               'snippet</p>';
+	             $scope.deliberatelyTrustDangerousSnippet = function() {
+	               return $sce.trustAsHtml($scope.snippet);
+	             };
+	           }]);
+	     </script>
+	     <div ng-controller="ExampleController">
+	        Snippet: <textarea ng-model="snippet" cols="60" rows="3"></textarea>
+	       <table>
+	         <tr>
+	           <td>Directive</td>
+	           <td>How</td>
+	           <td>Source</td>
+	           <td>Rendered</td>
+	         </tr>
+	         <tr id="bind-html-with-sanitize">
+	           <td>ng-bind-html</td>
+	           <td>Automatically uses $sanitize</td>
+	           <td><pre>&lt;div ng-bind-html="snippet"&gt;<br/>&lt;/div&gt;</pre></td>
+	           <td><div ng-bind-html="snippet"></div></td>
+	         </tr>
+	         <tr id="bind-html-with-trust">
+	           <td>ng-bind-html</td>
+	           <td>Bypass $sanitize by explicitly trusting the dangerous value</td>
+	           <td>
+	           <pre>&lt;div ng-bind-html="deliberatelyTrustDangerousSnippet()"&gt;
+	&lt;/div&gt;</pre>
+	           </td>
+	           <td><div ng-bind-html="deliberatelyTrustDangerousSnippet()"></div></td>
+	         </tr>
+	         <tr id="bind-default">
+	           <td>ng-bind</td>
+	           <td>Automatically escapes</td>
+	           <td><pre>&lt;div ng-bind="snippet"&gt;<br/>&lt;/div&gt;</pre></td>
+	           <td><div ng-bind="snippet"></div></td>
+	         </tr>
+	       </table>
+	       </div>
+	   </file>
+	   <file name="protractor.js" type="protractor">
+	     it('should sanitize the html snippet by default', function() {
+	       expect(element(by.css('#bind-html-with-sanitize div')).getInnerHtml()).
+	         toBe('<p>an html\n<em>click here</em>\nsnippet</p>');
+	     });
+	
+	     it('should inline raw snippet if bound to a trusted value', function() {
+	       expect(element(by.css('#bind-html-with-trust div')).getInnerHtml()).
+	         toBe("<p style=\"color:blue\">an html\n" +
+	              "<em onmouseover=\"this.textContent='PWN3D!'\">click here</em>\n" +
+	              "snippet</p>");
+	     });
+	
+	     it('should escape snippet without any filter', function() {
+	       expect(element(by.css('#bind-default div')).getInnerHtml()).
+	         toBe("&lt;p style=\"color:blue\"&gt;an html\n" +
+	              "&lt;em onmouseover=\"this.textContent='PWN3D!'\"&gt;click here&lt;/em&gt;\n" +
+	              "snippet&lt;/p&gt;");
+	     });
+	
+	     it('should update', function() {
+	       element(by.model('snippet')).clear();
+	       element(by.model('snippet')).sendKeys('new <b onclick="alert(1)">text</b>');
+	       expect(element(by.css('#bind-html-with-sanitize div')).getInnerHtml()).
+	         toBe('new <b>text</b>');
+	       expect(element(by.css('#bind-html-with-trust div')).getInnerHtml()).toBe(
+	         'new <b onclick="alert(1)">text</b>');
+	       expect(element(by.css('#bind-default div')).getInnerHtml()).toBe(
+	         "new &lt;b onclick=\"alert(1)\"&gt;text&lt;/b&gt;");
+	     });
+	   </file>
+	   </example>
+	 */
+	
+	
+	/**
+	 * @ngdoc provider
+	 * @name $sanitizeProvider
+	 *
+	 * @description
+	 * Creates and configures {@link $sanitize} instance.
+	 */
+	function $SanitizeProvider() {
+	  var svgEnabled = false;
+	
+	  this.$get = ['$$sanitizeUri', function($$sanitizeUri) {
+	    if (svgEnabled) {
+	      extend(validElements, svgElements);
+	    }
+	    return function(html) {
+	      var buf = [];
+	      htmlParser(html, htmlSanitizeWriter(buf, function(uri, isImage) {
+	        return !/^unsafe:/.test($$sanitizeUri(uri, isImage));
+	      }));
+	      return buf.join('');
+	    };
+	  }];
+	
+	
+	  /**
+	   * @ngdoc method
+	   * @name $sanitizeProvider#enableSvg
+	   * @kind function
+	   *
+	   * @description
+	   * Enables a subset of svg to be supported by the sanitizer.
+	   *
+	   * <div class="alert alert-warning">
+	   *   <p>By enabling this setting without taking other precautions, you might expose your
+	   *   application to click-hijacking attacks. In these attacks, sanitized svg elements could be positioned
+	   *   outside of the containing element and be rendered over other elements on the page (e.g. a login
+	   *   link). Such behavior can then result in phishing incidents.</p>
+	   *
+	   *   <p>To protect against these, explicitly setup `overflow: hidden` css rule for all potential svg
+	   *   tags within the sanitized content:</p>
+	   *
+	   *   <br>
+	   *
+	   *   <pre><code>
+	   *   .rootOfTheIncludedContent svg {
+	   *     overflow: hidden !important;
+	   *   }
+	   *   </code></pre>
+	   * </div>
+	   *
+	   * @param {boolean=} flag Enable or disable SVG support in the sanitizer.
+	   * @returns {boolean|ng.$sanitizeProvider} Returns the currently configured value if called
+	   *    without an argument or self for chaining otherwise.
+	   */
+	  this.enableSvg = function(enableSvg) {
+	    if (isDefined(enableSvg)) {
+	      svgEnabled = enableSvg;
+	      return this;
+	    } else {
+	      return svgEnabled;
+	    }
+	  };
+	
+	  //////////////////////////////////////////////////////////////////////////////////////////////////
+	  // Private stuff
+	  //////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	  bind = angular.bind;
+	  extend = angular.extend;
+	  forEach = angular.forEach;
+	  isDefined = angular.isDefined;
+	  lowercase = angular.lowercase;
+	  noop = angular.noop;
+	
+	  htmlParser = htmlParserImpl;
+	  htmlSanitizeWriter = htmlSanitizeWriterImpl;
+	
+	  // Regular Expressions for parsing tags and attributes
+	  var SURROGATE_PAIR_REGEXP = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g,
+	    // Match everything outside of normal chars and " (quote character)
+	    NON_ALPHANUMERIC_REGEXP = /([^\#-~ |!])/g;
+	
+	
+	  // Good source of info about elements and attributes
+	  // http://dev.w3.org/html5/spec/Overview.html#semantics
+	  // http://simon.html5.org/html-elements
+	
+	  // Safe Void Elements - HTML5
+	  // http://dev.w3.org/html5/spec/Overview.html#void-elements
+	  var voidElements = toMap("area,br,col,hr,img,wbr");
+	
+	  // Elements that you can, intentionally, leave open (and which close themselves)
+	  // http://dev.w3.org/html5/spec/Overview.html#optional-tags
+	  var optionalEndTagBlockElements = toMap("colgroup,dd,dt,li,p,tbody,td,tfoot,th,thead,tr"),
+	      optionalEndTagInlineElements = toMap("rp,rt"),
+	      optionalEndTagElements = extend({},
+	                                              optionalEndTagInlineElements,
+	                                              optionalEndTagBlockElements);
+	
+	  // Safe Block Elements - HTML5
+	  var blockElements = extend({}, optionalEndTagBlockElements, toMap("address,article," +
+	          "aside,blockquote,caption,center,del,dir,div,dl,figure,figcaption,footer,h1,h2,h3,h4,h5," +
+	          "h6,header,hgroup,hr,ins,map,menu,nav,ol,pre,section,table,ul"));
+	
+	  // Inline Elements - HTML5
+	  var inlineElements = extend({}, optionalEndTagInlineElements, toMap("a,abbr,acronym,b," +
+	          "bdi,bdo,big,br,cite,code,del,dfn,em,font,i,img,ins,kbd,label,map,mark,q,ruby,rp,rt,s," +
+	          "samp,small,span,strike,strong,sub,sup,time,tt,u,var"));
+	
+	  // SVG Elements
+	  // https://wiki.whatwg.org/wiki/Sanitization_rules#svg_Elements
+	  // Note: the elements animate,animateColor,animateMotion,animateTransform,set are intentionally omitted.
+	  // They can potentially allow for arbitrary javascript to be executed. See #11290
+	  var svgElements = toMap("circle,defs,desc,ellipse,font-face,font-face-name,font-face-src,g,glyph," +
+	          "hkern,image,linearGradient,line,marker,metadata,missing-glyph,mpath,path,polygon,polyline," +
+	          "radialGradient,rect,stop,svg,switch,text,title,tspan");
+	
+	  // Blocked Elements (will be stripped)
+	  var blockedElements = toMap("script,style");
+	
+	  var validElements = extend({},
+	                                     voidElements,
+	                                     blockElements,
+	                                     inlineElements,
+	                                     optionalEndTagElements);
+	
+	  //Attributes that have href and hence need to be sanitized
+	  var uriAttrs = toMap("background,cite,href,longdesc,src,xlink:href");
+	
+	  var htmlAttrs = toMap('abbr,align,alt,axis,bgcolor,border,cellpadding,cellspacing,class,clear,' +
+	      'color,cols,colspan,compact,coords,dir,face,headers,height,hreflang,hspace,' +
+	      'ismap,lang,language,nohref,nowrap,rel,rev,rows,rowspan,rules,' +
+	      'scope,scrolling,shape,size,span,start,summary,tabindex,target,title,type,' +
+	      'valign,value,vspace,width');
+	
+	  // SVG attributes (without "id" and "name" attributes)
+	  // https://wiki.whatwg.org/wiki/Sanitization_rules#svg_Attributes
+	  var svgAttrs = toMap('accent-height,accumulate,additive,alphabetic,arabic-form,ascent,' +
+	      'baseProfile,bbox,begin,by,calcMode,cap-height,class,color,color-rendering,content,' +
+	      'cx,cy,d,dx,dy,descent,display,dur,end,fill,fill-rule,font-family,font-size,font-stretch,' +
+	      'font-style,font-variant,font-weight,from,fx,fy,g1,g2,glyph-name,gradientUnits,hanging,' +
+	      'height,horiz-adv-x,horiz-origin-x,ideographic,k,keyPoints,keySplines,keyTimes,lang,' +
+	      'marker-end,marker-mid,marker-start,markerHeight,markerUnits,markerWidth,mathematical,' +
+	      'max,min,offset,opacity,orient,origin,overline-position,overline-thickness,panose-1,' +
+	      'path,pathLength,points,preserveAspectRatio,r,refX,refY,repeatCount,repeatDur,' +
+	      'requiredExtensions,requiredFeatures,restart,rotate,rx,ry,slope,stemh,stemv,stop-color,' +
+	      'stop-opacity,strikethrough-position,strikethrough-thickness,stroke,stroke-dasharray,' +
+	      'stroke-dashoffset,stroke-linecap,stroke-linejoin,stroke-miterlimit,stroke-opacity,' +
+	      'stroke-width,systemLanguage,target,text-anchor,to,transform,type,u1,u2,underline-position,' +
+	      'underline-thickness,unicode,unicode-range,units-per-em,values,version,viewBox,visibility,' +
+	      'width,widths,x,x-height,x1,x2,xlink:actuate,xlink:arcrole,xlink:role,xlink:show,xlink:title,' +
+	      'xlink:type,xml:base,xml:lang,xml:space,xmlns,xmlns:xlink,y,y1,y2,zoomAndPan', true);
+	
+	  var validAttrs = extend({},
+	                                  uriAttrs,
+	                                  svgAttrs,
+	                                  htmlAttrs);
+	
+	  function toMap(str, lowercaseKeys) {
+	    var obj = {}, items = str.split(','), i;
+	    for (i = 0; i < items.length; i++) {
+	      obj[lowercaseKeys ? lowercase(items[i]) : items[i]] = true;
+	    }
+	    return obj;
+	  }
+	
+	  var inertBodyElement;
+	  (function(window) {
+	    var doc;
+	    if (window.document && window.document.implementation) {
+	      doc = window.document.implementation.createHTMLDocument("inert");
+	    } else {
+	      throw $sanitizeMinErr('noinert', "Can't create an inert html document");
+	    }
+	    var docElement = doc.documentElement || doc.getDocumentElement();
+	    var bodyElements = docElement.getElementsByTagName('body');
+	
+	    // usually there should be only one body element in the document, but IE doesn't have any, so we need to create one
+	    if (bodyElements.length === 1) {
+	      inertBodyElement = bodyElements[0];
+	    } else {
+	      var html = doc.createElement('html');
+	      inertBodyElement = doc.createElement('body');
+	      html.appendChild(inertBodyElement);
+	      doc.appendChild(html);
+	    }
+	  })(window);
+	
+	  /**
+	   * @example
+	   * htmlParser(htmlString, {
+	   *     start: function(tag, attrs) {},
+	   *     end: function(tag) {},
+	   *     chars: function(text) {},
+	   *     comment: function(text) {}
+	   * });
+	   *
+	   * @param {string} html string
+	   * @param {object} handler
+	   */
+	  function htmlParserImpl(html, handler) {
+	    if (html === null || html === undefined) {
+	      html = '';
+	    } else if (typeof html !== 'string') {
+	      html = '' + html;
+	    }
+	    inertBodyElement.innerHTML = html;
+	
+	    //mXSS protection
+	    var mXSSAttempts = 5;
+	    do {
+	      if (mXSSAttempts === 0) {
+	        throw $sanitizeMinErr('uinput', "Failed to sanitize html because the input is unstable");
+	      }
+	      mXSSAttempts--;
+	
+	      // strip custom-namespaced attributes on IE<=11
+	      if (window.document.documentMode) {
+	        stripCustomNsAttrs(inertBodyElement);
+	      }
+	      html = inertBodyElement.innerHTML; //trigger mXSS
+	      inertBodyElement.innerHTML = html;
+	    } while (html !== inertBodyElement.innerHTML);
+	
+	    var node = inertBodyElement.firstChild;
+	    while (node) {
+	      switch (node.nodeType) {
+	        case 1: // ELEMENT_NODE
+	          handler.start(node.nodeName.toLowerCase(), attrToMap(node.attributes));
+	          break;
+	        case 3: // TEXT NODE
+	          handler.chars(node.textContent);
+	          break;
+	      }
+	
+	      var nextNode;
+	      if (!(nextNode = node.firstChild)) {
+	      if (node.nodeType == 1) {
+	          handler.end(node.nodeName.toLowerCase());
+	        }
+	        nextNode = node.nextSibling;
+	        if (!nextNode) {
+	          while (nextNode == null) {
+	            node = node.parentNode;
+	            if (node === inertBodyElement) break;
+	            nextNode = node.nextSibling;
+	          if (node.nodeType == 1) {
+	              handler.end(node.nodeName.toLowerCase());
+	            }
+	          }
+	        }
+	      }
+	      node = nextNode;
+	    }
+	
+	    while (node = inertBodyElement.firstChild) {
+	      inertBodyElement.removeChild(node);
+	    }
+	  }
+	
+	  function attrToMap(attrs) {
+	    var map = {};
+	    for (var i = 0, ii = attrs.length; i < ii; i++) {
+	      var attr = attrs[i];
+	      map[attr.name] = attr.value;
+	    }
+	    return map;
+	  }
+	
+	
+	  /**
+	   * Escapes all potentially dangerous characters, so that the
+	   * resulting string can be safely inserted into attribute or
+	   * element text.
+	   * @param value
+	   * @returns {string} escaped text
+	   */
+	  function encodeEntities(value) {
+	    return value.
+	      replace(/&/g, '&amp;').
+	      replace(SURROGATE_PAIR_REGEXP, function(value) {
+	        var hi = value.charCodeAt(0);
+	        var low = value.charCodeAt(1);
+	        return '&#' + (((hi - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000) + ';';
+	      }).
+	      replace(NON_ALPHANUMERIC_REGEXP, function(value) {
+	        return '&#' + value.charCodeAt(0) + ';';
+	      }).
+	      replace(/</g, '&lt;').
+	      replace(/>/g, '&gt;');
+	  }
+	
+	  /**
+	   * create an HTML/XML writer which writes to buffer
+	   * @param {Array} buf use buf.join('') to get out sanitized html string
+	   * @returns {object} in the form of {
+	   *     start: function(tag, attrs) {},
+	   *     end: function(tag) {},
+	   *     chars: function(text) {},
+	   *     comment: function(text) {}
+	   * }
+	   */
+	  function htmlSanitizeWriterImpl(buf, uriValidator) {
+	    var ignoreCurrentElement = false;
+	    var out = bind(buf, buf.push);
+	    return {
+	      start: function(tag, attrs) {
+	        tag = lowercase(tag);
+	        if (!ignoreCurrentElement && blockedElements[tag]) {
+	          ignoreCurrentElement = tag;
+	        }
+	        if (!ignoreCurrentElement && validElements[tag] === true) {
+	          out('<');
+	          out(tag);
+	          forEach(attrs, function(value, key) {
+	            var lkey = lowercase(key);
+	            var isImage = (tag === 'img' && lkey === 'src') || (lkey === 'background');
+	            if (validAttrs[lkey] === true &&
+	              (uriAttrs[lkey] !== true || uriValidator(value, isImage))) {
+	              out(' ');
+	              out(key);
+	              out('="');
+	              out(encodeEntities(value));
+	              out('"');
+	            }
+	          });
+	          out('>');
+	        }
+	      },
+	      end: function(tag) {
+	        tag = lowercase(tag);
+	        if (!ignoreCurrentElement && validElements[tag] === true && voidElements[tag] !== true) {
+	          out('</');
+	          out(tag);
+	          out('>');
+	        }
+	        if (tag == ignoreCurrentElement) {
+	          ignoreCurrentElement = false;
+	        }
+	      },
+	      chars: function(chars) {
+	        if (!ignoreCurrentElement) {
+	          out(encodeEntities(chars));
+	        }
+	      }
+	    };
+	  }
+	
+	
+	  /**
+	   * When IE9-11 comes across an unknown namespaced attribute e.g. 'xlink:foo' it adds 'xmlns:ns1' attribute to declare
+	   * ns1 namespace and prefixes the attribute with 'ns1' (e.g. 'ns1:xlink:foo'). This is undesirable since we don't want
+	   * to allow any of these custom attributes. This method strips them all.
+	   *
+	   * @param node Root element to process
+	   */
+	  function stripCustomNsAttrs(node) {
+	    if (node.nodeType === window.Node.ELEMENT_NODE) {
+	      var attrs = node.attributes;
+	      for (var i = 0, l = attrs.length; i < l; i++) {
+	        var attrNode = attrs[i];
+	        var attrName = attrNode.name.toLowerCase();
+	        if (attrName === 'xmlns:ns1' || attrName.lastIndexOf('ns1:', 0) === 0) {
+	          node.removeAttributeNode(attrNode);
+	          i--;
+	          l--;
+	        }
+	      }
+	    }
+	
+	    var nextNode = node.firstChild;
+	    if (nextNode) {
+	      stripCustomNsAttrs(nextNode);
+	    }
+	
+	    nextNode = node.nextSibling;
+	    if (nextNode) {
+	      stripCustomNsAttrs(nextNode);
+	    }
+	  }
+	}
+	
+	function sanitizeText(chars) {
+	  var buf = [];
+	  var writer = htmlSanitizeWriter(buf, noop);
+	  writer.chars(chars);
+	  return buf.join('');
+	}
+	
+	
+	// define ngSanitize module and register $sanitize service
+	angular.module('ngSanitize', []).provider('$sanitize', $SanitizeProvider);
+	
+	/**
+	 * @ngdoc filter
+	 * @name linky
+	 * @kind function
+	 *
+	 * @description
+	 * Finds links in text input and turns them into html links. Supports `http/https/ftp/mailto` and
+	 * plain email address links.
+	 *
+	 * Requires the {@link ngSanitize `ngSanitize`} module to be installed.
+	 *
+	 * @param {string} text Input text.
+	 * @param {string} target Window (`_blank|_self|_parent|_top`) or named frame to open links in.
+	 * @param {object|function(url)} [attributes] Add custom attributes to the link element.
+	 *
+	 *    Can be one of:
+	 *
+	 *    - `object`: A map of attributes
+	 *    - `function`: Takes the url as a parameter and returns a map of attributes
+	 *
+	 *    If the map of attributes contains a value for `target`, it overrides the value of
+	 *    the target parameter.
+	 *
+	 *
+	 * @returns {string} Html-linkified and {@link $sanitize sanitized} text.
+	 *
+	 * @usage
+	   <span ng-bind-html="linky_expression | linky"></span>
+	 *
+	 * @example
+	   <example module="linkyExample" deps="angular-sanitize.js">
+	     <file name="index.html">
+	       <div ng-controller="ExampleController">
+	       Snippet: <textarea ng-model="snippet" cols="60" rows="3"></textarea>
+	       <table>
+	         <tr>
+	           <th>Filter</th>
+	           <th>Source</th>
+	           <th>Rendered</th>
+	         </tr>
+	         <tr id="linky-filter">
+	           <td>linky filter</td>
+	           <td>
+	             <pre>&lt;div ng-bind-html="snippet | linky"&gt;<br>&lt;/div&gt;</pre>
+	           </td>
+	           <td>
+	             <div ng-bind-html="snippet | linky"></div>
+	           </td>
+	         </tr>
+	         <tr id="linky-target">
+	          <td>linky target</td>
+	          <td>
+	            <pre>&lt;div ng-bind-html="snippetWithSingleURL | linky:'_blank'"&gt;<br>&lt;/div&gt;</pre>
+	          </td>
+	          <td>
+	            <div ng-bind-html="snippetWithSingleURL | linky:'_blank'"></div>
+	          </td>
+	         </tr>
+	         <tr id="linky-custom-attributes">
+	          <td>linky custom attributes</td>
+	          <td>
+	            <pre>&lt;div ng-bind-html="snippetWithSingleURL | linky:'_self':{rel: 'nofollow'}"&gt;<br>&lt;/div&gt;</pre>
+	          </td>
+	          <td>
+	            <div ng-bind-html="snippetWithSingleURL | linky:'_self':{rel: 'nofollow'}"></div>
+	          </td>
+	         </tr>
+	         <tr id="escaped-html">
+	           <td>no filter</td>
+	           <td><pre>&lt;div ng-bind="snippet"&gt;<br>&lt;/div&gt;</pre></td>
+	           <td><div ng-bind="snippet"></div></td>
+	         </tr>
+	       </table>
+	     </file>
+	     <file name="script.js">
+	       angular.module('linkyExample', ['ngSanitize'])
+	         .controller('ExampleController', ['$scope', function($scope) {
+	           $scope.snippet =
+	             'Pretty text with some links:\n'+
+	             'http://angularjs.org/,\n'+
+	             'mailto:us@somewhere.org,\n'+
+	             'another@somewhere.org,\n'+
+	             'and one more: ftp://127.0.0.1/.';
+	           $scope.snippetWithSingleURL = 'http://angularjs.org/';
+	         }]);
+	     </file>
+	     <file name="protractor.js" type="protractor">
+	       it('should linkify the snippet with urls', function() {
+	         expect(element(by.id('linky-filter')).element(by.binding('snippet | linky')).getText()).
+	             toBe('Pretty text with some links: http://angularjs.org/, us@somewhere.org, ' +
+	                  'another@somewhere.org, and one more: ftp://127.0.0.1/.');
+	         expect(element.all(by.css('#linky-filter a')).count()).toEqual(4);
+	       });
+	
+	       it('should not linkify snippet without the linky filter', function() {
+	         expect(element(by.id('escaped-html')).element(by.binding('snippet')).getText()).
+	             toBe('Pretty text with some links: http://angularjs.org/, mailto:us@somewhere.org, ' +
+	                  'another@somewhere.org, and one more: ftp://127.0.0.1/.');
+	         expect(element.all(by.css('#escaped-html a')).count()).toEqual(0);
+	       });
+	
+	       it('should update', function() {
+	         element(by.model('snippet')).clear();
+	         element(by.model('snippet')).sendKeys('new http://link.');
+	         expect(element(by.id('linky-filter')).element(by.binding('snippet | linky')).getText()).
+	             toBe('new http://link.');
+	         expect(element.all(by.css('#linky-filter a')).count()).toEqual(1);
+	         expect(element(by.id('escaped-html')).element(by.binding('snippet')).getText())
+	             .toBe('new http://link.');
+	       });
+	
+	       it('should work with the target property', function() {
+	        expect(element(by.id('linky-target')).
+	            element(by.binding("snippetWithSingleURL | linky:'_blank'")).getText()).
+	            toBe('http://angularjs.org/');
+	        expect(element(by.css('#linky-target a')).getAttribute('target')).toEqual('_blank');
+	       });
+	
+	       it('should optionally add custom attributes', function() {
+	        expect(element(by.id('linky-custom-attributes')).
+	            element(by.binding("snippetWithSingleURL | linky:'_self':{rel: 'nofollow'}")).getText()).
+	            toBe('http://angularjs.org/');
+	        expect(element(by.css('#linky-custom-attributes a')).getAttribute('rel')).toEqual('nofollow');
+	       });
+	     </file>
+	   </example>
+	 */
+	angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
+	  var LINKY_URL_REGEXP =
+	        /((ftp|https?):\/\/|(www\.)|(mailto:)?[A-Za-z0-9._%+-]+@)\S*[^\s.;,(){}<>"\u201d\u2019]/i,
+	      MAILTO_REGEXP = /^mailto:/i;
+	
+	  var linkyMinErr = angular.$$minErr('linky');
+	  var isDefined = angular.isDefined;
+	  var isFunction = angular.isFunction;
+	  var isObject = angular.isObject;
+	  var isString = angular.isString;
+	
+	  return function(text, target, attributes) {
+	    if (text == null || text === '') return text;
+	    if (!isString(text)) throw linkyMinErr('notstring', 'Expected string but received: {0}', text);
+	
+	    var attributesFn =
+	      isFunction(attributes) ? attributes :
+	      isObject(attributes) ? function getAttributesObject() {return attributes;} :
+	      function getEmptyAttributesObject() {return {};};
+	
+	    var match;
+	    var raw = text;
+	    var html = [];
+	    var url;
+	    var i;
+	    while ((match = raw.match(LINKY_URL_REGEXP))) {
+	      // We can not end in these as they are sometimes found at the end of the sentence
+	      url = match[0];
+	      // if we did not match ftp/http/www/mailto then assume mailto
+	      if (!match[2] && !match[4]) {
+	        url = (match[3] ? 'http://' : 'mailto:') + url;
+	      }
+	      i = match.index;
+	      addText(raw.substr(0, i));
+	      addLink(url, match[0].replace(MAILTO_REGEXP, ''));
+	      raw = raw.substring(i + match[0].length);
+	    }
+	    addText(raw);
+	    return $sanitize(html.join(''));
+	
+	    function addText(text) {
+	      if (!text) {
+	        return;
+	      }
+	      html.push(sanitizeText(text));
+	    }
+	
+	    function addLink(url, text) {
+	      var key, linkAttributes = attributesFn(url);
+	      html.push('<a ');
+	
+	      for (key in linkAttributes) {
+	        html.push(key + '="' + linkAttributes[key] + '" ');
+	      }
+	
+	      if (isDefined(target) && !('target' in linkAttributes)) {
+	        html.push('target="',
+	                  target,
+	                  '" ');
+	      }
+	      html.push('href="',
+	                url.replace(/"/g, '&quot;'),
+	                '">');
+	      addText(text);
+	      html.push('</a>');
+	    }
+	  };
+	}]);
+	
+	
+	})(window, window.angular);
+
+
+/***/ },
+/* 31 */
 /*!****************************!*\
   !*** ../~/firebase/app.js ***!
   \****************************/
@@ -72065,12 +72830,12 @@
 	 *
 	 *   firebase = require('firebase/app');
 	 */
-	__webpack_require__(/*! ./firebase-app */ 30);
+	__webpack_require__(/*! ./firebase-app */ 32);
 	module.exports = firebase;
 
 
 /***/ },
-/* 30 */
+/* 32 */
 /*!*************************************!*\
   !*** ../~/firebase/firebase-app.js ***!
   \*************************************/
@@ -72110,7 +72875,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 31 */
+/* 33 */
 /*!*****************************!*\
   !*** ../~/firebase/auth.js ***!
   \*****************************/
@@ -72123,13 +72888,13 @@
 	 *
 	 *   auth = require('firebase/auth');
 	 */
-	__webpack_require__(/*! ./firebase-app */ 30);
-	__webpack_require__(/*! ./firebase-auth */ 32);
+	__webpack_require__(/*! ./firebase-app */ 32);
+	__webpack_require__(/*! ./firebase-auth */ 34);
 	module.exports = firebase.auth;
 
 
 /***/ },
-/* 32 */
+/* 34 */
 /*!**************************************!*\
   !*** ../~/firebase/firebase-auth.js ***!
   \**************************************/
@@ -72345,7 +73110,7 @@
 
 
 /***/ },
-/* 33 */
+/* 35 */
 /*!*********************************!*\
   !*** ../~/firebase/database.js ***!
   \*********************************/
@@ -72358,13 +73123,13 @@
 	 *
 	 *   database = require('firebase/database');
 	 */
-	__webpack_require__(/*! ./firebase-app */ 30);
-	__webpack_require__(/*! ./firebase-database */ 34);
+	__webpack_require__(/*! ./firebase-app */ 32);
+	__webpack_require__(/*! ./firebase-database */ 36);
 	module.exports = firebase.database;
 
 
 /***/ },
-/* 34 */
+/* 36 */
 /*!******************************************!*\
   !*** ../~/firebase/firebase-database.js ***!
   \******************************************/
@@ -72617,7 +73382,7 @@
 
 
 /***/ },
-/* 35 */
+/* 37 */
 /*!********************************!*\
   !*** ../~/firebase/storage.js ***!
   \********************************/
@@ -72630,13 +73395,13 @@
 	 *
 	 *   storage = require('firebase/storage');
 	 */
-	__webpack_require__(/*! ./firebase-app */ 30);
-	__webpack_require__(/*! ./firebase-storage */ 36);
+	__webpack_require__(/*! ./firebase-app */ 32);
+	__webpack_require__(/*! ./firebase-storage */ 38);
 	module.exports = firebase.storage;
 
 
 /***/ },
-/* 36 */
+/* 38 */
 /*!*****************************************!*\
   !*** ../~/firebase/firebase-storage.js ***!
   \*****************************************/
@@ -72736,7 +73501,7 @@
 
 
 /***/ },
-/* 37 */
+/* 39 */
 /*!********************************!*\
   !*** ./main/main_directive.js ***!
   \********************************/
@@ -72750,11 +73515,11 @@
 	
 	exports.default = function (ngModule, firebase, provider, database) {
 	    ngModule.directive("main", function () {
-	        __webpack_require__(/*! ./main.css */ 38);
+	        __webpack_require__(/*! ./main.css */ 40);
 	        return {
 	            restrict: "E",
 	            scope: true,
-	            template: __webpack_require__(/*! ./main.html */ 40),
+	            template: __webpack_require__(/*! ./main.html */ 42),
 	            controllerAs: "vm",
 	            controller: function controller($rootScope, $location, $scope, $timeout, $mdSidenav, $mdDialog) {
 	                //default add parameters on launch
@@ -72978,7 +73743,7 @@
 	};
 
 /***/ },
-/* 38 */
+/* 40 */
 /*!***********************!*\
   !*** ./main/main.css ***!
   \***********************/
@@ -72987,7 +73752,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./main.css */ 39);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./main.css */ 41);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
@@ -73007,7 +73772,7 @@
 	}
 
 /***/ },
-/* 39 */
+/* 41 */
 /*!***************************************!*\
   !*** ../~/css-loader!./main/main.css ***!
   \***************************************/
@@ -73024,7 +73789,7 @@
 
 
 /***/ },
-/* 40 */
+/* 42 */
 /*!************************!*\
   !*** ./main/main.html ***!
   \************************/
@@ -73033,7 +73798,7 @@
 	module.exports = "<div layout=\"column\" layout-fill>\n    <md-toolbar ng-show=\"!vm.showSearch\" style=\"position: fixed; z-index: 100\">\n        <div class=\"md-toolbar-tools\">\n            <md-button class=\"md-icon-button\" aria-label=\"Settings\" ng-disabled=\"true\">\n                <md-icon ng-if=\"vm.state.currentPath.name == 'main.tabs'\" ng-click=\"toggleLeft()\" md-svg-icon=\"img/icons/menu.svg\"></md-icon>\n                <md-icon ng-click=\"vm.statePop()\" ng-if=\"vm.state.currentPath.name != 'main.tabs'\" md-svg-icon=\"img/icons/back.svg\"></md-icon>\n            </md-button>\n            <span>{{appName}}</span>\n            <!-- fill up the space between left and right area -->\n            <span flex></span>\n            <md-button aria-label=\"Search\" ng-click=\"vm.searchPage()\">\n                <md-icon md-svg-icon=\"img/icons/search_white.svg\"></md-icon>\n            </md-button>\n            <md-button ng-if=\"!vm.user && ['main.signin', 'main.register'].indexOf(vm.state.currentPath.name) < 0 \" ng-click=\"vm.signinPage()\">\n                Sign in\n            </md-button>\n            <div class=\"fb-appbar-login-area\">\n                <md-menu class=\"fb-appear-menu\">\n                    <button class=\"fb-appear-btn md-button md-gmp-blue-theme md-ink-ripple\" ng-click=\"$mdOpenMenu($event)\">\n                        <img ng-if=\"vm.user.photoURL\" style=\"width: 40px; margin-right: 50px; border-radius: 50%\" ng-src=\"{{vm.user.photoURL}}\" />\n                        <p ng-if=\"!vm.user.photoURL\">{{vm.user.email}}</p>\n                        <div class=\"md-ripple-container\"></div>\n                    </button>\n                    <md-menu-content>\n                        <md-menu-item role=\"menuitem\" style=\"height: 90px\">\n                            <div layout=\"row\" class=\"logout\">\n                                <img ng-if=\"vm.user.photoURL\" ng-src=\"{{vm.user.photoURL}}\" />\n                                <div layout=\"column\" style=\"flex-direction: column\">\n                                    <div class=\"logout-email\">\n                                        {{vm.user.email}}\n                                    </div>\n                                    <div class=\"logout-btn\">\n                                        <a ng-click=\"vm.fblogout()\">SIGN OUT</a>\n                                    </div>\n                                </div>\n                            </div>\n                        </md-menu-item>\n                    </md-menu-content>\n                </md-menu>\n            </div>\n        </div>\n    </md-toolbar>\n    <md-toolbar class=\"md-hue-1\" ng-show=\"vm.showSearch\">\n        <div class=\"md-toolbar-tools\">\n            <md-button ng-click=\"vm.mainPage()\" aria-label=\"Back\">\n                <md-icon md-svg-icon=\"img/icons/back_white.svg\"></md-icon>\n            </md-button>\n            <h3 flex=\"10\">\n                Back\n            </h3>\n            <md-input-container md-theme=\"input\" flex>\n                <label>&nbsp;</label>\n                <form ng-submit=\"vm.search()\">\n                    <input style=\"margin-top: 20px\" ng-model=\"vm.searchContent\" placeholder=\"enter search\">\n                </form>\n            </md-input-container>\n            <md-button aria-label=\"Search\" ng-click=\"showSearch = !showSearch\">\n                <md-icon ng-click=\"vm.search()\" md-svg-icon=\"img/icons/search.svg\"></md-icon>\n            </md-button>\n        </div>\n\n    </md-toolbar>\n    <div ui-view></div>\n</div>"
 
 /***/ },
-/* 41 */
+/* 43 */
 /*!********************************!*\
   !*** ./tabs/tabs_directive.js ***!
   \********************************/
@@ -73047,11 +73812,11 @@
 	
 	exports.default = function (ngModule, firebase, database) {
 	    ngModule.directive("tabs", function () {
-	        __webpack_require__(/*! ./tabs.css */ 42);
+	        __webpack_require__(/*! ./tabs.css */ 44);
 	        return {
 	            restrict: "E",
 	            scope: true,
-	            template: __webpack_require__(/*! ./tabs.html */ 44),
+	            template: __webpack_require__(/*! ./tabs.html */ 46),
 	            controllerAs: "vm",
 	            controller: function controller($rootScope, $scope, $location, $mdDialog) {
 	                var vm = this;
@@ -73073,7 +73838,7 @@
 	};
 
 /***/ },
-/* 42 */
+/* 44 */
 /*!***********************!*\
   !*** ./tabs/tabs.css ***!
   \***********************/
@@ -73082,7 +73847,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./tabs.css */ 43);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./tabs.css */ 45);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
@@ -73102,7 +73867,7 @@
 	}
 
 /***/ },
-/* 43 */
+/* 45 */
 /*!***************************************!*\
   !*** ../~/css-loader!./tabs/tabs.css ***!
   \***************************************/
@@ -73119,7 +73884,7 @@
 
 
 /***/ },
-/* 44 */
+/* 46 */
 /*!************************!*\
   !*** ./tabs/tabs.html ***!
   \************************/
@@ -73128,7 +73893,7 @@
 	module.exports = "<div layout=\"column\" ng-cloak>\n    <section layout=\"row\" flex>\n        <md-sidenav\n            class=\"md-sidenav-left\"\n            md-component-id=\"left\"\n            md-whiteframe=\"4\">\n          <md-toolbar class=\"md-theme-indigo\">\n            <h1 class=\"md-toolbar-tools\">Sidenav Left</h1>\n          </md-toolbar>\n          <md-content layout-padding>\n              <md-list ng-cloak>\n                  <md-list-item ng-click=\"vm.collectionPage()\">\n                      <md-icon md-svg-icon=\"img/icons/collection.svg\"></md-icon>\n                      <p> My collection </p>\n                  </md-list-item>\n                  <md-divider></md-divider>\n              </md-list>\n          </md-content>\n        </md-sidenav>\n        <md-content flex layout-padding style=\"margin-top: 65px;\">\n            <md-tabs md-selected=\"tabIndex\" md-dynamic-height md-border-bottom>\n                <md-tab ng-click=\"vm.setTab(0)\" label=\"Now Playing\">\n                    <md-content class=\"md-padding\">\n                        <movies category=\"now_playing\" index='categoryIndex.nowPlaying' addcollection=\"addCollection\"></movies>\n                    </md-content>\n                </md-tab>\n                <md-tab ng-click=\"vm.setTab(1)\" label=\"Popular\">\n                    <md-content class=\"md-padding\">\n                        <movies category=\"popular\" index='categoryIndex.popular' addcollection=\"addCollection\"></movies>\n                    </md-content>\n                </md-tab>\n                <md-tab ng-click=\"vm.setTab(2)\" label=\"Top Rated\">\n                    <md-content class=\"md-padding\">\n                        <movies category=\"top_rated\" index='categoryIndex.topRate' addcollection=\"addCollection\"></movies>\n                    </md-content>\n                </md-tab>\n                <md-tab ng-click=\"vm.setTab(3)\" label=\"Upcoming\">\n                    <md-content class=\"md-padding\">\n                        <movies category=\"upcoming\" index='categoryIndex.upComing' addcollection=\"addCollection\"></movies>\n                    </md-content>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n    </section>\n</div>"
 
 /***/ },
-/* 45 */
+/* 47 */
 /*!************************************!*\
   !*** ./movies/movies_directive.js ***!
   \************************************/
@@ -73142,8 +73907,8 @@
 	
 	exports.default = function (ngModule) {
 	    ngModule.directive("movies", function () {
-	        __webpack_require__(/*! ./movies.css */ 46);
-	        var crud = __webpack_require__(/*! ../service/crud */ 48);
+	        __webpack_require__(/*! ./movies.css */ 48);
+	        var crud = __webpack_require__(/*! ../service/crud */ 50);
 	        return {
 	            restrict: "E",
 	            scope: {
@@ -73152,7 +73917,7 @@
 	                keyword: '=',
 	                addcollection: '&'
 	            },
-	            template: __webpack_require__(/*! ./movies.html */ 69),
+	            template: __webpack_require__(/*! ./movies.html */ 71),
 	            controllerAs: "vm",
 	            controller: function controller($scope, $rootScope, $location) {
 	                var vm = this;
@@ -73221,7 +73986,7 @@
 	};
 
 /***/ },
-/* 46 */
+/* 48 */
 /*!***************************!*\
   !*** ./movies/movies.css ***!
   \***************************/
@@ -73230,7 +73995,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./movies.css */ 47);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./movies.css */ 49);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
@@ -73250,7 +74015,7 @@
 	}
 
 /***/ },
-/* 47 */
+/* 49 */
 /*!*******************************************!*\
   !*** ../~/css-loader!./movies/movies.css ***!
   \*******************************************/
@@ -73267,7 +74032,7 @@
 
 
 /***/ },
-/* 48 */
+/* 50 */
 /*!*************************!*\
   !*** ./service/crud.js ***!
   \*************************/
@@ -73275,12 +74040,10 @@
 
 	'use strict';
 	
-	var axios = __webpack_require__(/*! axios */ 49);
+	var axios = __webpack_require__(/*! axios */ 51);
 	var domain = 'https://sheltered-peak-44325.herokuapp.com';
 	var crud = {
 	    GET: function GET(url, headers) {
-	        debugger;
-	        console.log('' + domain + url);
 	        return axios({
 	            method: 'get',
 	            url: url,
@@ -73300,16 +74063,16 @@
 	module.exports = crud;
 
 /***/ },
-/* 49 */
+/* 51 */
 /*!***************************!*\
   !*** ../~/axios/index.js ***!
   \***************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(/*! ./lib/axios */ 50);
+	module.exports = __webpack_require__(/*! ./lib/axios */ 52);
 
 /***/ },
-/* 50 */
+/* 52 */
 /*!*******************************!*\
   !*** ../~/axios/lib/axios.js ***!
   \*******************************/
@@ -73317,14 +74080,14 @@
 
 	'use strict';
 	
-	var defaults = __webpack_require__(/*! ./defaults */ 51);
-	var utils = __webpack_require__(/*! ./utils */ 52);
-	var dispatchRequest = __webpack_require__(/*! ./core/dispatchRequest */ 54);
-	var InterceptorManager = __webpack_require__(/*! ./core/InterceptorManager */ 64);
-	var isAbsoluteURL = __webpack_require__(/*! ./helpers/isAbsoluteURL */ 65);
-	var combineURLs = __webpack_require__(/*! ./helpers/combineURLs */ 66);
-	var bind = __webpack_require__(/*! ./helpers/bind */ 67);
-	var transformData = __webpack_require__(/*! ./helpers/transformData */ 59);
+	var defaults = __webpack_require__(/*! ./defaults */ 53);
+	var utils = __webpack_require__(/*! ./utils */ 54);
+	var dispatchRequest = __webpack_require__(/*! ./core/dispatchRequest */ 56);
+	var InterceptorManager = __webpack_require__(/*! ./core/InterceptorManager */ 66);
+	var isAbsoluteURL = __webpack_require__(/*! ./helpers/isAbsoluteURL */ 67);
+	var combineURLs = __webpack_require__(/*! ./helpers/combineURLs */ 68);
+	var bind = __webpack_require__(/*! ./helpers/bind */ 69);
+	var transformData = __webpack_require__(/*! ./helpers/transformData */ 61);
 	
 	function Axios(defaultConfig) {
 	  this.defaults = utils.merge({}, defaultConfig);
@@ -73413,7 +74176,7 @@
 	axios.all = function all(promises) {
 	  return Promise.all(promises);
 	};
-	axios.spread = __webpack_require__(/*! ./helpers/spread */ 68);
+	axios.spread = __webpack_require__(/*! ./helpers/spread */ 70);
 	
 	// Provide aliases for supported request methods
 	utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
@@ -73441,7 +74204,7 @@
 
 
 /***/ },
-/* 51 */
+/* 53 */
 /*!**********************************!*\
   !*** ../~/axios/lib/defaults.js ***!
   \**********************************/
@@ -73449,8 +74212,8 @@
 
 	'use strict';
 	
-	var utils = __webpack_require__(/*! ./utils */ 52);
-	var normalizeHeaderName = __webpack_require__(/*! ./helpers/normalizeHeaderName */ 53);
+	var utils = __webpack_require__(/*! ./utils */ 54);
+	var normalizeHeaderName = __webpack_require__(/*! ./helpers/normalizeHeaderName */ 55);
 	
 	var PROTECTION_PREFIX = /^\)\]\}',?\n/;
 	var DEFAULT_CONTENT_TYPE = {
@@ -73522,7 +74285,7 @@
 
 
 /***/ },
-/* 52 */
+/* 54 */
 /*!*******************************!*\
   !*** ../~/axios/lib/utils.js ***!
   \*******************************/
@@ -73808,7 +74571,7 @@
 
 
 /***/ },
-/* 53 */
+/* 55 */
 /*!*****************************************************!*\
   !*** ../~/axios/lib/helpers/normalizeHeaderName.js ***!
   \*****************************************************/
@@ -73816,7 +74579,7 @@
 
 	'use strict';
 	
-	var utils = __webpack_require__(/*! ../utils */ 52);
+	var utils = __webpack_require__(/*! ../utils */ 54);
 	
 	module.exports = function normalizeHeaderName(headers, normalizedName) {
 	  utils.forEach(headers, function processHeader(value, name) {
@@ -73829,7 +74592,7 @@
 
 
 /***/ },
-/* 54 */
+/* 56 */
 /*!**********************************************!*\
   !*** ../~/axios/lib/core/dispatchRequest.js ***!
   \**********************************************/
@@ -73854,10 +74617,10 @@
 	        adapter = config.adapter;
 	      } else if (typeof XMLHttpRequest !== 'undefined') {
 	        // For browsers use XHR adapter
-	        adapter = __webpack_require__(/*! ../adapters/xhr */ 56);
+	        adapter = __webpack_require__(/*! ../adapters/xhr */ 58);
 	      } else if (typeof process !== 'undefined') {
 	        // For node use HTTP adapter
-	        adapter = __webpack_require__(/*! ../adapters/http */ 56);
+	        adapter = __webpack_require__(/*! ../adapters/http */ 58);
 	      }
 	
 	      if (typeof adapter === 'function') {
@@ -73870,10 +74633,10 @@
 	};
 	
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ../~/process/browser.js */ 55)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ../~/process/browser.js */ 57)))
 
 /***/ },
-/* 55 */
+/* 57 */
 /*!*******************************!*\
   !*** ../~/process/browser.js ***!
   \*******************************/
@@ -74001,7 +74764,7 @@
 
 
 /***/ },
-/* 56 */
+/* 58 */
 /*!**************************************!*\
   !*** ../~/axios/lib/adapters/xhr.js ***!
   \**************************************/
@@ -74009,13 +74772,13 @@
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var utils = __webpack_require__(/*! ./../utils */ 52);
-	var buildURL = __webpack_require__(/*! ./../helpers/buildURL */ 57);
-	var parseHeaders = __webpack_require__(/*! ./../helpers/parseHeaders */ 58);
-	var transformData = __webpack_require__(/*! ./../helpers/transformData */ 59);
-	var isURLSameOrigin = __webpack_require__(/*! ./../helpers/isURLSameOrigin */ 60);
-	var btoa = (typeof window !== 'undefined' && window.btoa) || __webpack_require__(/*! ./../helpers/btoa */ 61);
-	var settle = __webpack_require__(/*! ../helpers/settle */ 62);
+	var utils = __webpack_require__(/*! ./../utils */ 54);
+	var buildURL = __webpack_require__(/*! ./../helpers/buildURL */ 59);
+	var parseHeaders = __webpack_require__(/*! ./../helpers/parseHeaders */ 60);
+	var transformData = __webpack_require__(/*! ./../helpers/transformData */ 61);
+	var isURLSameOrigin = __webpack_require__(/*! ./../helpers/isURLSameOrigin */ 62);
+	var btoa = (typeof window !== 'undefined' && window.btoa) || __webpack_require__(/*! ./../helpers/btoa */ 63);
+	var settle = __webpack_require__(/*! ../helpers/settle */ 64);
 	
 	module.exports = function xhrAdapter(resolve, reject, config) {
 	  var requestData = config.data;
@@ -74112,7 +74875,7 @@
 	  // This is only done if running in a standard browser environment.
 	  // Specifically not if we're in a web worker, or react-native.
 	  if (utils.isStandardBrowserEnv()) {
-	    var cookies = __webpack_require__(/*! ./../helpers/cookies */ 63);
+	    var cookies = __webpack_require__(/*! ./../helpers/cookies */ 65);
 	
 	    // Add xsrf header
 	    var xsrfValue = config.withCredentials || isURLSameOrigin(config.url) ?
@@ -74170,10 +74933,10 @@
 	  request.send(requestData);
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ../~/process/browser.js */ 55)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ../~/process/browser.js */ 57)))
 
 /***/ },
-/* 57 */
+/* 59 */
 /*!******************************************!*\
   !*** ../~/axios/lib/helpers/buildURL.js ***!
   \******************************************/
@@ -74181,7 +74944,7 @@
 
 	'use strict';
 	
-	var utils = __webpack_require__(/*! ./../utils */ 52);
+	var utils = __webpack_require__(/*! ./../utils */ 54);
 	
 	function encode(val) {
 	  return encodeURIComponent(val).
@@ -74250,7 +75013,7 @@
 
 
 /***/ },
-/* 58 */
+/* 60 */
 /*!**********************************************!*\
   !*** ../~/axios/lib/helpers/parseHeaders.js ***!
   \**********************************************/
@@ -74258,7 +75021,7 @@
 
 	'use strict';
 	
-	var utils = __webpack_require__(/*! ./../utils */ 52);
+	var utils = __webpack_require__(/*! ./../utils */ 54);
 	
 	/**
 	 * Parse headers into an object
@@ -74296,7 +75059,7 @@
 
 
 /***/ },
-/* 59 */
+/* 61 */
 /*!***********************************************!*\
   !*** ../~/axios/lib/helpers/transformData.js ***!
   \***********************************************/
@@ -74304,7 +75067,7 @@
 
 	'use strict';
 	
-	var utils = __webpack_require__(/*! ./../utils */ 52);
+	var utils = __webpack_require__(/*! ./../utils */ 54);
 	
 	/**
 	 * Transform the data for a request or a response
@@ -74325,7 +75088,7 @@
 
 
 /***/ },
-/* 60 */
+/* 62 */
 /*!*************************************************!*\
   !*** ../~/axios/lib/helpers/isURLSameOrigin.js ***!
   \*************************************************/
@@ -74333,7 +75096,7 @@
 
 	'use strict';
 	
-	var utils = __webpack_require__(/*! ./../utils */ 52);
+	var utils = __webpack_require__(/*! ./../utils */ 54);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -74402,7 +75165,7 @@
 
 
 /***/ },
-/* 61 */
+/* 63 */
 /*!**************************************!*\
   !*** ../~/axios/lib/helpers/btoa.js ***!
   \**************************************/
@@ -74447,7 +75210,7 @@
 
 
 /***/ },
-/* 62 */
+/* 64 */
 /*!****************************************!*\
   !*** ../~/axios/lib/helpers/settle.js ***!
   \****************************************/
@@ -74474,7 +75237,7 @@
 
 
 /***/ },
-/* 63 */
+/* 65 */
 /*!*****************************************!*\
   !*** ../~/axios/lib/helpers/cookies.js ***!
   \*****************************************/
@@ -74482,7 +75245,7 @@
 
 	'use strict';
 	
-	var utils = __webpack_require__(/*! ./../utils */ 52);
+	var utils = __webpack_require__(/*! ./../utils */ 54);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -74536,7 +75299,7 @@
 
 
 /***/ },
-/* 64 */
+/* 66 */
 /*!*************************************************!*\
   !*** ../~/axios/lib/core/InterceptorManager.js ***!
   \*************************************************/
@@ -74544,7 +75307,7 @@
 
 	'use strict';
 	
-	var utils = __webpack_require__(/*! ./../utils */ 52);
+	var utils = __webpack_require__(/*! ./../utils */ 54);
 	
 	function InterceptorManager() {
 	  this.handlers = [];
@@ -74597,7 +75360,7 @@
 
 
 /***/ },
-/* 65 */
+/* 67 */
 /*!***********************************************!*\
   !*** ../~/axios/lib/helpers/isAbsoluteURL.js ***!
   \***********************************************/
@@ -74620,7 +75383,7 @@
 
 
 /***/ },
-/* 66 */
+/* 68 */
 /*!*********************************************!*\
   !*** ../~/axios/lib/helpers/combineURLs.js ***!
   \*********************************************/
@@ -74641,7 +75404,7 @@
 
 
 /***/ },
-/* 67 */
+/* 69 */
 /*!**************************************!*\
   !*** ../~/axios/lib/helpers/bind.js ***!
   \**************************************/
@@ -74661,7 +75424,7 @@
 
 
 /***/ },
-/* 68 */
+/* 70 */
 /*!****************************************!*\
   !*** ../~/axios/lib/helpers/spread.js ***!
   \****************************************/
@@ -74697,7 +75460,7 @@
 
 
 /***/ },
-/* 69 */
+/* 71 */
 /*!****************************!*\
   !*** ./movies/movies.html ***!
   \****************************/
@@ -74706,7 +75469,7 @@
 	module.exports = "<div>\n    <md-grid-list\n            md-cols=\"1\" md-cols-sm=\"2\" md-cols-md=\"3\" md-cols-gt-md=\"6\"\n            md-row-height-gt-md=\"1:1\" md-row-height=\"4:3\"\n            md-gutter=\"8px\" md-gutter-gt-sm=\"4px\" >\n        <md-grid-tile ng-repeat=\"movie in vm.movies.results\"\n                      md-rowspan=\"3\"\n                      md-colspan=\"1\"\n                      md-colspan-sm=\"1\"\n                      md-colspan-xs=\"1\">\n            <md-card>\n                <img ng-click=\"vm.forwardInfo(movie)\" ng-src=\"{{movie.poster_path?'https://image.tmdb.org/t/p/w300'+movie.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image\" alt=\"Washed Out\">\n                <md-card-title ng-click=\"vm.forwardInfo(movie)\">\n                    <md-card-title-text>\n                        <h4>{{movie.title}}</h4>\n                    </md-card-title-text>\n                </md-card-title>\n                <md-card-content ng-click=\"vm.forwardInfo(movie)\">\n                    <p>{{movie.overview | limitTo:100}}</p>\n                </md-card-content>\n                <md-card-actions layout=\"row\" layout-align=\"end\">\n                    <md-button ng-click=\"addcollection()(movie)\" class=\"md-icon-button\" aria-label=\"popularity\">\n                        <md-icon md-svg-icon=\"img/icons/collection.svg\"></md-icon>\n                    </md-button>\n                    <md-button class=\"md-icon-button\" aria-label=\"popularity\">\n                        <md-icon md-svg-icon=\"img/icons/popularity.svg\"></md-icon>\n                    </md-button>\n                    <p ng-style=\"{'color': '#'+vm.Math.floor((movie.popularity/100)*16777215).toString(16)}\" style=\"padding-right: 10px; padding-top: 10px\">{{movie.popularity | limitTo: 4}}</p>\n                </md-card-actions>\n            </md-card>\n        </md-grid-tile>\n    </md-grid-list>\n    <nav ng-show=\"vm.movies.results\" class=\"paginWrapper\">\n        <ul class=\"pagination\">\n            <li><a ng-class=\"{'disabled': vm.index<=1}\" ng-click=\"vm.pagination(1)\">First</a></li>\n            <li><a ng-class=\"{'disabled': vm.index<=1}\" ng-click=\"vm.pagination(vm.index-1)\">Pre</a></li>\n            <li><a >{{vm.index}} of {{vm.totalPages}}</a></li>\n            <li><a ng-class=\"{'disabled': vm.index>=vm.totalPages}\" ng-click=\"vm.pagination(vm.index+1)\"}>Next</a></li>\n            <li><a ng-class=\"{'disabled': vm.index>=vm.totalPages}\" ng-click=\"vm.pagination(vm.totalPages)\">Last</a></li>\n        </ul>\n    </nav>\n</div>"
 
 /***/ },
-/* 70 */
+/* 72 */
 /*!*********************************!*\
   !*** ./MovieInfo/movie_info.js ***!
   \*********************************/
@@ -74717,18 +75480,18 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	var _ = __webpack_require__(/*! underscore */ 72);
-	var crud = __webpack_require__(/*! ../service/crud */ 48);
-	var util = __webpack_require__(/*! ../util/util */ 98);
-	var key = 'AIzaSyDOjFm5V6Ar1QeNIDa0_d_jjfDQ2KGR2Ts';
+	var _ = __webpack_require__(/*! underscore */ 73);
+	var crud = __webpack_require__(/*! ../service/crud */ 50);
+	var util = __webpack_require__(/*! ../util/util */ 74);
+	var key = __webpack_require__(/*! ../util/properties */ 75).key;
 	
 	exports.default = function (ngModule, firebase, database) {
 	    ngModule.directive("info", function () {
-	        __webpack_require__(/*! ./movie_info.css */ 99);
+	        __webpack_require__(/*! ./movie_info.css */ 76);
 	        return {
 	            restrict: "E",
 	            scope: true,
-	            template: __webpack_require__(/*! ./movie_info.html */ 101),
+	            template: __webpack_require__(/*! ./movie_info.html */ 78),
 	            controllerAs: "vm",
 	            controller: function controller($scope, $rootScope, $mdDialog, $mdMedia) {
 	                var vm = this;
@@ -74960,7 +75723,7 @@
 	
 	                    $mdDialog.show({
 	                        controller: DialogController,
-	                        template: __webpack_require__(/*! ./person.html */ 102),
+	                        template: __webpack_require__(/*! ./person.html */ 79),
 	                        locals: {
 	                            person: person
 	                        },
@@ -75018,105 +75781,7 @@
 	}
 
 /***/ },
-/* 71 */
-/*!******************************!*\
-  !*** ./map/map_directive.js ***!
-  \******************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	var _ = __webpack_require__(/*! underscore */ 72);
-	var GoogleMapsLoader = __webpack_require__(/*! google-maps */ 73);
-	
-	GoogleMapsLoader.KEY = 'AIzaSyDOjFm5V6Ar1QeNIDa0_d_jjfDQ2KGR2Ts';
-	
-	exports.default = function (ngModule) {
-	    ngModule.directive("map", function () {
-	        __webpack_require__(/*! ./map.css */ 74);
-	        return {
-	            restrict: "E",
-	            scope: {
-	                location: '=',
-	                theaters: '='
-	            },
-	            template: __webpack_require__(/*! ./map.html */ 76),
-	            controllerAs: "vm",
-	            controller: function controller($scope, $rootScope) {
-	
-	                var vm = this;
-	                var map;
-	                var geocoder;
-	                var bounds;
-	
-	                GoogleMapsLoader.load(function (google) {
-	
-	                    var infoWindow = function infoWindow(marker, map, title, address) {
-	                        google.maps.event.addListener(marker, 'click', function () {
-	                            var html = "<div><h3>" + title + "</h3><p>" + address + "</p></div>";
-	                            var iw = new google.maps.InfoWindow({
-	                                content: html,
-	                                maxWidth: 350
-	                            });
-	                            iw.open(map, marker);
-	                        });
-	                    };
-	
-	                    var geocodeAddress = function geocodeAddress(address, title) {
-	                        geocoder.geocode({ 'address': address }, function (results, status) {
-	                            if (status == google.maps.GeocoderStatus.OK) {
-	                                var marker = new google.maps.Marker({
-	                                    icon: './img/pic/blueMark.png',
-	                                    map: map,
-	                                    animation: google.maps.Animation.DROP,
-	                                    position: results[0].geometry.location,
-	                                    title: title,
-	                                    address: address
-	                                });
-	                                infoWindow(marker, map, title, address);
-	                                bounds.extend(marker.getPosition());
-	                                map.fitBounds(bounds);
-	                            } else {
-	                                alert("geocode of " + address + " failed:" + status);
-	                            }
-	                        });
-	                    };
-	
-	                    bounds = new google.maps.LatLngBounds();
-	                    map = new google.maps.Map(document.getElementById('map'), {
-	                        zoom: 8,
-	                        center: { lat: $scope.location.lati, lng: $scope.location.longi },
-	                        mapTypeId: google.maps.MapTypeId.ROADMAP,
-	                        scrollwheel: false
-	                    });
-	                    var marker = new google.maps.Marker({
-	                        position: { lat: $scope.location.lati, lng: $scope.location.longi },
-	                        map: map,
-	                        title: 'Your current location'
-	                    });
-	                    google.maps.event.addListener(map, 'click', function (event) {
-	                        this.setOptions({ scrollwheel: true });
-	                    });
-	                    geocoder = new google.maps.Geocoder();
-	
-	                    //loop through theater address
-	                    _.each($scope.theaters, function (theater) {
-	                        geocodeAddress(theater.address, theater.name);
-	                    });
-	                });
-	
-	                //initialize map
-	                //vm.initMap();
-	            }
-	        };
-	    });
-	};
-
-/***/ },
-/* 72 */
+/* 73 */
 /*!*************************************!*\
   !*** ../~/underscore/underscore.js ***!
   \*************************************/
@@ -76673,7 +77338,222 @@
 
 
 /***/ },
-/* 73 */
+/* 74 */
+/*!**********************!*\
+  !*** ./util/util.js ***!
+  \**********************/
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	var util = {
+	    compareDate: function compareDate(date1, date2) {
+	        Date.prototype.addHours = function (h) {
+	            this.setHours(this.getHours() + h);
+	            return this;
+	        };
+	
+	        // adjust diff for for daylight savings
+	        var hoursToAdjust = Math.abs(date1.getTimezoneOffset() / 60) - Math.abs(date2.getTimezoneOffset() / 60);
+	        // apply the tz offset
+	        date2.addHours(hoursToAdjust);
+	
+	        // The number of milliseconds in one day
+	        var ONE_DAY = 1000 * 60 * 60 * 24;
+	
+	        // Convert both dates to milliseconds
+	        var date1_ms = date1.getTime();
+	        var date2_ms = date2.getTime();
+	
+	        // Calculate the difference in milliseconds
+	        var difference_ms = date1_ms - date2_ms;
+	
+	        // Convert back to days and return
+	        return Math.round(difference_ms / ONE_DAY);
+	    }
+	};
+	
+	module.exports = util;
+
+/***/ },
+/* 75 */
+/*!****************************!*\
+  !*** ./util/properties.js ***!
+  \****************************/
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	var properties = {
+		key: 'AIzaSyDOjFm5V6Ar1QeNIDa0_d_jjfDQ2KGR2Ts'
+	};
+	
+	module.exports = properties;
+
+/***/ },
+/* 76 */
+/*!**********************************!*\
+  !*** ./MovieInfo/movie_info.css ***!
+  \**********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !./../../~/css-loader!./movie_info.css */ 77);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./movie_info.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./movie_info.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 77 */
+/*!**************************************************!*\
+  !*** ../~/css-loader!./MovieInfo/movie_info.css ***!
+  \**************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".info-container {\n    margin-top: 10px;\n    margin-left: 10px;\n    width: 80%;\n    height: 100%;\n    display: flex;\n}\n\n.video-list {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.cast {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.theaters {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.avilableon {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.info-poster {\n    width: 20%;\n    float: left;\n}\n\n.top-card {\n    margin-left: 20px;\n    padding-top: 10px;\n}\n\n.right-card {\n    width: 80%;\n    position: relative;\n}\n\n.description {\n    margin-right: 20px;\n    position: absolute;\n    bottom: 0;\n}\n\n.inlineText {\n    float: left;\n    padding-left: 10px;\n}\n\n.similiar {\n    height: 100%;\n}\n\n.similar-movie {\n    margin-top: 5px;\n    margin-bottom: 5px;\n}\n\n.similar-summry {\n    padding-left: 10px;\n}\n\n.video-card {\n    width: 90%;\n    margin: auto;\n}\n\n.video-card:hover {\n    cursor: pointer;\n}\n\n.info-card {\n    width: 100%;\n    display: flex;\n}\n\n.play-button {\n    opacity: 0.8;\n    position: absolute;\n    left: 30%;\n    top: 20%; \n    width: 30%;\n}\n\n.video-description {\n    background-color: rgba(0, 0, 0, 0.7);\n    width: 90%;\n}\n\n.video-description p {\n    color: white;\n}\n\n.theater-card {\n    float: left;\n    margin-right: 10px;\n    width: 20%;\n}\n\n.showtime {\n    float: left;\n    width: 80%;\n}\n\n#map {\n    height: 100%;\n}\n\n.collectionBtn {\n    margin-right: 20px;\n}\n\n.collectionBtn:hover {\n    cursor: pointer;\n}", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 78 */
+/*!***********************************!*\
+  !*** ./MovieInfo/movie_info.html ***!
+  \***********************************/
+/***/ function(module, exports) {
+
+	module.exports = "\n<section layout=\"row\" style=\"margin-top: 65px\" flex>\n    <div class=\"info-container\" layout=\"column\">\n        <div class=\"info-card\">\n            <md-card class=\"info-poster\">\n                <img ng-src=\"{{vm.info.poster_path?'https://image.tmdb.org/t/p/w300'+vm.info.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image\" alt=\"Washed Out\">\n            </md-card>\n            <div class=\"right-card\">\n                <div>\n                    <div class=\"top-card\">\n                        <div class=\"collectionBtn\" ng-click=\"vm.addMovieToCollection()\">\n                            <p style=\"float: right\"> Add to my collection </p>\n                            <md-icon style=\"float: right\" md-svg-icon=\"img/icons/collection.svg\"></md-icon>\n                        </div>\n                        <span style=\"clear: both\" class=\"md-headline\">\n                            {{vm.info.tagline}}\n                        </span>\n                        <h5>Rated {{vm.info.vote_average}} by {{vm.info.vote_count}} people</h5>\n                        <h5>Release data: {{vm.info.release_date}}</h5>\n                        <h5>Runtime: {{vm.info.runtime}} minutes</h5>\n                        <h5>Original language: {{vm.info.original_language}}</h5>\n                        <h5 style=\"display: inline;\"><p style=\"float: left; display: inline; padding-top: 15px\">Genre:</p></h5>\n                        <md-chips style=\"float: left\">\n                            <md-chip ng-repeat=\"genre in vm.info.genres\">\n                                {{genre.name}}\n                            </md-chip>\n                        </md-chips>\n                    </div>\n                </div>\n                <div>\n                </div>\n                <md-content class=\"description\" flex layout-padding>\n                    <p style=\"padding-left: 5px\">Storyline: {{vm.info.overview}}</p>\n                </md-content>\n            </div>\n        </div>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab label=\"Videos\">\n                    <div class=\"video-list\">\n                        <div layout='row'>\n                            <div ng-click=\"vm.openPlayer(video.link)\" style=\"position: relative;\" ng-repeat=\"video in vm.info.videos\">\n                                <picture>\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/mqdefault.jpg\"}}' media=\"(min-width:991px)\" />\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/hqdefault.jpg\"}}' media=\"(min-width:767px)\" />\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/sddefault.jpg\"}}' />\n                                    <img class=\"video-card\" srcSet />\n                                </picture>\n                                <img class=\"play-button\" src=\"../img/pic/play.png\" />\n                                <div class=\"video-description\">\n                                    <p>{{video.title | limitTo: 40}}...</p>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab ng-if=\"vm.shouldShowtime\" label=\"Showtime\">\n                    <div class=\"theaters\">\n                        <div style=\"margin-left: 20px\" layout=\"row\">\n                            <md-content>\n                                <h4>Date</h4>\n                                <md-datepicker style=\"float: left\" ng-model=\"vm.date.currentDate\" md-placeholder=\"Enter date\"\n                                               md-min-date=\"vm.date.minDate\" md-max-date=\"vm.date.maxDate\"></md-datepicker>\n                                <md-list ng-if=\"vm.info.theaters.length > 0\" class=\"md-dense\" flex style=\"width: 100%; clear: both; margin-top: 100px\">\n                                    <md-list-item  class=\"md-3-line\" style=\"justify-content: space-between;\" ng-repeat=\"theater in vm.info.theaters\">\n                                        <div class=\"theater-card\">\n                                            <b style=\"display: block\">{{theater.name}}</b>\n                                            <!--<img style=\"float: left\" class=\"md-avatar\" ng-src=\"../img/icons/phone.svg\" />-->\n                                            <!--<div style=\"float: left\" class=\"md-list-item-text\">-->\n                                                <!--<p> {{theater.phoneNumber}} </p>-->\n                                            <!--</div>-->\n                                        </div>\n                                        <div class=\"showtime\" layout=\"row\">\n                                            <table class=\"table\">\n                                                <tbody>\n                                                <tr ng-repeat=\"movie in theater.movie\">\n                                                    <th>{{movie.name}}</th>\n                                                    <td ng-repeat=\"time in movie.showtimes\"><p style=\"display: block\">{{time}}</p> <img ng-if=\"movie.showtime_tickets[time]\" ng-click=\"vm.buyTicket(movie.showtime_tickets[time])\" style=\"width: 50px; height: 20px\" ng-src=\"../img/pic/ticket.png\" /></td>\n                                                </tr>\n                                                </tbody>\n                                            </table>\n                                        </div>\n                                        <md-divider ng-if=\"!$last\"></md-divider>\n                                    </md-list-item>\n                                </md-list>\n                            </md-content>\n                        </div>\n                        <map ng-if=\"vm.info.theaters.length > 0\" location=\"vm.location\" theaters=\"vm.info.theaters\"></map>\n                    </div>\n                </md-tab>\n                <md-tab ng-if=\"vm.info.purchaseChannels\" label=\"Avilable On\">\n                    <channels channels=\"vm.info.purchaseChannels\"></channels>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab label=\"Credit\">\n                    <div class=\"cast\">\n                        <div ng-cloak layout-gt-sm=\"row\" layout=\"column\">\n                            <div flex-gt-sm=\"50\" flex>\n                                <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                                  <div class=\"md-toolbar-tools\">\n                                    <span>Crew</span>\n                                  </div>\n                                </md-toolbar>\n                                <md-content>\n                                    <md-list flex>\n                                        <!-- <md-subheader class=\"md-no-sticky\">Crew</md-subheader> -->\n                                        <md-list-item class=\"md-3-line\" ng-repeat=\"crew in vm.info.credit.crew | limitTo: 10\" ng-click=\"vm.showPerson(crew)\">\n                                          <img ng-src=\"{{crew.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+crew.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                                          <div class=\"md-list-item-text\" layout=\"column\">\n                                            <h4>department: {{crew.department}}</h4>\n                                            <p>name: {{crew.name}}</p>\n                                          </div>\n                                        </md-list-item>\n                                    </md-list>\n                                </md-content>\n                            </div>\n                            <div flex-gt-sm=\"50\" flex>\n                                <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                                  <div class=\"md-toolbar-tools\">\n                                    <span>Cast</span>\n                                  </div>\n                                </md-toolbar>\n                                <md-content>\n                                    <md-list flex>\n                                        <!-- <md-subheader class=\"md-no-sticky\">Cast</md-subheader> -->\n                                        <md-list-item class=\"md-3-line\" ng-repeat=\"cast in vm.info.credit.cast | limitTo: 10\" ng-click=\"vm.showPerson(cast)\">\n                                          <img ng-src=\"{{cast.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+cast.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                                          <div class=\"md-list-item-text\" layout=\"column\">\n                                            <h4>character: {{cast.character}}</h4>\n                                            <p>name: {{cast.name}}</p>\n                                          </div>\n                                        </md-list-item>\n                                    </md-list>\n                                </md-content>\n                            </div>\n                        </div>\n                    </div>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab label=\"Reviews\">\n                    <reviews id=\"vm.info.id\"></reviews>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n    </div>\n    <md-sidenav flex class=\"md-sidenav-right md-whiteframe-4dp similiar\" md-is-locked-open=\"$mdMedia('gt-md')\" md-component-id=\"right\">\n        <h4 style=\"margin-top: 20px; margin-left: 20px\">You may also like</h4>\n        <md-divider ng-if=\"!$last\"></md-divider>\n        <md-list flex>\n            <md-list-item class=\"md-3-line\" ng-repeat=\"movie in vm.info.similar\" ng-click=\"vm.loadSimilar(movie)\">\n                <img ng-src=\"{{movie.poster_path?'https://image.tmdb.org/t/p/w92'+movie.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image similar-movie\" />\n                <div class=\"md-list-item-text similar-summry\" layout=\"column\">\n                    <h5>{{movie.title}}</h5>\n                    <p>Rate: {{movie.vote_average}} by {{movie.vote_count}} people</p>\n                </div>\n                <md-divider ng-if=\"!$last\"></md-divider>\n            </md-list-item>\n        </md-list>\n    </md-sidenav>\n</section>\n"
+
+/***/ },
+/* 79 */
+/*!*******************************!*\
+  !*** ./MovieInfo/person.html ***!
+  \*******************************/
+/***/ function(module, exports) {
+
+	module.exports = "<md-dialog   ng-cloak>\n  <form>\n    <md-toolbar>\n      <div class=\"md-toolbar-tools\">\n        <h2>{{person.name}}</h2>\n        <span flex></span>\n        <md-button class=\"md-icon-button\" ng-click=\"cancel()\">\n          <md-icon md-svg-src=\"img/icons/close.svg\" aria-label=\"Close dialog\"></md-icon>\n        </md-button>\n      </div>\n    </md-toolbar>\n    <md-dialog-content>\n      <div class=\"md-dialog-content\" style=\"width: 800px\">\n        <img style=\"float: left; max-width: 200px;\" alt=\"Lush mango tree\" ng-src=\"{{person.profile_path?'https://image.tmdb.org/t/p/w300_and_h450_bestv2/'+person.profile_path:'../img/pic/avatar.png'}}\">\n        <div style=\"float: left; width: 400px; margin-left: 20px\">\n        <label>Birthday</label>\n          <p>\n            {{person.birthday}}\n          </p>\n        <label>Place of birth</label>\n          <p>\n            {{person.place_of_birth}}\n          </p>\n        <label>Biography</label>\n          <p>\n            {{person.biography}}\n          </p>\n        </div>\n      </div>\n    </md-dialog-content>\n    <md-dialog-actions layout=\"row\">\n      <md-button ng-href=\"{{'http://www.imdb.com/name/'+person.imdb_id}}\" target=\"_blank\" md-autofocus>\n        IMDB profile\n      </md-button>\n      <span flex></span>\n    </md-dialog-actions>\n  </form>\n</md-dialog>"
+
+/***/ },
+/* 80 */
+/*!******************************!*\
+  !*** ./map/map_directive.js ***!
+  \******************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var _ = __webpack_require__(/*! underscore */ 73);
+	var GoogleMapsLoader = __webpack_require__(/*! google-maps */ 81);
+	
+	GoogleMapsLoader.KEY = 'AIzaSyDOjFm5V6Ar1QeNIDa0_d_jjfDQ2KGR2Ts';
+	
+	exports.default = function (ngModule) {
+	    ngModule.directive("map", function () {
+	        __webpack_require__(/*! ./map.css */ 82);
+	        return {
+	            restrict: "E",
+	            scope: {
+	                location: '=',
+	                theaters: '='
+	            },
+	            template: __webpack_require__(/*! ./map.html */ 84),
+	            controllerAs: "vm",
+	            controller: function controller($scope, $rootScope) {
+	
+	                var vm = this;
+	                var map;
+	                var geocoder;
+	                var bounds;
+	
+	                GoogleMapsLoader.load(function (google) {
+	
+	                    var infoWindow = function infoWindow(marker, map, title, address) {
+	                        google.maps.event.addListener(marker, 'click', function () {
+	                            var html = "<div><h3>" + title + "</h3><p>" + address + "</p></div>";
+	                            var iw = new google.maps.InfoWindow({
+	                                content: html,
+	                                maxWidth: 350
+	                            });
+	                            iw.open(map, marker);
+	                        });
+	                    };
+	
+	                    var geocodeAddress = function geocodeAddress(address, title) {
+	                        geocoder.geocode({ 'address': address }, function (results, status) {
+	                            if (status == google.maps.GeocoderStatus.OK) {
+	                                var marker = new google.maps.Marker({
+	                                    icon: './img/pic/blueMark.png',
+	                                    map: map,
+	                                    animation: google.maps.Animation.DROP,
+	                                    position: results[0].geometry.location,
+	                                    title: title,
+	                                    address: address
+	                                });
+	                                infoWindow(marker, map, title, address);
+	                                bounds.extend(marker.getPosition());
+	                                map.fitBounds(bounds);
+	                            } else {
+	                                alert("geocode of " + address + " failed:" + status);
+	                            }
+	                        });
+	                    };
+	
+	                    bounds = new google.maps.LatLngBounds();
+	                    map = new google.maps.Map(document.getElementById('map'), {
+	                        zoom: 8,
+	                        center: { lat: $scope.location.lati, lng: $scope.location.longi },
+	                        mapTypeId: google.maps.MapTypeId.ROADMAP,
+	                        scrollwheel: false
+	                    });
+	                    var marker = new google.maps.Marker({
+	                        position: { lat: $scope.location.lati, lng: $scope.location.longi },
+	                        map: map,
+	                        title: 'Your current location'
+	                    });
+	                    google.maps.event.addListener(map, 'click', function (event) {
+	                        this.setOptions({ scrollwheel: true });
+	                    });
+	                    geocoder = new google.maps.Geocoder();
+	
+	                    //loop through theater address
+	                    _.each($scope.theaters, function (theater) {
+	                        geocodeAddress(theater.address, theater.name);
+	                    });
+	                });
+	
+	                //initialize map
+	                //vm.initMap();
+	            }
+	        };
+	    });
+	};
+
+/***/ },
+/* 81 */
 /*!**************************************!*\
   !*** ../~/google-maps/lib/Google.js ***!
   \**************************************/
@@ -76901,7 +77781,7 @@
 
 
 /***/ },
-/* 74 */
+/* 82 */
 /*!*********************!*\
   !*** ./map/map.css ***!
   \*********************/
@@ -76910,7 +77790,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./map.css */ 75);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./map.css */ 83);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
@@ -76930,7 +77810,7 @@
 	}
 
 /***/ },
-/* 75 */
+/* 83 */
 /*!*************************************!*\
   !*** ../~/css-loader!./map/map.css ***!
   \*************************************/
@@ -76947,7 +77827,7 @@
 
 
 /***/ },
-/* 76 */
+/* 84 */
 /*!**********************!*\
   !*** ./map/map.html ***!
   \**********************/
@@ -76956,7 +77836,7 @@
 	module.exports = "<div id=\"map\"></div>"
 
 /***/ },
-/* 77 */
+/* 85 */
 /*!***********************************************!*\
   !*** ./PurchaseChannels/purchase_channels.js ***!
   \***********************************************/
@@ -76970,13 +77850,13 @@
 	
 	exports.default = function (ngModule) {
 	    ngModule.directive("channels", function () {
-	        __webpack_require__(/*! ./purchase.css */ 78);
+	        __webpack_require__(/*! ./purchase.css */ 86);
 	        return {
 	            restrict: "E",
 	            scope: {
 	                channels: "="
 	            },
-	            template: __webpack_require__(/*! ./purchase.html */ 80),
+	            template: __webpack_require__(/*! ./purchase.html */ 88),
 	            controllerAs: "vm",
 	            controller: function controller($scope, $rootScope) {
 	                var vm = this;
@@ -76991,7 +77871,7 @@
 	};
 
 /***/ },
-/* 78 */
+/* 86 */
 /*!***************************************!*\
   !*** ./PurchaseChannels/purchase.css ***!
   \***************************************/
@@ -77000,7 +77880,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./purchase.css */ 79);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./purchase.css */ 87);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
@@ -77020,7 +77900,7 @@
 	}
 
 /***/ },
-/* 79 */
+/* 87 */
 /*!*******************************************************!*\
   !*** ../~/css-loader!./PurchaseChannels/purchase.css ***!
   \*******************************************************/
@@ -77037,7 +77917,7 @@
 
 
 /***/ },
-/* 80 */
+/* 88 */
 /*!****************************************!*\
   !*** ./PurchaseChannels/purchase.html ***!
   \****************************************/
@@ -77046,7 +77926,7 @@
 	module.exports = "<div>\n    <md-list ng-if=\"vm.channels.length > 0\" class=\"md-dense\" flex style=\"width: 100%; clear: both; margin-top: 10px\">\n        <md-list-item  class=\"md-3-line\" style=\"justify-content: space-between;\" ng-repeat=\"channel in vm.channels\" ng-click=\"vm.redirect(channel.link)\">\n            <div class=\"channel-card\">\n                <img class=\"md-avatar\" ng-src=\"{{'img/channels/'+channel.source+'.png'}}\" />\n                <p style=\"font-size: 10px\">{{channel.display_name}}</p>\n            </div>\n            <div class=\"purchase-info\" layout=\"row\">\n                <table>\n                    <tbody>\n                    <tr>\n                        <td ng-repeat=\"info in channel.formats\"><p style=\"display: block\">{{info.price}}$</p><p>{{info.type}} {{info.format}}</p></td>\n                    </tr>\n                    </tbody>\n                </table>\n            </div>\n            <md-divider ng-if=\"!$last\"></md-divider>\n        </md-list-item>\n    </md-list>\n</div>"
 
 /***/ },
-/* 81 */
+/* 89 */
 /*!************************************!*\
   !*** ./signin/signin_directive.js ***!
   \************************************/
@@ -77060,12 +77940,12 @@
 	
 	exports.default = function (ngModule) {
 	    ngModule.directive("signin", function () {
-	        __webpack_require__(/*! ./signin.css */ 82);
-	        var crud = __webpack_require__(/*! ../service/crud */ 48);
+	        __webpack_require__(/*! ./signin.css */ 90);
+	        var crud = __webpack_require__(/*! ../service/crud */ 50);
 	        return {
 	            restrict: "E",
 	            scope: true,
-	            template: __webpack_require__(/*! ./signin.html */ 84),
+	            template: __webpack_require__(/*! ./signin.html */ 92),
 	            controllerAs: "vm",
 	            controller: function controller($scope, $rootScope, $location) {
 	                var vm = this;
@@ -77079,7 +77959,7 @@
 	};
 
 /***/ },
-/* 82 */
+/* 90 */
 /*!***************************!*\
   !*** ./signin/signin.css ***!
   \***************************/
@@ -77088,7 +77968,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./signin.css */ 83);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./signin.css */ 91);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
@@ -77108,7 +77988,7 @@
 	}
 
 /***/ },
-/* 83 */
+/* 91 */
 /*!*******************************************!*\
   !*** ../~/css-loader!./signin/signin.css ***!
   \*******************************************/
@@ -77125,7 +78005,7 @@
 
 
 /***/ },
-/* 84 */
+/* 92 */
 /*!****************************!*\
   !*** ./signin/signin.html ***!
   \****************************/
@@ -77134,7 +78014,7 @@
 	module.exports = "<div style=\"margin-top: 60px\">\n    <div class=\"signinHeader\">\n        <h2 class=\"signin-h3\">Sign in</h2>\n    </div>\n    <div>\n        <div class=\"fblogin\">\n            <button id=\"facebook\" ng-click=\"fbsignin()\">Sign in with Facebook</button>\n        </div>\n        <div style=\"width: 30%; margin: auto\">\n            <md-divider></md-divider>\n            <form name=\"userForm\">\n                <div class=\"logingrouop\">\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Email</label>\n                        <input name=\"email\" ng-model=\"user.email\"\n                               required />\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Password</label>\n                        <input type=\"password\" required name=\"password\" ng-model=\"user.password\" />\n                        <div style=\"color: #dd2c00\" ng-show=\"emailSigninError\">\n                            {{signinErrorMessage}}\n                        </div>\n                    </md-input-container>\n                    <style>\n                        /*\n                         * The Material demos system does not currently allow targeting the body element, so this\n                         * must go here in the HTML.\n                         */\n                        body[dir=rtl] .hint {\n                            right: 2px;\n                            left: auto;\n                        }\n                    </style>\n                    <md-button ng-disabled=\"userForm.$invalid\" class=\"md-raised md-primary\" style=\"width: 100%\" ng-click=\"emailsignin(user.email, user.password)\">login</md-button>\n                    <a style=\"margin-left: 15px\" ng-click=\"vm.registerpage()\">Register</a>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>"
 
 /***/ },
-/* 85 */
+/* 93 */
 /*!****************************************!*\
   !*** ./register/register_directive.js ***!
   \****************************************/
@@ -77148,12 +78028,12 @@
 	
 	exports.default = function (ngModule) {
 	    ngModule.directive("register", function () {
-	        __webpack_require__(/*! ./register.css */ 86);
-	        var crud = __webpack_require__(/*! ../service/crud */ 48);
+	        __webpack_require__(/*! ./register.css */ 94);
+	        var crud = __webpack_require__(/*! ../service/crud */ 50);
 	        return {
 	            restrict: "E",
 	            scope: true,
-	            template: __webpack_require__(/*! ./register.html */ 88),
+	            template: __webpack_require__(/*! ./register.html */ 96),
 	            controllerAs: "vm",
 	            controller: function controller($scope, $rootScope, $location) {
 	                var vm = this;
@@ -77163,7 +78043,7 @@
 	};
 
 /***/ },
-/* 86 */
+/* 94 */
 /*!*******************************!*\
   !*** ./register/register.css ***!
   \*******************************/
@@ -77172,7 +78052,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./register.css */ 87);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./register.css */ 95);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
@@ -77192,7 +78072,7 @@
 	}
 
 /***/ },
-/* 87 */
+/* 95 */
 /*!***********************************************!*\
   !*** ../~/css-loader!./register/register.css ***!
   \***********************************************/
@@ -77209,7 +78089,7 @@
 
 
 /***/ },
-/* 88 */
+/* 96 */
 /*!********************************!*\
   !*** ./register/register.html ***!
   \********************************/
@@ -77218,7 +78098,7 @@
 	module.exports = "<div style=\"margin-top: 60px\">\n    <div class=\"registerHeader\">\n        <h2 class=\"register-h3\">Register</h2>\n    </div>\n    <div>\n        <div style=\"width: 30%; margin: auto\">\n            <form name=\"userForm\">\n                <div class=\"registergrouop\">\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Email</label>\n                        <input name=\"email\" ng-model=\"user.email\"\n                               required ng-pattern=\"/^.+@.+\\..+$/\" />\n                        <div style=\"color: #dd2c00\" ng-show=\"userForm.email.$invalid && userForm.email.$dirty\">\n                            Please input a valid email address\n                        </div>\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Password</label>\n                        <input type=\"password\" name=\"password\" ng-pattern=\"/^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/\" required ng-model=\"user.password\" />\n                        <div class=\"hint\" >Password should contain at least one digit, one lower case character, one upper case character, and at least 8 from above mentioned characters</div>\n                        <div style=\"color: #dd2c00\" ng-show=\"userForm.password.$invalid && userForm.password.$dirty\">Your password doesn't match the criteria</div>\n                    </md-input-container>\n                    <md-input-container class=\"md-block\" flex-gt-sm>\n                        <label>Retype Password</label>\n                        <input type=\"password\" name=\"repassword\" required ng-model=\"user.repassword\" />\n                        <div ng-show=\"userForm.repassword.$dirty && user.password != user.repassword\" style=\"color: #dd2c00\">Password doesn't match.</div>\n                    </md-input-container>\n                    <style>\n                        /*\n                         * The Material demos system does not currently allow targeting the body element, so this\n                         * must go here in the HTML.\n                         */\n                        body[dir=rtl] .hint {\n                            right: 2px;\n                            left: auto;\n                        }\n                    </style>\n                    <md-button ng-disabled=\"!userForm.$valid || user.password!=user.repassword\" class=\"md-raised md-primary\" style=\"width: 100%\" ng-click=\"emailregister(user.email, user.password)\">register</md-button>\n                    <div ng-if=\"registerErrorMessage\" style=\"color: #dd2c00\">{{registerErrorMessage}}</div>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>"
 
 /***/ },
-/* 89 */
+/* 97 */
 /*!************************************!*\
   !*** ./search/search_directive.js ***!
   \************************************/
@@ -77232,12 +78112,12 @@
 	
 	exports.default = function (ngModule) {
 	    ngModule.directive("search", function () {
-	        __webpack_require__(/*! ./search.css */ 90);
-	        var crud = __webpack_require__(/*! ../service/crud */ 48);
+	        __webpack_require__(/*! ./search.css */ 98);
+	        var crud = __webpack_require__(/*! ../service/crud */ 50);
 	        return {
 	            restrict: "E",
 	            scope: true,
-	            template: __webpack_require__(/*! ./search.html */ 92),
+	            template: __webpack_require__(/*! ./search.html */ 100),
 	            controllerAs: "vm",
 	            controller: function controller($scope, $rootScope, $location) {
 	                var vm = this;
@@ -77247,7 +78127,7 @@
 	};
 
 /***/ },
-/* 90 */
+/* 98 */
 /*!***************************!*\
   !*** ./search/search.css ***!
   \***************************/
@@ -77256,7 +78136,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./search.css */ 91);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./search.css */ 99);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
@@ -77276,7 +78156,7 @@
 	}
 
 /***/ },
-/* 91 */
+/* 99 */
 /*!*******************************************!*\
   !*** ../~/css-loader!./search/search.css ***!
   \*******************************************/
@@ -77293,7 +78173,7 @@
 
 
 /***/ },
-/* 92 */
+/* 100 */
 /*!****************************!*\
   !*** ./search/search.html ***!
   \****************************/
@@ -77302,7 +78182,7 @@
 	module.exports = "<div>\n    <md-content layout-padding style=\"height: 100vh\">\n        <h4 style=\"color: #9e9e9e\">Search results</h4>\n        <movies ng-if=\"searchKeyword\" category=\"search\" index='1' keyword=\"searchKeyword\"></movies>\n    </md-content>\n</div>"
 
 /***/ },
-/* 93 */
+/* 101 */
 /*!************************************************!*\
   !*** ./mycollection/mycollection_directive.js ***!
   \************************************************/
@@ -77316,12 +78196,12 @@
 	
 	exports.default = function (ngModule, firebase, database) {
 	    ngModule.directive("mycollection", function () {
-	        __webpack_require__(/*! ./mycollection.css */ 94);
-	        var crud = __webpack_require__(/*! ../service/crud */ 48);
+	        __webpack_require__(/*! ./mycollection.css */ 102);
+	        var crud = __webpack_require__(/*! ../service/crud */ 50);
 	        return {
 	            restrict: "E",
 	            scope: true,
-	            template: __webpack_require__(/*! ./mycollection.html */ 96),
+	            template: __webpack_require__(/*! ./mycollection.html */ 104),
 	            controllerAs: "vm",
 	            controller: function controller($scope, $rootScope, $location, $mdDialog) {
 	                var vm = this;
@@ -77357,7 +78237,7 @@
 	};
 
 /***/ },
-/* 94 */
+/* 102 */
 /*!***************************************!*\
   !*** ./mycollection/mycollection.css ***!
   \***************************************/
@@ -77366,7 +78246,7 @@
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./mycollection.css */ 95);
+	var content = __webpack_require__(/*! !./../../~/css-loader!./mycollection.css */ 103);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
@@ -77386,7 +78266,7 @@
 	}
 
 /***/ },
-/* 95 */
+/* 103 */
 /*!*******************************************************!*\
   !*** ../~/css-loader!./mycollection/mycollection.css ***!
   \*******************************************************/
@@ -77403,7 +78283,7 @@
 
 
 /***/ },
-/* 96 */
+/* 104 */
 /*!****************************************!*\
   !*** ./mycollection/mycollection.html ***!
   \****************************************/
@@ -77412,7 +78292,116 @@
 	module.exports = "<md-content flex layout-padding style=\"margin-top: 65px;height: 100vh;\">\n    <div class=\"centerDiv\" ng-if=\"vm.noContent\">\n        <h3 style=\"color: #9e9e9e\">Seems like you haven't build your collection yet</h3>\n    </div>\n    <div ng-if=\"!vm.noContent\">\n        <div ng-repeat=\"(key, value) in vm.collection\" class=\"list-item\">\n            <img class=\"poster-img\" ng-click=\"vm.forwardInfo(value)\" ng-src=\"{{value.poster_path?'https://image.tmdb.org/t/p/w300'+value.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image\" alt=\"Washed Out\">\n            <div class=\"poster-info\" ng-click=\"vm.forwardInfo(value)\">\n                <h4>{{value.title}}</h4>\n                <h5>Rated {{value.vote_average}} by {{value.vote_count}} people</h5>\n                <h5>Release data: {{value.release_date}}</h5>\n                <h5>Description: {{value.overview | limitTo:300}}</h5>\n            </div>\n            <md-icon ng-click=\"vm.removeItem(key)\" class=\"clear-btn\" md-svg-icon=\"img/icons/clear.svg\"></md-icon>\n        </div>\n    </div>\n</md-content>"
 
 /***/ },
-/* 97 */
+/* 105 */
+/*!**************************************!*\
+  !*** ./reviews/reviews_directive.js ***!
+  \**************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var _ = __webpack_require__(/*! underscore */ 73);
+	var crud = __webpack_require__(/*! ../service/crud */ 50);
+	var util = __webpack_require__(/*! ../util/util */ 74);
+	var key = __webpack_require__(/*! ../util/properties */ 75).key;
+	
+	exports.default = function (ngModule) {
+	    ngModule.directive("reviews", function () {
+	        __webpack_require__(/*! ./reviews.css */ 106);
+	        return {
+	            restrict: "E",
+	            scope: {
+	                id: "="
+	            },
+	            template: __webpack_require__(/*! ./reviews.html */ 108),
+	            controllerAs: "vm",
+	            controller: function controller($scope, $rootScope) {
+	                var vm = this;
+	
+	                vm.id = $scope.id;
+	                vm.reviews = [];
+	                vm.getReviews = function () {
+	                    crud.GET('/movie/review/' + vm.id, {}).then(function (response) {
+	                        vm.reviews = response.data.results;
+	                        $scope.$digest();
+	                        console.log(vm.reviews);
+	                    }).catch(function (err) {
+	                        console.error(err.data);
+	                    });
+	                };
+	
+	                vm.getReviews();
+	
+	                $scope.$watch('id', function (newValue, oldValue) {
+	                    vm.reviews = [];
+	                    vm.id = newValue;
+	                    vm.getReviews();
+	                });
+	            }
+	        };
+	    });
+	};
+
+/***/ },
+/* 106 */
+/*!*****************************!*\
+  !*** ./reviews/reviews.css ***!
+  \*****************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !./../../~/css-loader!./reviews.css */ 107);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./reviews.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./reviews.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 107 */
+/*!*********************************************!*\
+  !*** ../~/css-loader!./reviews/reviews.css ***!
+  \*********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".review_text {\n     font-size: 16px;\n     line-height: 16px;\n     height: 32px;\n     overflow: hidden;\n     margin-bottom: 15px;\n}\n.review_text_show {\n     overflow: visible;\n     height: auto;\n}", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 108 */
+/*!******************************!*\
+  !*** ./reviews/reviews.html ***!
+  \******************************/
+/***/ function(module, exports) {
+
+	module.exports = "<div>\n    <md-list ng-if=\"vm.reviews.length > 0\" flex style=\"width: 100%; clear: both; margin-top: 10px\">\n        <md-list-item style=\"justify-content: space-between;\" ng-repeat=\"review in vm.reviews\">\n          <md-card>\n            <md-card-title>\n              <md-card-title-text>\n                <span class=\"md-headline\">by {{review.author}}</span>\n              </md-card-title-text>\n            </md-card-title>\n            <md-card-content class=\"review_text\" ng-class=\"{'review_text_show': review.show}\" ng-bind-html=\"review.content\">\n            </md-card-content>\n            <md-card-actions ng-show=\"review.content.length > 250\" layout=\"row\" layout-align=\"end\">\n              <md-button class=\"md-primary md-hue-1\" ng-click=\"review.show = true\" ng-if=\"!review.show\">Show more</md-button>\n              <md-button class=\"md-primary md-hue-1\" ng-click=\"review.show = !review.show\" ng-if=\"review.show\">Show less</md-button>\n            </md-card-actions>\n          </md-card>\n      </md-list-item>\n    </md-list>\n    <div ng-if=\"vm.reviews.length == 0\">\n        <h2 style=\"justify-content: center\">No review avilable</h2>\n    </div>\n</div>"
+
+/***/ },
+/* 109 */
 /*!**************************!*\
   !*** ./router/router.js ***!
   \**************************/
@@ -77452,108 +78441,6 @@
 	        $urlRouterProvider.otherwise('/main/tabs');
 	    });
 	};
-
-/***/ },
-/* 98 */
-/*!**********************!*\
-  !*** ./util/util.js ***!
-  \**********************/
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	var util = {
-	    compareDate: function compareDate(date1, date2) {
-	        Date.prototype.addHours = function (h) {
-	            this.setHours(this.getHours() + h);
-	            return this;
-	        };
-	
-	        // adjust diff for for daylight savings
-	        var hoursToAdjust = Math.abs(date1.getTimezoneOffset() / 60) - Math.abs(date2.getTimezoneOffset() / 60);
-	        // apply the tz offset
-	        date2.addHours(hoursToAdjust);
-	
-	        // The number of milliseconds in one day
-	        var ONE_DAY = 1000 * 60 * 60 * 24;
-	
-	        // Convert both dates to milliseconds
-	        var date1_ms = date1.getTime();
-	        var date2_ms = date2.getTime();
-	
-	        // Calculate the difference in milliseconds
-	        var difference_ms = date1_ms - date2_ms;
-	
-	        // Convert back to days and return
-	        return Math.round(difference_ms / ONE_DAY);
-	    }
-	};
-	
-	module.exports = util;
-
-/***/ },
-/* 99 */
-/*!**********************************!*\
-  !*** ./MovieInfo/movie_info.css ***!
-  \**********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./movie_info.css */ 100);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./movie_info.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./movie_info.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 100 */
-/*!**************************************************!*\
-  !*** ../~/css-loader!./MovieInfo/movie_info.css ***!
-  \**************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 3)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, ".info-container {\n    margin-top: 10px;\n    margin-left: 10px;\n    width: 80%;\n    height: 100%;\n    display: flex;\n}\n\n.video-list {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.cast {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.theaters {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.avilableon {\n    float: left;\n    width: 100%;\n    margin-top: 10px;\n}\n\n.info-poster {\n    width: 20%;\n    float: left;\n}\n\n.top-card {\n    margin-left: 20px;\n    padding-top: 10px;\n}\n\n.right-card {\n    width: 80%;\n    position: relative;\n}\n\n.description {\n    margin-right: 20px;\n    position: absolute;\n    bottom: 0;\n}\n\n.inlineText {\n    float: left;\n    padding-left: 10px;\n}\n\n.similiar {\n    height: 100%;\n}\n\n.similar-movie {\n    margin-top: 5px;\n    margin-bottom: 5px;\n}\n\n.similar-summry {\n    padding-left: 10px;\n}\n\n.video-card {\n    width: 90%;\n    margin: auto;\n}\n\n.video-card:hover {\n    cursor: pointer;\n}\n\n.info-card {\n    width: 100%;\n    display: flex;\n}\n\n.play-button {\n    opacity: 0.8;\n    position: absolute;\n    left: 30%;\n    top: 20%; \n    width: 30%;\n}\n\n.video-description {\n    background-color: rgba(0, 0, 0, 0.7);\n    width: 90%;\n}\n\n.video-description p {\n    color: white;\n}\n\n.theater-card {\n    float: left;\n    margin-right: 10px;\n    width: 20%;\n}\n\n.showtime {\n    float: left;\n    width: 80%;\n}\n\n#map {\n    height: 100%;\n}\n\n.collectionBtn {\n    margin-right: 20px;\n}\n\n.collectionBtn:hover {\n    cursor: pointer;\n}", ""]);
-	
-	// exports
-
-
-/***/ },
-/* 101 */
-/*!***********************************!*\
-  !*** ./MovieInfo/movie_info.html ***!
-  \***********************************/
-/***/ function(module, exports) {
-
-	module.exports = "\n<section layout=\"row\" style=\"margin-top: 65px\" flex>\n    <div class=\"info-container\" layout=\"column\">\n        <div class=\"info-card\">\n            <md-card class=\"info-poster\">\n                <img ng-src=\"{{vm.info.poster_path?'https://image.tmdb.org/t/p/w300'+vm.info.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image\" alt=\"Washed Out\">\n            </md-card>\n            <div class=\"right-card\">\n                <div>\n                    <div class=\"top-card\">\n                        <div class=\"collectionBtn\" ng-click=\"vm.addMovieToCollection()\">\n                            <p style=\"float: right\"> Add to my collection </p>\n                            <md-icon style=\"float: right\" md-svg-icon=\"img/icons/collection.svg\"></md-icon>\n                        </div>\n                        <span style=\"clear: both\" class=\"md-headline\">\n                            {{vm.info.tagline}}\n                        </span>\n                        <h5>Rated {{vm.info.vote_average}} by {{vm.info.vote_count}} people</h5>\n                        <h5>Release data: {{vm.info.release_date}}</h5>\n                        <h5>Runtime: {{vm.info.runtime}} minutes</h5>\n                        <h5>Original language: {{vm.info.original_language}}</h5>\n                        <h5 style=\"display: inline;\"><p style=\"float: left; display: inline; padding-top: 15px\">Genre:</p></h5>\n                        <md-chips style=\"float: left\">\n                            <md-chip ng-repeat=\"genre in vm.info.genres\">\n                                {{genre.name}}\n                            </md-chip>\n                        </md-chips>\n                    </div>\n                </div>\n                <div>\n                </div>\n                <md-content class=\"description\" flex layout-padding>\n                    <p style=\"padding-left: 5px\">Storyline: {{vm.info.overview}}</p>\n                </md-content>\n            </div>\n        </div>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab label=\"Videos\">\n                    <div class=\"video-list\">\n                        <div layout='row'>\n                            <div ng-click=\"vm.openPlayer(video.link)\" style=\"position: relative;\" ng-repeat=\"video in vm.info.videos\">\n                                <picture>\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/mqdefault.jpg\"}}' media=\"(min-width:991px)\" />\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/hqdefault.jpg\"}}' media=\"(min-width:767px)\" />\n                                    <source srcSet='{{\"https://i.ytimg.com/vi/\"+video.id+\"/sddefault.jpg\"}}' />\n                                    <img class=\"video-card\" srcSet />\n                                </picture>\n                                <img class=\"play-button\" src=\"../img/pic/play.png\" />\n                                <div class=\"video-description\">\n                                    <p>{{video.title | limitTo: 40}}...</p>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab ng-if=\"vm.shouldShowtime\" label=\"Showtime\">\n                    <div class=\"theaters\">\n                        <div style=\"margin-left: 20px\" layout=\"row\">\n                            <md-content>\n                                <h4>Date</h4>\n                                <md-datepicker style=\"float: left\" ng-model=\"vm.date.currentDate\" md-placeholder=\"Enter date\"\n                                               md-min-date=\"vm.date.minDate\" md-max-date=\"vm.date.maxDate\"></md-datepicker>\n                                <md-list ng-if=\"vm.info.theaters.length > 0\" class=\"md-dense\" flex style=\"width: 100%; clear: both; margin-top: 100px\">\n                                    <md-list-item  class=\"md-3-line\" style=\"justify-content: space-between;\" ng-repeat=\"theater in vm.info.theaters\">\n                                        <div class=\"theater-card\">\n                                            <b style=\"display: block\">{{theater.name}}</b>\n                                            <!--<img style=\"float: left\" class=\"md-avatar\" ng-src=\"../img/icons/phone.svg\" />-->\n                                            <!--<div style=\"float: left\" class=\"md-list-item-text\">-->\n                                                <!--<p> {{theater.phoneNumber}} </p>-->\n                                            <!--</div>-->\n                                        </div>\n                                        <div class=\"showtime\" layout=\"row\">\n                                            <table class=\"table\">\n                                                <tbody>\n                                                <tr ng-repeat=\"movie in theater.movie\">\n                                                    <th>{{movie.name}}</th>\n                                                    <td ng-repeat=\"time in movie.showtimes\"><p style=\"display: block\">{{time}}</p> <img ng-if=\"movie.showtime_tickets[time]\" ng-click=\"vm.buyTicket(movie.showtime_tickets[time])\" style=\"width: 50px; height: 20px\" ng-src=\"../img/pic/ticket.png\" /></td>\n                                                </tr>\n                                                </tbody>\n                                            </table>\n                                        </div>\n                                        <md-divider ng-if=\"!$last\"></md-divider>\n                                    </md-list-item>\n                                </md-list>\n                            </md-content>\n                        </div>\n                        <map ng-if=\"vm.info.theaters.length > 0\" location=\"vm.location\" theaters=\"vm.info.theaters\"></map>\n                    </div>\n                </md-tab>\n                <md-tab ng-if=\"vm.info.purchaseChannels\" label=\"Avilable On\">\n                    <channels channels=\"vm.info.purchaseChannels\"></channels>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n        <md-content>\n            <md-tabs md-dynamic-height md-border-bottom>\n                <md-tab label=\"Credit\">\n                    <div class=\"cast\">\n                        <div ng-cloak layout-gt-sm=\"row\" layout=\"column\">\n                            <div flex-gt-sm=\"50\" flex>\n                                <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                                  <div class=\"md-toolbar-tools\">\n                                    <span>Crew</span>\n                                  </div>\n                                </md-toolbar>\n                                <md-content>\n                                    <md-list flex>\n                                        <!-- <md-subheader class=\"md-no-sticky\">Crew</md-subheader> -->\n                                        <md-list-item class=\"md-3-line\" ng-repeat=\"crew in vm.info.credit.crew | limitTo: 10\" ng-click=\"vm.showPerson(crew)\">\n                                          <img ng-src=\"{{crew.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+crew.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                                          <div class=\"md-list-item-text\" layout=\"column\">\n                                            <h4>department: {{crew.department}}</h4>\n                                            <p>name: {{crew.name}}</p>\n                                          </div>\n                                        </md-list-item>\n                                    </md-list>\n                                </md-content>\n                            </div>\n                            <div flex-gt-sm=\"50\" flex>\n                                <md-toolbar layout=\"row\" class=\"md-hue-3\">\n                                  <div class=\"md-toolbar-tools\">\n                                    <span>Cast</span>\n                                  </div>\n                                </md-toolbar>\n                                <md-content>\n                                    <md-list flex>\n                                        <!-- <md-subheader class=\"md-no-sticky\">Cast</md-subheader> -->\n                                        <md-list-item class=\"md-3-line\" ng-repeat=\"cast in vm.info.credit.cast | limitTo: 10\" ng-click=\"vm.showPerson(cast)\">\n                                          <img ng-src=\"{{cast.profile_path?'https://image.tmdb.org/t/p/w132_and_h132_bestv2/'+cast.profile_path:'../img/pic/avatar.png'}}\" class=\"md-avatar\" />\n                                          <div class=\"md-list-item-text\" layout=\"column\">\n                                            <h4>character: {{cast.character}}</h4>\n                                            <p>name: {{cast.name}}</p>\n                                          </div>\n                                        </md-list-item>\n                                    </md-list>\n                                </md-content>\n                            </div>\n                        </div>\n                    </div>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n    </div>\n    <md-sidenav flex class=\"md-sidenav-right md-whiteframe-4dp similiar\" md-is-locked-open=\"$mdMedia('gt-md')\" md-component-id=\"right\">\n        <h4 style=\"margin-top: 20px; margin-left: 20px\">You may also like</h4>\n        <md-divider ng-if=\"!$last\"></md-divider>\n        <md-list flex>\n            <md-list-item class=\"md-3-line\" ng-repeat=\"movie in vm.info.similar\" ng-click=\"vm.loadSimilar(movie)\">\n                <img ng-src=\"{{movie.poster_path?'https://image.tmdb.org/t/p/w92'+movie.poster_path:'img/pic/NoImage.jpg'}}\" class=\"md-card-image similar-movie\" />\n                <div class=\"md-list-item-text similar-summry\" layout=\"column\">\n                    <h5>{{movie.title}}</h5>\n                    <p>Rate: {{movie.vote_average}} by {{movie.vote_count}} people</p>\n                </div>\n                <md-divider ng-if=\"!$last\"></md-divider>\n            </md-list-item>\n        </md-list>\n    </md-sidenav>\n</section>\n"
-
-/***/ },
-/* 102 */
-/*!*******************************!*\
-  !*** ./MovieInfo/person.html ***!
-  \*******************************/
-/***/ function(module, exports) {
-
-	module.exports = "<md-dialog   ng-cloak>\n  <form>\n    <md-toolbar>\n      <div class=\"md-toolbar-tools\">\n        <h2>{{person.name}}</h2>\n        <span flex></span>\n        <md-button class=\"md-icon-button\" ng-click=\"cancel()\">\n          <md-icon md-svg-src=\"img/icons/close.svg\" aria-label=\"Close dialog\"></md-icon>\n        </md-button>\n      </div>\n    </md-toolbar>\n    <md-dialog-content>\n      <div class=\"md-dialog-content\" style=\"width: 800px\">\n        <img style=\"float: left; max-width: 200px;\" alt=\"Lush mango tree\" ng-src=\"{{person.profile_path?'https://image.tmdb.org/t/p/w300_and_h450_bestv2/'+person.profile_path:'../img/pic/avatar.png'}}\">\n        <div style=\"float: left; width: 400px; margin-left: 20px\">\n        <label>Birthday</label>\n          <p>\n            {{person.birthday}}\n          </p>\n        <label>Place of birth</label>\n          <p>\n            {{person.place_of_birth}}\n          </p>\n        <label>Biography</label>\n          <p>\n            {{person.biography}}\n          </p>\n        </div>\n      </div>\n    </md-dialog-content>\n    <md-dialog-actions layout=\"row\">\n      <md-button ng-href=\"{{'http://www.imdb.com/name/'+person.imdb_id}}\" target=\"_blank\" md-autofocus>\n        IMDB profile\n      </md-button>\n      <span flex></span>\n    </md-dialog-actions>\n  </form>\n</md-dialog>"
 
 /***/ }
 /******/ ]);

@@ -1,0 +1,11 @@
+.review_text {
+     font-size: 16px;
+     line-height: 16px;
+     height: 32px;
+     overflow: hidden;
+     margin-bottom: 15px;
+}
+.review_text_show {
+     overflow: visible;
+     height: auto;
+}

@@ -4,6 +4,7 @@
   "description": "",
   "main": "webpack.config.js",
   "dependencies": {
+    "angular-sanitize": "^1.5.8",
     "webpack": "^1.13.1",
     "webpack-dev-server": "^1.14.1"
   },

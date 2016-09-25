@@ -84,11 +84,22 @@ router.get('/person/:id', apicache('1 day'), function(req, res){
     req.apicacheGroup = req.params.id;
     let id = req.params.id;
 
-    console.log(`${theMoviePersonUrl}${id}?api_key=${theMovieToken}`);
     axios({method: 'GET', url: `${theMoviePersonUrl}${id}?api_key=${theMovieToken}`}).then((result) => {
         res.send(result.data);
     }).catch((data) => {
         console.error(data.data.status_message);
+        res.status(400).send('Ooops something went wrong');
+    });
+});
+
+router.get('/review/:id', apicache('1 day'), function(req, res){
+    req.apicacheGroup = req.params.id;
+    let id = req.params.id;
+
+    axios({method: 'GET', url: `${theMovieBaseUrl}${id}/reviews?api_key=${theMovieToken}`}).then((result) => {
+        res.send(result.data);
+    }).catch((err) => {
+        console.error(err);
         res.status(400).send('Ooops something went wrong');
     });
 });

@@ -1,7 +1,7 @@
 const _ = require('underscore');
 const crud = require('../service/crud');
 const util = require('../util/util');
-const key = 'AIzaSyDOjFm5V6Ar1QeNIDa0_d_jjfDQ2KGR2Ts';
+const key = require('../util/properties').key;
 
 export default (ngModule, firebase, database) => {
     ngModule.directive("info", () => {

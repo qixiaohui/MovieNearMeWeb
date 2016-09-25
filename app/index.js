@@ -12,6 +12,8 @@ import angularAnimate from 'angular-animate'
 import angularMaterial from 'angular-material';
 // Router
 import angularUIRouter from 'angular-ui-router';
+//ng sanitize
+import angularSanitize from 'angular-sanitize';
 
 /**
  * initialize firebase
@@ -32,7 +34,7 @@ firebase.initializeApp(config);
 const provider = new firebase.auth.FacebookAuthProvider();
 const database = new firebase.database();
 
-const app = angular.module('app', [angularMaterial, angularAnimate, angularUIRouter]);
+const app = angular.module('app', [angularMaterial, angularAnimate, angularUIRouter, angularSanitize]);
 
 require('./main/main_directive').default(app, firebase, provider, database);
 require('./tabs/tabs_directive').default(app, firebase, database);
@@ -44,6 +46,7 @@ require('./signin/signin_directive').default(app);
 require('./register/register_directive.js').default(app);
 require('./search/search_directive').default(app);
 require('./mycollection/mycollection_directive').default(app, firebase, database);
+require('./reviews/reviews_directive').default(app);
 
 require('./router/router').default(app);
 

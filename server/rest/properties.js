@@ -33,3 +33,7 @@ exports.guideboxApi = guideboxApi;
 const guideboxKey = "rKnB5DbnNDFUHmnmtcxfKzb4zXXo7zDR";
 
 exports.guideboxKey = guideboxKey;
+
+const screenrantNews = 'http://screenrant.com/movie-news/page/';
+
+exports.screenrantNews = screenrantNews;

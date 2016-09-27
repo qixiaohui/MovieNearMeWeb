@@ -9,7 +9,6 @@ const newsScrapper = {
 		if(!page) page=1;
 		let url = `${properties.screenrantNews}${page}/`;
 
-        console.log(url);
         xray(url, {
         	list: xray('.latest-news .thumb-list .thumb-wrap', [{
         		title: '.info-wrapper .title a',
@@ -23,6 +22,23 @@ const newsScrapper = {
             }
             resolve(data);
         });
+	},
+	getContent: (title, resolve, reject) => {
+		if(!title) {
+			reject();
+			return;
+		}
+		let url = `${properties.screenrantNewsContent}${title}`;
+
+		xray(url, {
+			article: ['.article-body p']
+		})((err, data) => {
+			if(err) {
+				reject();
+				return;
+			}
+			resolve(data);
+		});
 	}
 };
 

@@ -23,4 +23,20 @@ router.get('/latest/:page', apicache('1 day'), (req, res) => {
 
 });
 
+router.get('/content/:title', apicache('1 day'), (req, res) =>{
+	req.apicacheGroup = req.params.title;
+	let title = req.params.title;
+
+	let promise = new Promise((resolve, reject) => {
+		newsScrapper.getContent(title, resolve, reject);
+	});
+
+	promise.then((data) => {
+		res.status(200).send(data);
+	}).catch((err) => {
+		console.error(err.message);
+		res.status(400).send('Ooops something went wrong');
+	});
+});
+
 module.exports = router;

@@ -37,3 +37,7 @@ exports.guideboxKey = guideboxKey;
 const screenrantNews = 'http://screenrant.com/movie-news/page/';
 
 exports.screenrantNews = screenrantNews;
+
+const screenrantNewsContent = 'http://screenrant.com/';
+
+exports.screenrantNewsContent = screenrantNewsContent;

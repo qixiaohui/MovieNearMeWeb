@@ -13,7 +13,8 @@ const newsScrapper = {
         	list: xray('.latest-news .thumb-list .thumb-wrap', [{
         		title: '.info-wrapper .title a',
         		img: '.img-wrapper img@src',
-        		content: '.info-wrapper .title a@href'
+        		content: '.info-wrapper .title a@href',
+        		author: '.info-wrapper .author'
         	}])
         })((err, data) => {
             if(err){

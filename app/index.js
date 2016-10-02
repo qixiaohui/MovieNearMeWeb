@@ -47,6 +47,8 @@ require('./register/register_directive.js').default(app);
 require('./search/search_directive').default(app);
 require('./mycollection/mycollection_directive').default(app, firebase, database);
 require('./reviews/reviews_directive').default(app);
+require('./news/news_directive').default(app);
+require('./NewsContent/news_content_directive').default(app);
 
 require('./router/router').default(app);
 

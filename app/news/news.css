@@ -1,0 +1,27 @@
+.news-thumnail {
+    width: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.news-thumnail:hover {
+	cursor: pointer;
+}
+
+.news-row-item {
+    background: #f0f0f0;
+    box-shadow: 8px 8px 5px #c9c9c9;
+    margin: 10px;
+	overflow: hidden;
+}
+
+.news-info {
+	width: 90%;
+	margin: 0 auto;
+}
+
+.paginWrapper{
+    width: 30%;
+    margin: auto;
+}
+

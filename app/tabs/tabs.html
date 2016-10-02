@@ -39,6 +39,11 @@
                         <movies category="upcoming" index='categoryIndex.upComing' addcollection="addCollection"></movies>
                     </md-content>
                 </md-tab>
+                <md-tab ng-click="vm.setTab(4)" label="Latest News">
+                    <md-content class="md-padding">
+                        <latest-news />
+                    </md-contnt>
+                </md-tab>
             </md-tabs>
         </md-content>
     </section>

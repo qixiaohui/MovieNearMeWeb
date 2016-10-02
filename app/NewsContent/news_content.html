@@ -1,0 +1,11 @@
+<div class="col-lg-offset-3 col-lg-6 col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 col-xs-offset-1 col-xs-10 container" style=" margin-top: 90px">
+	<div>
+		<h3>{{vm.news.title}}</h3>
+		<h5 style="color: #a3a3a3">{{vm.news.author}}</h5>
+	</div>
+	<img style="width: 100%; margin: 0 auto;" ng-src="{{vm.news.img}}"  />
+	<div ng-repeat="line in vm.content track by $index" ng-hide="line.includes('function()') || line.includes('Function()')">
+		<h4 style="text-indent: 20px">{{line}}</h4>
+		<br/>
+	</div>
+</div>

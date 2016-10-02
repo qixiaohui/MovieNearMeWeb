@@ -1,0 +1,22 @@
+<div>
+	<div class="row-fluid">
+	    <div ng-repeat="news in vm.news" class="col-sm-6 col-md-6 col-lg-4 col-xs-12">
+	    	<div class="news-row-item">
+		        <img class="news-thumnail" ng-click="vm.newsContent(news)" ng-src="{{news.img}}" alt="Washed Out">
+		        <div class="news-info">
+		            <h4>{{news.title | limitTo: 60}}</h4>
+		            <h5>{{news.author}}</h5>
+		        </div>
+	    	</div>
+	    </div>
+	</div>
+	<nav style="clear: both" class="paginWrapper">
+	    <ul class="pagination">
+	        <li ng-click='vm.getLatestNews(1)'><a >1</a></li>
+	        <li ng-click='vm.getLatestNews(2)'><a >2</a></li>
+	        <li ng-click='vm.getLatestNews(3)'><a >3</a></li>
+	        <li ng-click='vm.getLatestNews(4)'><a >4</a></li>
+	        <li ng-click='vm.getLatestNews(5)'><a >5</a></li>
+	    </ul>
+	</nav>
+</div>

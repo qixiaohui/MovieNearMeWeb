@@ -122,8 +122,10 @@
 	__webpack_require__(/*! ./search/search_directive */ 97).default(app);
 	__webpack_require__(/*! ./mycollection/mycollection_directive */ 101).default(app, firebase, database);
 	__webpack_require__(/*! ./reviews/reviews_directive */ 105).default(app);
+	__webpack_require__(/*! ./news/news_directive */ 109).default(app);
+	__webpack_require__(/*! ./NewsContent/news_content_directive */ 114).default(app);
 	
-	__webpack_require__(/*! ./router/router */ 109).default(app);
+	__webpack_require__(/*! ./router/router */ 113).default(app);
 
 /***/ },
 /* 1 */
@@ -73890,7 +73892,7 @@
   \************************/
 /***/ function(module, exports) {
 
-	module.exports = "<div layout=\"column\" ng-cloak>\n    <section layout=\"row\" flex>\n        <md-sidenav\n            class=\"md-sidenav-left\"\n            md-component-id=\"left\"\n            md-whiteframe=\"4\">\n          <md-toolbar class=\"md-theme-indigo\">\n            <h1 class=\"md-toolbar-tools\">Sidenav Left</h1>\n          </md-toolbar>\n          <md-content layout-padding>\n              <md-list ng-cloak>\n                  <md-list-item ng-click=\"vm.collectionPage()\">\n                      <md-icon md-svg-icon=\"img/icons/collection.svg\"></md-icon>\n                      <p> My collection </p>\n                  </md-list-item>\n                  <md-divider></md-divider>\n              </md-list>\n          </md-content>\n        </md-sidenav>\n        <md-content flex layout-padding style=\"margin-top: 65px;\">\n            <md-tabs md-selected=\"tabIndex\" md-dynamic-height md-border-bottom>\n                <md-tab ng-click=\"vm.setTab(0)\" label=\"Now Playing\">\n                    <md-content class=\"md-padding\">\n                        <movies category=\"now_playing\" index='categoryIndex.nowPlaying' addcollection=\"addCollection\"></movies>\n                    </md-content>\n                </md-tab>\n                <md-tab ng-click=\"vm.setTab(1)\" label=\"Popular\">\n                    <md-content class=\"md-padding\">\n                        <movies category=\"popular\" index='categoryIndex.popular' addcollection=\"addCollection\"></movies>\n                    </md-content>\n                </md-tab>\n                <md-tab ng-click=\"vm.setTab(2)\" label=\"Top Rated\">\n                    <md-content class=\"md-padding\">\n                        <movies category=\"top_rated\" index='categoryIndex.topRate' addcollection=\"addCollection\"></movies>\n                    </md-content>\n                </md-tab>\n                <md-tab ng-click=\"vm.setTab(3)\" label=\"Upcoming\">\n                    <md-content class=\"md-padding\">\n                        <movies category=\"upcoming\" index='categoryIndex.upComing' addcollection=\"addCollection\"></movies>\n                    </md-content>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n    </section>\n</div>"
+	module.exports = "<div layout=\"column\" ng-cloak>\n    <section layout=\"row\" flex>\n        <md-sidenav\n            class=\"md-sidenav-left\"\n            md-component-id=\"left\"\n            md-whiteframe=\"4\">\n          <md-toolbar class=\"md-theme-indigo\">\n            <h1 class=\"md-toolbar-tools\">Sidenav Left</h1>\n          </md-toolbar>\n          <md-content layout-padding>\n              <md-list ng-cloak>\n                  <md-list-item ng-click=\"vm.collectionPage()\">\n                      <md-icon md-svg-icon=\"img/icons/collection.svg\"></md-icon>\n                      <p> My collection </p>\n                  </md-list-item>\n                  <md-divider></md-divider>\n              </md-list>\n          </md-content>\n        </md-sidenav>\n        <md-content flex layout-padding style=\"margin-top: 65px;\">\n            <md-tabs md-selected=\"tabIndex\" md-dynamic-height md-border-bottom>\n                <md-tab ng-click=\"vm.setTab(0)\" label=\"Now Playing\">\n                    <md-content class=\"md-padding\">\n                        <movies category=\"now_playing\" index='categoryIndex.nowPlaying' addcollection=\"addCollection\"></movies>\n                    </md-content>\n                </md-tab>\n                <md-tab ng-click=\"vm.setTab(1)\" label=\"Popular\">\n                    <md-content class=\"md-padding\">\n                        <movies category=\"popular\" index='categoryIndex.popular' addcollection=\"addCollection\"></movies>\n                    </md-content>\n                </md-tab>\n                <md-tab ng-click=\"vm.setTab(2)\" label=\"Top Rated\">\n                    <md-content class=\"md-padding\">\n                        <movies category=\"top_rated\" index='categoryIndex.topRate' addcollection=\"addCollection\"></movies>\n                    </md-content>\n                </md-tab>\n                <md-tab ng-click=\"vm.setTab(3)\" label=\"Upcoming\">\n                    <md-content class=\"md-padding\">\n                        <movies category=\"upcoming\" index='categoryIndex.upComing' addcollection=\"addCollection\"></movies>\n                    </md-content>\n                </md-tab>\n                <md-tab ng-click=\"vm.setTab(4)\" label=\"Latest News\">\n                    <md-content class=\"md-padding\">\n                        <latest-news />\n                    </md-contnt>\n                </md-tab>\n            </md-tabs>\n        </md-content>\n    </section>\n</div>"
 
 /***/ },
 /* 47 */
@@ -78402,6 +78404,108 @@
 
 /***/ },
 /* 109 */
+/*!********************************!*\
+  !*** ./news/news_directive.js ***!
+  \********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	exports.default = function (ngModule) {
+	    ngModule.directive("latestNews", function () {
+	        __webpack_require__(/*! ./news.css */ 110);
+	        var crud = __webpack_require__(/*! ../service/crud */ 50);
+	        return {
+	            restrict: "E",
+	            scope: {},
+	            template: __webpack_require__(/*! ./news.html */ 112),
+	            controllerAs: "vm",
+	            controller: function controller($scope, $rootScope, $location) {
+	                var vm = this;
+	                vm.news = [];
+	                vm.getLatestNews = function (index) {
+	                    var url = '/news/latest/' + index;
+	                    crud.GET(url, {}).then(function (response) {
+	                        vm.news = response.data.list;
+	                        $scope.$digest();
+	                    }).catch(function (err) {
+	                        console.error(err.message);
+	                    });
+	                };
+	
+	                vm.newsContent = function (news) {
+	                    $rootScope.news = news;
+	                    $rootScope.appName = "Latest News";
+	                    $location.path('/main/newscontent');
+	                };
+	
+	                vm.getLatestNews(1);
+	            }
+	        };
+	    });
+	};
+
+/***/ },
+/* 110 */
+/*!***********************!*\
+  !*** ./news/news.css ***!
+  \***********************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !./../../~/css-loader!./news.css */ 111);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./news.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./news.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 111 */
+/*!***************************************!*\
+  !*** ../~/css-loader!./news/news.css ***!
+  \***************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".news-thumnail {\n    width: 100%;\n    margin: 0 auto;\n    overflow: hidden;\n}\n\n.news-thumnail:hover {\n\tcursor: pointer;\n}\n\n.news-row-item {\n    background: #f0f0f0;\n    box-shadow: 8px 8px 5px #c9c9c9;\n    margin: 10px;\n\toverflow: hidden;\n}\n\n.news-info {\n\twidth: 90%;\n\tmargin: 0 auto;\n}\n\n.paginWrapper{\n    width: 30%;\n    margin: auto;\n}\n\n", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 112 */
+/*!************************!*\
+  !*** ./news/news.html ***!
+  \************************/
+/***/ function(module, exports) {
+
+	module.exports = "<div>\n\t<div class=\"row-fluid\">\n\t    <div ng-repeat=\"news in vm.news\" class=\"col-sm-6 col-md-6 col-lg-4 col-xs-12\">\n\t    \t<div class=\"news-row-item\">\n\t\t        <img class=\"news-thumnail\" ng-click=\"vm.newsContent(news)\" ng-src=\"{{news.img}}\" alt=\"Washed Out\">\n\t\t        <div class=\"news-info\">\n\t\t            <h4>{{news.title | limitTo: 60}}</h4>\n\t\t            <h5>{{news.author}}</h5>\n\t\t        </div>\n\t    \t</div>\n\t    </div>\n\t</div>\n\t<nav style=\"clear: both\" class=\"paginWrapper\">\n\t    <ul class=\"pagination\">\n\t        <li ng-click='vm.getLatestNews(1)'><a >1</a></li>\n\t        <li ng-click='vm.getLatestNews(2)'><a >2</a></li>\n\t        <li ng-click='vm.getLatestNews(3)'><a >3</a></li>\n\t        <li ng-click='vm.getLatestNews(4)'><a >4</a></li>\n\t        <li ng-click='vm.getLatestNews(5)'><a >5</a></li>\n\t    </ul>\n\t</nav>\n</div>"
+
+/***/ },
+/* 113 */
 /*!**************************!*\
   !*** ./router/router.js ***!
   \**************************/
@@ -78436,11 +78540,117 @@
 	        }).state('main.mycollection', {
 	            url: '/mycollection',
 	            template: '<mycollection></mycollection>'
+	        }).state('main.newscontent', {
+	            url: '/newscontent',
+	            template: '<latest-news-content></latest-news-content>'
 	        });
 	
 	        $urlRouterProvider.otherwise('/main/tabs');
 	    });
 	};
+
+/***/ },
+/* 114 */
+/*!***********************************************!*\
+  !*** ./NewsContent/news_content_directive.js ***!
+  \***********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	exports.default = function (ngModule) {
+	    ngModule.directive("latestNewsContent", function () {
+	        __webpack_require__(/*! ./news_content.css */ 115);
+	        var crud = __webpack_require__(/*! ../service/crud */ 50);
+	        return {
+	            restrict: "E",
+	            scope: {},
+	            template: __webpack_require__(/*! ./news_content.html */ 117),
+	            controllerAs: "vm",
+	            controller: function controller($scope, $rootScope, $location) {
+	                var vm = this;
+	                vm.content = [];
+	                var url = '';
+	
+	                var getContent = function getContent(url) {
+	                    crud.GET(url, {}).then(function (response) {
+	                        vm.content = response.data.article;
+	                        $scope.$digest();
+	                    }).catch(function (err) {
+	                        console.error(err.message);
+	                    });
+	                };
+	
+	                if ($rootScope.news) {
+	                    vm.news = $rootScope.news;
+	                    var titleList = vm.news.content.substring(0, vm.news.content.length - 1).split("/");
+	                    var title = titleList[titleList.length - 1];
+	                    url = '/news/content/' + title;
+	                    getContent(url);
+	                }
+	            }
+	        };
+	    });
+	};
+
+/***/ },
+/* 115 */
+/*!**************************************!*\
+  !*** ./NewsContent/news_content.css ***!
+  \**************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !./../../~/css-loader!./news_content.css */ 116);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./news_content.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./news_content.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 116 */
+/*!******************************************************!*\
+  !*** ../~/css-loader!./NewsContent/news_content.css ***!
+  \******************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".container {\n\theight: 100vh;\n\tbackground-color: #ffffff;\n}", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 117 */
+/*!***************************************!*\
+  !*** ./NewsContent/news_content.html ***!
+  \***************************************/
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"col-lg-offset-3 col-lg-6 col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 col-xs-offset-1 col-xs-10 container\" style=\" margin-top: 90px\">\n\t<div>\n\t\t<h3>{{vm.news.title}}</h3>\n\t\t<h5 style=\"color: #a3a3a3\">{{vm.news.author}}</h5>\n\t</div>\n\t<img style=\"width: 100%; margin: 0 auto;\" ng-src=\"{{vm.news.img}}\"  />\n\t<div ng-repeat=\"line in vm.content track by $index\" ng-hide=\"line.includes('function()') || line.includes('Function()')\">\n\t\t<h4 style=\"text-indent: 20px\">{{line}}</h4>\n\t\t<br/>\n\t</div>\n</div>"
 
 /***/ }
 /******/ ]);

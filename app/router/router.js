@@ -35,6 +35,11 @@ export default ngModule => {
                 url: '/mycollection',
                 template: '<mycollection></mycollection>'
             }
+        ).state(
+            'main.newscontent', {
+                url: '/newscontent',
+                template: '<latest-news-content></latest-news-content>'
+            }
         );
 
         $urlRouterProvider.otherwise('/main/tabs');

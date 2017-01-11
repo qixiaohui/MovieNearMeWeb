@@ -123,9 +123,9 @@
 	__webpack_require__(/*! ./mycollection/mycollection_directive */ 101).default(app, firebase, database);
 	__webpack_require__(/*! ./reviews/reviews_directive */ 105).default(app);
 	__webpack_require__(/*! ./news/news_directive */ 109).default(app);
-	__webpack_require__(/*! ./NewsContent/news_content_directive */ 114).default(app);
+	__webpack_require__(/*! ./NewsContent/news_content_directive */ 113).default(app);
 	
-	__webpack_require__(/*! ./router/router */ 113).default(app);
+	__webpack_require__(/*! ./router/router */ 117).default(app);
 
 /***/ },
 /* 1 */
@@ -78506,6 +78506,109 @@
 
 /***/ },
 /* 113 */
+/*!***********************************************!*\
+  !*** ./NewsContent/news_content_directive.js ***!
+  \***********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	exports.default = function (ngModule) {
+	    ngModule.directive("latestNewsContent", function () {
+	        __webpack_require__(/*! ./news_content.css */ 114);
+	        var crud = __webpack_require__(/*! ../service/crud */ 50);
+	        return {
+	            restrict: "E",
+	            scope: {},
+	            template: __webpack_require__(/*! ./news_content.html */ 116),
+	            controllerAs: "vm",
+	            controller: function controller($scope, $rootScope, $location) {
+	                var vm = this;
+	                vm.content = [];
+	                var url = '';
+	
+	                var getContent = function getContent(url) {
+	                    crud.GET(url, {}).then(function (response) {
+	                        vm.content = response.data.article;
+	                        $scope.$digest();
+	                    }).catch(function (err) {
+	                        console.error(err.message);
+	                    });
+	                };
+	
+	                if ($rootScope.news) {
+	                    vm.news = $rootScope.news;
+	                    var titleList = vm.news.content.substring(0, vm.news.content.length - 1).split("/");
+	                    var title = titleList[titleList.length - 1];
+	                    url = '/news/content/' + title;
+	                    getContent(url);
+	                }
+	            }
+	        };
+	    });
+	};
+
+/***/ },
+/* 114 */
+/*!**************************************!*\
+  !*** ./NewsContent/news_content.css ***!
+  \**************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !./../../~/css-loader!./news_content.css */ 115);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./news_content.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./news_content.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 115 */
+/*!******************************************************!*\
+  !*** ../~/css-loader!./NewsContent/news_content.css ***!
+  \******************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".container {\n\theight: 100vh;\n\tbackground-color: #ffffff;\n}", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 116 */
+/*!***************************************!*\
+  !*** ./NewsContent/news_content.html ***!
+  \***************************************/
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"col-lg-offset-3 col-lg-6 col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 col-xs-offset-1 col-xs-10 container\" style=\" margin-top: 90px\">\n\t<div>\n\t\t<h3>{{vm.news.title}}</h3>\n\t\t<h5 style=\"color: #a3a3a3\">{{vm.news.author}}</h5>\n\t</div>\n\t<img style=\"width: 100%; margin: 0 auto;\" ng-src=\"{{vm.news.img}}\"  />\n\t<div ng-repeat=\"line in vm.content track by $index\" ng-hide=\"line.includes('function()') || line.includes('Function()')\">\n\t\t<h4 style=\"text-indent: 20px\">{{line}}</h4>\n\t\t<br/>\n\t</div>\n</div>"
+
+/***/ },
+/* 117 */
 /*!**************************!*\
   !*** ./router/router.js ***!
   \**************************/
@@ -78548,109 +78651,6 @@
 	        $urlRouterProvider.otherwise('/main/tabs');
 	    });
 	};
-
-/***/ },
-/* 114 */
-/*!***********************************************!*\
-  !*** ./NewsContent/news_content_directive.js ***!
-  \***********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	exports.default = function (ngModule) {
-	    ngModule.directive("latestNewsContent", function () {
-	        __webpack_require__(/*! ./news_content.css */ 115);
-	        var crud = __webpack_require__(/*! ../service/crud */ 50);
-	        return {
-	            restrict: "E",
-	            scope: {},
-	            template: __webpack_require__(/*! ./news_content.html */ 117),
-	            controllerAs: "vm",
-	            controller: function controller($scope, $rootScope, $location) {
-	                var vm = this;
-	                vm.content = [];
-	                var url = '';
-	
-	                var getContent = function getContent(url) {
-	                    crud.GET(url, {}).then(function (response) {
-	                        vm.content = response.data.article;
-	                        $scope.$digest();
-	                    }).catch(function (err) {
-	                        console.error(err.message);
-	                    });
-	                };
-	
-	                if ($rootScope.news) {
-	                    vm.news = $rootScope.news;
-	                    var titleList = vm.news.content.substring(0, vm.news.content.length - 1).split("/");
-	                    var title = titleList[titleList.length - 1];
-	                    url = '/news/content/' + title;
-	                    getContent(url);
-	                }
-	            }
-	        };
-	    });
-	};
-
-/***/ },
-/* 115 */
-/*!**************************************!*\
-  !*** ./NewsContent/news_content.css ***!
-  \**************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(/*! !./../../~/css-loader!./news_content.css */ 116);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(/*! ./../../~/style-loader/addStyles.js */ 9)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./news_content.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./news_content.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 116 */
-/*!******************************************************!*\
-  !*** ../~/css-loader!./NewsContent/news_content.css ***!
-  \******************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(/*! ./../../~/css-loader/lib/css-base.js */ 3)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, ".container {\n\theight: 100vh;\n\tbackground-color: #ffffff;\n}", ""]);
-	
-	// exports
-
-
-/***/ },
-/* 117 */
-/*!***************************************!*\
-  !*** ./NewsContent/news_content.html ***!
-  \***************************************/
-/***/ function(module, exports) {
-
-	module.exports = "<div class=\"col-lg-offset-3 col-lg-6 col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 col-xs-offset-1 col-xs-10 container\" style=\" margin-top: 90px\">\n\t<div>\n\t\t<h3>{{vm.news.title}}</h3>\n\t\t<h5 style=\"color: #a3a3a3\">{{vm.news.author}}</h5>\n\t</div>\n\t<img style=\"width: 100%; margin: 0 auto;\" ng-src=\"{{vm.news.img}}\"  />\n\t<div ng-repeat=\"line in vm.content track by $index\" ng-hide=\"line.includes('function()') || line.includes('Function()')\">\n\t\t<h4 style=\"text-indent: 20px\">{{line}}</h4>\n\t\t<br/>\n\t</div>\n</div>"
 
 /***/ }
 /******/ ]);

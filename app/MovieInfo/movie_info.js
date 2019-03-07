@@ -11,7 +11,7 @@ export default (ngModule, firebase, database) => {
             scope: true,
             template: require('./movie_info.html'),
             controllerAs: "vm",
-            controller: function ($scope, $rootScope, $mdDialog, $mdMedia) {
+            controller: function ($scope, $rootScope, $mdDialog, $mdMedia, $location) {
                 const vm = this;
 
                 $scope.$watch('vm.date.currentDate', (newValue, oldValue) => {
@@ -140,7 +140,6 @@ export default (ngModule, firebase, database) => {
                 };
 
                 vm.reload = () => {
-
                     vm.info = $rootScope.movieInfo;
                     //this will decide if the show time will show
                     //condition: if release date month is older than 2 month
@@ -258,6 +257,10 @@ export default (ngModule, firebase, database) => {
                     $rootScope.appName = vm.info.title;
                     vm.reload();
                 };
+
+                vm.loadForum = () => {
+                    $location.path('/main/forum');
+                }
 
                 $rootScope.$on('pop', (event) => {
                     vm.reload();

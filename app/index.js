@@ -49,6 +49,7 @@ require('./mycollection/mycollection_directive').default(app, firebase, database
 require('./reviews/reviews_directive').default(app);
 require('./news/news_directive').default(app);
 require('./NewsContent/news_content_directive').default(app);
+require('./forum/forum_directive').default(app, firebase, database);
 
 require('./router/router').default(app);
 

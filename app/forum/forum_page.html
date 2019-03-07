@@ -1,0 +1,38 @@
+<md-content flex layout-padding style="margin-top: 65px;height: 100vh;">
+    <div class="centerDiv" ng-if="vm.noContent && !vm.showDraftForm">
+        <h3 style="color: #9e9e9e">There doesn't seem to be any posts yet, be the fist one to post!</h3>
+    </div>
+  	<md-content class="md-no-momentum" ng-if="vm.showDraftForm">
+  		<md-icon ng-click="vm.cancelPostDraft()" class="clear-btn" md-svg-icon="img/icons/clear.svg"></md-icon>
+  		<br>
+	    <md-input-container class="md-icon-float md-block">
+	      <!-- Use floating label instead of placeholder -->
+	      <label>Name</label>
+	      <md-icon md-svg-src="img/icons/title.svg" class="name"></md-icon>
+	      <input ng-model="vm.draftPost.title" type="text">
+	    </md-input-container>
+        <md-input-container md-no-float class="md-block">
+        	<label>Thoughts</label>
+        	<textarea ng-model="vm.draftPost.content" placeholder="Write down your thoughts" md-maxlength="500" rows="5" md-select-on-focus></textarea>
+	    </md-input-container>
+		<div>
+			<md-button class="md-raised md-primary" type="submit" ng-click="vm.submitPost()">Save</md-button>
+			<md-button class="md-raised md-primary" ng-click="vm.cancelPostDraft()">Cancel</md-button>
+		</div>
+	 </md-content>
+	 <div lex-gt-sm="80">
+		 <md-list  flex>
+		     <md-list-item ng-if="!vm.noContent" class="md-3-line" ng-repeat="post in vm.posts" ng-click="null">
+				<img ng-src="{{post.photoURL}}" class="md-avatar" alt="{{item.who}}" />
+				<div class="md-list-item-text" layout="column">
+					<h3>{{ post.title }}</h3>
+					<h4>By {{ post.displayName || post.email }}</h4>
+					<p>{{ post.content }}</p>
+				</div>
+			</md-list-item>
+		</md-list>
+	</div>
+    <md-button ng-if="!vm.showDraftForm" ng-click="vm.writePost()" class="md-fab md-primary float-forum-button" aria-label="Use Android">
+      <md-icon md-svg-src="img/icons/forum.svg"></md-icon>
+    </md-button>
+</md-content>

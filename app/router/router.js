@@ -40,6 +40,11 @@ export default ngModule => {
                 url: '/newscontent',
                 template: '<latest-news-content></latest-news-content>'
             }
+        ).state(
+            'main.forum', {
+                url: '/forum',
+                template: '<forum-info></forum-info>'
+            }
         );
 
         $urlRouterProvider.otherwise('/main/tabs');

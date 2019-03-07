@@ -122,3 +122,9 @@
 .collectionBtn:hover {
     cursor: pointer;
 }
+
+.float-forum-button {
+    position: fixed;
+    bottom: 5%;
+    right: 22%;
+}

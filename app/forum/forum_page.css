@@ -1,0 +1,13 @@
+.float-forum-button {
+    position: fixed;
+    bottom: 5%;
+    right: 5%;
+}
+
+.clear-btn {
+    margin-top: 10px;
+    margin-right: 10px;
+    position: absolute;
+    top:0;
+    right: 0;
+}

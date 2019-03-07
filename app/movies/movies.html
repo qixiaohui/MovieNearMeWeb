@@ -25,6 +25,9 @@
                     <md-button class="md-icon-button" aria-label="popularity">
                         <md-icon md-svg-icon="img/icons/popularity.svg"></md-icon>
                     </md-button>
+                    <md-button class="md-icon-button" class="md-icon-button" aria-label="popularity">
+                        <md-icon md-svg-icon="img/icons/forum.svg"></md-icon>
+                    </md-button>
                     <p ng-style="{'color': '#'+vm.Math.floor((movie.popularity/100)*16777215).toString(16)}" style="padding-right: 10px; padding-top: 10px">{{movie.popularity | limitTo: 4}}</p>
                 </md-card-actions>
             </md-card>
